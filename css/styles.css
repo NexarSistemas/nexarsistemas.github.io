@@ -154,15 +154,16 @@ footer {
 }
 
 .hero-logo {
-    max-width: 180px;
+    max-width: 100px;   /* tamaño ideal */
     width: 100%;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    opacity: 0.95;      /* opcional: más elegante */
 }
 
 @media (max-width: 600px) {
     .hero-logo {
-        max-width: 130px;
+        max-width: 70px;
     }
 }
 
