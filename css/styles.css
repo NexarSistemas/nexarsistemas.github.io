@@ -115,12 +115,9 @@ body {
 }
 
 .card {
-    background: white;
-    padding: 20px;
-    width: 250px;
-    border-radius: 10px;
-
-    /* SIN animaciones que rompan layout */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
 }
 
 /* =========================
