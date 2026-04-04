@@ -88,3 +88,9 @@ button {
     display: block;
     margin: 0 auto 15px; /* centrado + espacio abajo */
 }
+
+@media (max-width: 600px) {
+    .logo-seccion {
+        width: 90px;
+    }
+}
