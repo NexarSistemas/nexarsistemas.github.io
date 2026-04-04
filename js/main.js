@@ -1,104 +1,27 @@
-// main.js
-
-// ==============================
-// 1. Scroll suave en navegación
-// ==============================
-
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        const targetId = this.getAttribute('href');
-        const target = document.querySelector(targetId);
-
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-
-// ==============================
-// 2. Animación al hacer scroll
-// ==============================
-
-const elements = document.querySelectorAll('.card');
-
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, {
-    threshold: 0.2
-});
-
-elements.forEach(el => observer.observe(el));
-
-
-// ==============================
-// Botón "Solicitar demo" → enviar mail (FIX)
-// ==============================
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    const button = document.getElementById('demoBtn');
-
-    if (!button) {
-        console.error("No se encontró el botón #demoBtn");
-        return;
-    }
-
-    button.addEventListener('click', () => {
-
-        const email = "NexarSistemas@outlook.com.ar";
-        const subject = encodeURIComponent("Solicitud de demo - Nexar Sistemas");
-
-        const body = encodeURIComponent(
-`Hola,
-
-Me gustaría solicitar una demo de los sistemas Nexar.
-
-Estoy interesado en:
-- Nexar Almacén / Nexar Finanzas
-
-Tipo de negocio:
-Cantidad de usuarios:
-Mensaje adicional:
-
-Gracias.`
-        );
-
-        const link = `mailto:${email}?subject=${subject}&body=${body}`;
-
-        window.location.href = link;
-    });
-
-});
-
-
-// ==============================
-// 4. Debug simple (opcional)
-// ==============================
-
-console.log("Nexar Web cargada correctamente");
-
-// ==============================
-// Animación simple (segura)
-// ==============================
-
 document.addEventListener("DOMContentLoaded", () => {
 
+    // BOTÓN MAIL
+    const buttons = document.querySelectorAll("#demoBtn");
+
+    buttons.forEach(btn => {
+        btn.onclick = () => {
+            window.location.href =
+                "mailto:NexarSistemas@outlook.com.ar?subject=Solicitud%20de%20demo";
+        };
+    });
+
+    // ANIMACIÓN SIMPLE
     const cards = document.querySelectorAll(".card");
 
-    cards.forEach((card, index) => {
+    cards.forEach((card, i) => {
+        card.style.opacity = "0";
+        card.style.transform = "translateY(20px)";
+        card.style.transition = "all 0.5s ease";
+
         setTimeout(() => {
             card.style.opacity = "1";
             card.style.transform = "translateY(0)";
-        }, index * 100);
+        }, i * 120);
     });
 
 });
