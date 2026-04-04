@@ -83,14 +83,15 @@ button {
 }
 
 .logo-seccion {
-    width: 60px;        /* tamaño del logo */
+    max-width: 120px;   /* límite real */
+    width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto 15px; /* centrado + espacio abajo */
+    margin: 0 auto 10px;
 }
 
-@media (max-width: 60px) {
+@media (max-width: 600px) {
     .logo-seccion {
-        width: 90px;
+        width: 80px;
     }
 }
