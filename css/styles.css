@@ -21,7 +21,14 @@ a {
 }
 
 .navbar {
-    background: #111;
+    background: #111;   /* 👈 ESTE ES EL FIX CLAVE */
+    color: white;
+
+    padding: 15px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .logo img {
