@@ -93,10 +93,12 @@ button {
 
     text-align: center;
 }
+.card h3 {
+    margin-bottom: 10px;
 }
+
 .card p {
     font-size: 14px;
-    margin-top: 10px;
     color: #555;
 }
 /* CTA */
