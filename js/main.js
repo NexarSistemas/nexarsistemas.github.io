@@ -40,14 +40,42 @@ elements.forEach(el => observer.observe(el));
 
 
 // ==============================
-// 3. Botón "Solicitar demo"
+// Botón "Solicitar demo" → enviar mail
 // ==============================
 
 const button = document.querySelector('button');
 
-button.addEventListener('click', () => {
-    alert("Próximamente: sistema de solicitud de demo 🚀");
-});
+if (button) {
+    button.addEventListener('click', () => {
+
+        const email = "NexarSistemas@outlook.com.ar";
+        const subject = encodeURIComponent("Solicitud de demo - Nexar Sistemas");
+        
+        const body = encodeURIComponent(
+`Hola,
+
+Me gustaría solicitar una demo de los sistemas Nexar.
+
+Estoy interesado en:
+- Nexar Almacén / Nexar Finanzas (especificar)
+
+Tipo de negocio:
+(Tu respuesta)
+
+Cantidad de usuarios estimados:
+(Tu respuesta)
+
+Mensaje adicional:
+(Tu respuesta)
+
+Gracias.`
+        );
+
+        const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+
+        window.location.href = mailtoLink;
+    });
+}
 
 
 // ==============================
