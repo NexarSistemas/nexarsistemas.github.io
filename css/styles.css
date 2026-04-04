@@ -78,16 +78,21 @@ button {
 /* CARDS */
 .features {
     display: flex;
-    gap: 20px;
-    justify-content: center;
     flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
 }
 
 .card {
     background: white;
     padding: 20px;
-    width: 200px;
+    width: 250px;
     border-radius: 10px;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+    text-align: center;
+}
 }
 .card p {
     font-size: 14px;
