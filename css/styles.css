@@ -152,3 +152,16 @@ footer {
         gap: 20px;
     }
 }
+
+.hero-logo {
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .hero-logo {
+        max-width: 130px;
+    }
+}
