@@ -1,15 +1,40 @@
+/* =========================
+   RESET
+========================= */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
 }
-a {
-    text-decoration: none;
-    color: inherit;
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+    background: #111;
+    color: white;
+    padding: 10px 15px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap; /* 🔥 evita que el menú baje */
 }
-/* NAVBAR */
+
+/* LOGO */
+.logo img {
+    height: 40px;
+}
+
+/* NAV LINKS */
+.navbar nav {
+    display: flex;
+    gap: 15px;
+}
+
 .navbar a {
     color: white;
     text-decoration: none;
+    font-size: 14px;
 }
 
 .navbar a:visited {
@@ -17,24 +42,12 @@ a {
 }
 
 .navbar a:hover {
-    text-decoration: underline;
+    opacity: 0.8;
 }
 
-.navbar {
-    background: #111;
-    color: white;
-    padding: 10px 15px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.logo img {
-    height: 40px;
-}
-
-/* HERO */
+/* =========================
+   HERO
+========================= */
 .hero {
     background: linear-gradient(135deg, #111, #333);
     color: white;
@@ -48,36 +61,47 @@ a {
 }
 
 .hero-logo {
-    max-width: 140px;
-    margin-bottom: 20px;
+    max-width: 110px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .hero h1 {
     font-size: 28px;
+    margin: 10px 0;
 }
 
+.hero p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+/* BOTONES */
 .hero-buttons {
     margin-top: 20px;
 }
 
-/* BOTONES */
 button {
     padding: 10px 20px;
     background: #00c853;
     border: none;
     color: white;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .btn-secondary {
     margin-left: 10px;
-    padding: 10px;
+    padding: 10px 20px;
     border: 1px solid white;
     color: white;
     text-decoration: none;
+    border-radius: 5px;
 }
 
-/* SECCIONES */
+/* =========================
+   SECCIONES
+========================= */
 .section {
     padding: 60px 20px;
     text-align: center;
@@ -87,13 +111,15 @@ button {
     background: #eee;
 }
 
-/* LOGOS */
+/* LOGOS DE SECCIÓN */
 .logo-seccion {
     max-width: 100px;
     margin-bottom: 10px;
 }
 
-/* CARDS */
+/* =========================
+   CARDS / FEATURES
+========================= */
 .features {
     display: flex;
     flex-wrap: wrap;
@@ -106,11 +132,16 @@ button {
     padding: 20px;
     width: 250px;
     border-radius: 10px;
+    text-align: center;
 
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
-    text-align: center;
+    /* animación */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
 }
+
 .card h3 {
     margin-bottom: 10px;
 }
@@ -119,7 +150,10 @@ button {
     font-size: 14px;
     color: #555;
 }
-/* CTA */
+
+/* =========================
+   CTA
+========================= */
 .cta {
     background: #111;
     color: white;
@@ -127,18 +161,5 @@ button {
     text-align: center;
 }
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-    .hero-logo {
-        max-width: 110px;
-    }
-
-    .hero h1 {
-        font-size: 22px;
-    }
-
-    .features {
-        flex-direction: column;
-        align-items: center;
-    }
-}
+/* =========================
+   FOOT
