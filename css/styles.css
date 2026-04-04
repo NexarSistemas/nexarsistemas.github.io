@@ -81,3 +81,10 @@ button {
     opacity: 1;
     transform: translateY(0);
 }
+
+.logo-seccion {
+    width: 120px;        /* tamaño del logo */
+    height: auto;
+    display: block;
+    margin: 0 auto 15px; /* centrado + espacio abajo */
+}
