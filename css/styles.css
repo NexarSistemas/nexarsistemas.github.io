@@ -11,6 +11,7 @@ body {
     padding: 15px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .navbar a {
@@ -99,4 +100,10 @@ button {
 .logo-navbar {
     height: 40px;      /* controla el tamaño */
     width: auto;
+}
+
+@media (max-width: 600px) {
+    .logo-navbar {
+        height: 30px;
+    }
 }
