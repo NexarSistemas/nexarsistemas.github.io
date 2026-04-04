@@ -165,3 +165,10 @@ footer {
         max-width: 130px;
     }
 }
+
+.hero {
+    background: linear-gradient(135deg, #111, #444);
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+}
