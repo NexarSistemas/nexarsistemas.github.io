@@ -1,0 +1,71 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+}
+
+.navbar {
+    background: #111;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+}
+
+.hero {
+    background: linear-gradient(135deg, #222, #555);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.section {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.section.alt {
+    background: #eaeaea;
+}
+
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    width: 250px;
+    border-radius: 10px;
+}
+
+.comparison {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.cta {
+    background: #111;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #00c853;
+    color: white;
+    cursor: pointer;
+}
