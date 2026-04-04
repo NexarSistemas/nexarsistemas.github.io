@@ -95,3 +95,8 @@ button {
         width: 80px;
     }
 }
+
+.logo-navbar {
+    height: 40px;      /* controla el tamaño */
+    width: auto;
+}
