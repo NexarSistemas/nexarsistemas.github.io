@@ -1,3 +1,6 @@
+/* =========================
+   RESET BÁSICO
+========================= */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -5,6 +8,9 @@ body {
     color: #333;
 }
 
+/* =========================
+   NAVBAR
+========================= */
 .navbar {
     background: #111;
     color: white;
@@ -15,19 +21,28 @@ body {
     align-items: center;
 }
 
-/* contenedor del logo */
+/* LOGO NAVBAR */
 .logo img {
     height: 40px;
     width: auto;
     display: block;
 }
 
-/* evitar que el nav se rompa */
+/* LINKS NAVBAR */
 .navbar nav {
     display: flex;
     gap: 15px;
 }
 
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* =========================
+   HERO
+========================= */
 .hero {
     background: linear-gradient(135deg, #222, #555);
     color: white;
@@ -35,8 +50,11 @@ body {
     text-align: center;
 }
 
+/* =========================
+   SECCIONES
+========================= */
 .section {
-    padding: 50px 20px;
+    padding: 60px 20px;
     text-align: center;
 }
 
@@ -44,74 +62,15 @@ body {
     background: #eaeaea;
 }
 
-.features {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.card {
-    background: white;
-    padding: 20px;
-    margin: 10px;
-    width: 250px;
-    border-radius: 10px;
-}
-
-.comparison {
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-}
-
-.cta {
-    background: #111;
-    color: white;
-    text-align: center;
-    padding: 40px;
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background: #00c853;
-    color: white;
-    cursor: pointer;
-}
-
-.card {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
-}
-
-/* SOLO se aplica cuando JS está activo */
-.js .card.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
+/* LOGOS DE SECCIÓN */
 .logo-seccion {
-    max-width: 120px;   /* límite real */
+    max-width: 120px;
     width: 100%;
     height: auto;
     display: block;
     margin: 0 auto 10px;
 }
 
-@media (max-width: 600px) {
-    .logo-seccion {
-        width: 80px;
-    }
-}
-
-.logo-navbar {
-    height: 40px;      /* controla el tamaño */
-    width: auto;
-}
-
-@media (max-width: 600px) {
-    .logo-navbar {
-        height: 30px;
-    }
-}
+/* =========================
+   FEATURES / CARDS
+================
