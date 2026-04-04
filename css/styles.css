@@ -20,6 +20,10 @@ a {
     text-decoration: underline;
 }
 
+.navbar {
+    background: #111;
+}
+
 .logo img {
     height: 40px;
 }
