@@ -9,15 +9,23 @@ body {
     background: #111;
     color: white;
     padding: 15px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.navbar a {
-    color: white;
-    margin-left: 15px;
-    text-decoration: none;
+/* contenedor del logo */
+.logo img {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+
+/* evitar que el nav se rompa */
+.navbar nav {
+    display: flex;
+    gap: 15px;
 }
 
 .hero {
