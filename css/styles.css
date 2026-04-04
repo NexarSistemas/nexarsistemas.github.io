@@ -76,7 +76,8 @@ button {
     transition: all 0.5s ease;
 }
 
-.card.visible {
+/* SOLO se aplica cuando JS está activo */
+.js .card.visible {
     opacity: 1;
     transform: translateY(0);
 }
