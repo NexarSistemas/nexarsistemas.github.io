@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // BOTÓN MAIL
+    // BOTÓN MAIL (se mantiene igual)
     const buttons = document.querySelectorAll("#demoBtn");
 
     buttons.forEach(btn => {
@@ -10,18 +10,31 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     });
 
-    // ANIMACIÓN SIMPLE
+    // ANIMACIÓN SCROLL (nueva)
     const cards = document.querySelectorAll(".card");
 
-    cards.forEach((card, i) => {
+    // Estado inicial
+    cards.forEach(card => {
         card.style.opacity = "0";
-        card.style.transform = "translateY(20px)";
-        card.style.transition = "all 0.5s ease";
+        card.style.transform = "translateY(30px)";
+        card.style.transition = "all 0.6s ease";
+    });
 
-        setTimeout(() => {
-            card.style.opacity = "1";
-            card.style.transform = "translateY(0)";
-        }, i * 120);
+    // Observer
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+            }
+        });
+    }, {
+        threshold: 0.2
+    });
+
+    // Observar cada card
+    cards.forEach(card => {
+        observer.observe(card);
     });
 
 });
