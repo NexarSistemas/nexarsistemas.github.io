@@ -37,4 +37,13 @@ document.addEventListener("DOMContentLoaded", () => {
         observer.observe(card);
     });
 
+    // FAQ ACORDEÓN
+    const faqQuestions = document.querySelectorAll(".faq-question");
+    faqQuestions.forEach(q => {
+        q.addEventListener("click", () => {
+            const item = q.parentElement;
+            item.classList.toggle("active");
+        });
+    });
+
 });

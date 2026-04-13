@@ -168,4 +168,49 @@ button {
 }
 
 /* =========================
+   FAQ
+========================= */
+.faq-item {
+    background: white;
+    padding: 0 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.faq-question {
+    padding: 20px 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.faq-question::after {
+    content: '▼';
+    font-size: 12px;
+    transition: transform 0.3s ease;
+    color: #888;
+}
+
+.faq-item.active .faq-question::after {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px;
+    padding-bottom: 20px;
+}
+
+.faq-item h3 {
+    margin-top: 0;
+}
    FOOT
