@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // BOTÓN MAIL (se mantiene igual)
-    const buttons = document.querySelectorAll("#demoBtn");
+    // BOTÓN MAIL
+    const buttons = document.querySelectorAll(".demoBtn");
 
     buttons.forEach(btn => {
         btn.onclick = () => {
