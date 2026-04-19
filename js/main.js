@@ -10,6 +10,72 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     });
 
+    // ================================
+    // FORMULARIO DE CONTACTO - WHATSAPP
+    // ================================
+
+    // Tu número en base64. Para generarlo, abrí la consola del navegador
+    // y ejecutá: btoa("549264XXXXXXXX")
+    // Reemplazá "549264XXXXXXXX" por tu número real (código país + área + número)
+    // Ejemplo Argentina San Juan: btoa("5492644123456")  →  "NTQ5MjY0NDEyMzQ1Ng=="
+    const _wn = atob("NTQ5MjY0XXXXXXXX");  // ← reemplazá esto
+
+    const contactForm = document.getElementById("contactForm");
+    if (contactForm) {
+        contactForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const nombre   = document.getElementById("cf-nombre").value.trim();
+            const email    = document.getElementById("cf-email").value.trim();
+            const telefono = document.getElementById("cf-telefono").value.trim();
+            const producto = document.getElementById("cf-producto").value;
+            const consulta = document.getElementById("cf-consulta").value;
+            const mensaje  = document.getElementById("cf-mensaje").value.trim();
+            const btn      = document.getElementById("cf-submit");
+
+            // Validación básica
+            if (!nombre || !email || !producto || !consulta || !mensaje) {
+                alert("Por favor completá todos los campos obligatorios.");
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Por favor ingresá un correo electrónico válido.");
+                return;
+            }
+
+            // Construir el mensaje para WhatsApp
+            const lineas = [
+                `*📩 Consulta desde Nexar Sistemas*`,
+                ``,
+                `👤 *Nombre:* ${nombre}`,
+                `📧 *Email:* ${email}`,
+                telefono ? `📱 *Teléfono:* ${telefono}` : null,
+                `🖥️ *Producto:* ${producto}`,
+                `📋 *Tipo de consulta:* ${consulta}`,
+                ``,
+                `💬 *Mensaje:*`,
+                mensaje
+            ].filter(l => l !== null).join("\n");
+
+            const url = `https://wa.me/${_wn}?text=${encodeURIComponent(lineas)}`;
+
+            // Feedback visual
+            btn.disabled = true;
+            btn.textContent = "Abriendo WhatsApp...";
+
+            window.open(url, "_blank");
+
+            setTimeout(() => {
+                document.getElementById("cf-success").style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Enviar por WhatsApp ✉️";
+                contactForm.reset();
+            }, 1500);
+        });
+    }
+
     // ANIMACIÓN SCROLL (nueva)
     const cards = document.querySelectorAll(".card");
 

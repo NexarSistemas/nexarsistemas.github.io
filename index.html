@@ -268,12 +268,81 @@
     </div>
 </section>
 
-<section class="cta">
-    <h2>¿Listo para llevar tu negocio al siguiente nivel?</h2>
-    <button class="demoBtn" type="button">Solicitar demo</button>
+<!-- SECCIÓN CONTACTO -->
+<section id="contacto" class="contact-section">
+    <h2>Contactanos 📬</h2>
+    <p class="subtitle">
+        Completá el formulario y te respondemos por WhatsApp a la brevedad.
+    </p>
 
-<footer id="contacto">
-    <p>© 2026 Nexar Sistemas</p>
+    <form class="contact-form" id="contactForm" novalidate>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cf-nombre">Nombre completo <span class="required-mark">*</span></label>
+                <input type="text" id="cf-nombre" placeholder="Tu nombre" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="cf-email">Correo electrónico <span class="required-mark">*</span></label>
+                <input type="email" id="cf-email" placeholder="tu@email.com" autocomplete="email">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cf-telefono">Teléfono <span style="color:#555; font-weight:normal;">(opcional)</span></label>
+                <input type="tel" id="cf-telefono" placeholder="Ej: 264 412-3456" autocomplete="tel">
+            </div>
+            <div class="form-group">
+                <label for="cf-producto">Producto de interés <span class="required-mark">*</span></label>
+                <select id="cf-producto">
+                    <option value="" disabled selected>Seleccioná un producto</option>
+                    <option value="Nexar Almacén 🏪">Nexar Almacén 🏪</option>
+                    <option value="Nexar Tienda 🛍️">Nexar Tienda 🛍️</option>
+                    <option value="Nexar Finanzas 💰">Nexar Finanzas 💰</option>
+                    <option value="Nexar Tetris 🎮">Nexar Tetris 🎮</option>
+                    <option value="Ecosistema completo 🔐">Ecosistema completo 🔐</option>
+                    <option value="Otro / Consulta general">Otro / Consulta general</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="cf-consulta">Tipo de consulta <span class="required-mark">*</span></label>
+            <select id="cf-consulta">
+                <option value="" disabled selected>¿En qué te podemos ayudar?</option>
+                <option value="Solicitar una demo">📺 Solicitar una demo</option>
+                <option value="Información general">ℹ️ Información general</option>
+                <option value="Consulta de precios">💲 Consulta de precios</option>
+                <option value="Soporte técnico">🛠️ Soporte técnico</option>
+                <option value="Propuesta comercial">🤝 Propuesta comercial</option>
+                <option value="Otra consulta">💬 Otra consulta</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cf-mensaje">Mensaje <span class="required-mark">*</span></label>
+            <textarea id="cf-mensaje" placeholder="Describí brevemente tu consulta o necesidad..."></textarea>
+        </div>
+
+        <div>
+            <button type="submit" class="btn-submit" id="cf-submit">
+                Enviar por WhatsApp ✉️
+            </button>
+            <p class="form-notice">
+                * Campos obligatorios. Al enviar, se abrirá WhatsApp con tu mensaje listo para enviar.
+            </p>
+        </div>
+
+        <div class="form-success" id="cf-success">
+            ✅ ¡Listo! Tu WhatsApp se abrió con el mensaje. Te respondemos pronto.
+        </div>
+
+    </form>
+</section>
+
+<footer>
+    <p>© 2026 Nexar Sistemas · Todos los derechos reservados</p>
 </footer>
 
 <script src="./js/main.js"></script>
