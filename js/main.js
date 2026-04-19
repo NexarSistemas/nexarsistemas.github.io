@@ -1,26 +1,58 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // BOTÓN MAIL
+    // ================================
+    // BOTONES "SOLICITAR DEMO"
+    // ================================
     const buttons = document.querySelectorAll(".demoBtn");
-
     buttons.forEach(btn => {
         btn.onclick = () => {
-            window.location.href =
-                "mailto:NexarSistemas@outlook.com.ar?subject=Solicitud%20de%20demo";
+            // Scroll suave al formulario de contacto
+            document.getElementById("contacto").scrollIntoView({ behavior: "smooth" });
         };
+    });
+
+    // ================================
+    // ANIMACIÓN SCROLL EN CARDS
+    // ================================
+    const cards = document.querySelectorAll(".card");
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+            }
+        });
+    }, { threshold: 0.2 });
+
+    cards.forEach(card => {
+        observer.observe(card);
+    });
+
+    // ================================
+    // FAQ ACORDEÓN
+    // ================================
+    const faqQuestions = document.querySelectorAll(".faq-question");
+    faqQuestions.forEach(q => {
+        q.addEventListener("click", () => {
+            const item = q.parentElement;
+            item.classList.toggle("active");
+        });
     });
 
     // ================================
     // FORMULARIO DE CONTACTO - WHATSAPP
     // ================================
 
-    // Tu número en base64. Para generarlo, abrí la consola del navegador
-    // y ejecutá: btoa("549264XXXXXXXX")
-    // Reemplazá "549264XXXXXXXX" por tu número real (código país + área + número)
-    // Ejemplo Argentina San Juan: btoa("5492644123456")  →  "NTQ5MjY0NDEyMzQ1Ng=="
-    const _wn = atob("NTQ5MjY0XXXXXXXX");  // ← reemplazá esto
+    // Tu número en base64. Para generarlo:
+    // 1. Abrí la consola del navegador (F12 → Console)
+    // 2. Ejecutá: btoa("5492644123456")
+    //    (54 = Argentina, 264 = San Juan sin el 0, luego tu número)
+    // 3. Pegá el resultado entre las comillas del atob("...")
+    const _wn = atob("NTQ5MjY0XXXXXXXX"); // ← reemplazá esto con tu base64
 
     const contactForm = document.getElementById("contactForm");
+
     if (contactForm) {
         contactForm.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -32,8 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const consulta = document.getElementById("cf-consulta").value;
             const mensaje  = document.getElementById("cf-mensaje").value.trim();
             const btn      = document.getElementById("cf-submit");
+            const success  = document.getElementById("cf-success");
 
-            // Validación básica
+            // --- Validación ---
             if (!nombre || !email || !producto || !consulta || !mensaje) {
                 alert("Por favor completá todos los campos obligatorios.");
                 return;
@@ -45,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Construir el mensaje para WhatsApp
+            // --- Armar el mensaje ---
             const lineas = [
                 `*📩 Consulta desde Nexar Sistemas*`,
                 ``,
@@ -53,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 `📧 *Email:* ${email}`,
                 telefono ? `📱 *Teléfono:* ${telefono}` : null,
                 `🖥️ *Producto:* ${producto}`,
-                `📋 *Tipo de consulta:* ${consulta}`,
+                `📋 *Consulta:* ${consulta}`,
                 ``,
                 `💬 *Mensaje:*`,
                 mensaje
@@ -61,55 +94,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const url = `https://wa.me/${_wn}?text=${encodeURIComponent(lineas)}`;
 
-            // Feedback visual
+            // --- Feedback visual ---
             btn.disabled = true;
             btn.textContent = "Abriendo WhatsApp...";
+            success.style.display = "none";
 
             window.open(url, "_blank");
 
             setTimeout(() => {
-                document.getElementById("cf-success").style.display = "block";
+                success.style.display = "block";
                 btn.disabled = false;
                 btn.textContent = "Enviar por WhatsApp ✉️";
                 contactForm.reset();
+
+                // Ocultar el mensaje de éxito después de 5 segundos
+                setTimeout(() => {
+                    success.style.display = "none";
+                }, 5000);
             }, 1500);
         });
     }
-
-    // ANIMACIÓN SCROLL (nueva)
-    const cards = document.querySelectorAll(".card");
-
-    // Estado inicial
-    cards.forEach(card => {
-        card.style.opacity = "0";
-        card.style.transform = "translateY(30px)";
-        card.style.transition = "all 0.6s ease";
-    });
-
-    // Observer
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = "1";
-                entry.target.style.transform = "translateY(0)";
-            }
-        });
-    }, {
-        threshold: 0.2
-    });
-
-    // Observar cada card
-    cards.forEach(card => {
-        observer.observe(card);
-    });
-
-    // FAQ ACORDEÓN
-    const faqQuestions = document.querySelectorAll(".faq-question");
-    faqQuestions.forEach(q => {
-        q.addEventListener("click", () => {
-            const item = q.parentElement;
-            item.classList.toggle("active");
-        });
-    });
 
 });

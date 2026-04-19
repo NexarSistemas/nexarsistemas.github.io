@@ -13,19 +13,16 @@ body {
     background: #111;
     color: white;
     padding: 10px 15px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap; /* 🔥 evita que el menú baje */
+    flex-wrap: nowrap;
 }
 
-/* LOGO */
 .logo img {
     height: 40px;
 }
 
-/* NAV LINKS */
 .navbar nav {
     display: flex;
     gap: 15px;
@@ -76,7 +73,6 @@ body {
     opacity: 0.9;
 }
 
-/* BOTONES */
 .hero-buttons {
     margin-top: 20px;
 }
@@ -111,7 +107,6 @@ button {
     background: #eee;
 }
 
-/* LOGOS DE SECCIÓN */
 .logo-seccion {
     max-width: 100px;
     margin-bottom: 10px;
@@ -133,19 +128,15 @@ button {
     width: 250px;
     border-radius: 10px;
     text-align: center;
-
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-
-    /* animación */
     opacity: 0;
     transform: translateY(30px);
     transition: all 0.6s ease;
 }
 
-/* Cuando aparece */
 .card.show {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .card h3 {
@@ -158,14 +149,8 @@ button {
 }
 
 /* =========================
-   CTA
+   CTA (eliminado, reemplazado por contacto)
 ========================= */
-.cta {
-    background: #111;
-    color: white;
-    padding: 40px;
-    text-align: center;
-}
 
 /* =========================
    FAQ
@@ -213,6 +198,7 @@ button {
 .faq-item h3 {
     margin-top: 0;
 }
+
 /* =========================
    FOOTER
 ========================= */
@@ -331,14 +317,14 @@ footer {
     align-self: flex-start;
 }
 
-.btn-submit:hover { background: #00a844; }
+.btn-submit:hover  { background: #00a844; }
 .btn-submit:active { transform: scale(0.97); }
 .btn-submit:disabled { background: #2a5a3a; cursor: not-allowed; }
 
 .form-notice {
     font-size: 12px;
     color: #555;
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 .form-success {
@@ -350,5 +336,4 @@ footer {
     color: #00c853;
     text-align: center;
     font-size: 14px;
-    margin-top: 10px;
 }
