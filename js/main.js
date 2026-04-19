@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2. Ejecutá: btoa("5492644123456")
     //    (54 = Argentina, 264 = San Juan sin el 0, luego tu número)
     // 3. Pegá el resultado entre las comillas del atob("...")
-    const _wn = atob("NTQ5MjY0XXXXXXXX"); // ← reemplazá esto con tu base64
+    const _wn = atob("NTQ5MjY0NTg1ODg3NA=="); // ← reemplazá esto con tu base64
 
     const contactForm = document.getElementById("contactForm");
 
