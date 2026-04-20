@@ -12,6 +12,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ================================
+    // LINKS "SOLICITAR DESCARGA"
+    // ================================
+    const downloadInquiries = document.querySelectorAll(".downloadInquiry");
+
+    downloadInquiries.forEach(link => {
+        link.addEventListener("click", () => {
+            const productSelect = document.getElementById("cf-producto");
+            const inquirySelect = document.getElementById("cf-consulta");
+            const messageField = document.getElementById("cf-mensaje");
+            const product = link.dataset.product;
+
+            if (productSelect && product) {
+                productSelect.value = product;
+            }
+
+            if (inquirySelect) {
+                inquirySelect.value = "Solicitar descarga";
+            }
+
+            if (messageField && !messageField.value.trim()) {
+                messageField.value = `Hola, quiero solicitar la descarga de ${product}.`;
+            }
+        });
+    });
+
+    // ================================
     // ANIMACIÓN SCROLL EN CARDS
     // ================================
     const cards = document.querySelectorAll(".card");
