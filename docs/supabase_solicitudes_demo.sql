@@ -42,5 +42,6 @@ on public.solicitudes_demo (estado);
 create index if not exists idx_solicitudes_demo_leida
 on public.solicitudes_demo (leida);
 
--- No crear policy SELECT publica.
+-- No crear policy SELECT publica para anon ni para frontend.
+-- GitHub Pages usa anon public key y RLS debe permitir solo INSERT publico en solicitudes_demo.
 -- Nexar Admin debe leer con backend seguro y service_role en variables de entorno.

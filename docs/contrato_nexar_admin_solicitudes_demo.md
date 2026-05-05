@@ -6,9 +6,10 @@ Nexar Admin debe consumir las solicitudes creadas por la landing desde un backen
 
 ## Regla principal de seguridad
 
+- GitHub Pages usa unicamente `SUPABASE_URL` y `SUPABASE_ANON_KEY`.
 - `SUPABASE_SERVICE_ROLE_KEY` solo en backend o variables de entorno del panel admin.
 - Nunca exponer `service_role` en frontend, HTML o JavaScript publico.
-- La landing usa unicamente `SUPABASE_URL` y `SUPABASE_ANON_KEY`.
+- `service_role` jamas va en este repo publico.
 
 ## Tabla fuente
 
@@ -74,6 +75,7 @@ where id = :id;
 - `service_role` en `.env` o secret manager.
 - Endpoints protegidos para listar y actualizar.
 - Auditoria basica de cambios de estado.
+- `RLS` en la landing: solo `INSERT` publico a `solicitudes_demo` y nunca `SELECT` publico.
 
 ## Checklist de integracion
 

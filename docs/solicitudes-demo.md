@@ -8,6 +8,7 @@ La seguridad depende de:
 
 - RLS habilitado en la tabla.
 - Una policy que permita solo `INSERT` para `anon`.
+- Esa policy debe aplicar a `public.solicitudes_demo`.
 - No exponer `SUPABASE_SERVICE_ROLE_KEY` en frontend.
 - No habilitar `SELECT` publico sobre `solicitudes_demo`.
 
@@ -44,13 +45,14 @@ Usa solo:
 Nunca uses:
 
 - `SUPABASE_SERVICE_ROLE_KEY`
+- `service_role` ni `serviceRoleKey`
 
 Edita `assets/js/supabase-config.js` y reemplaza los placeholders:
 
 ```js
 window.NEXAR_SUPABASE_CONFIG = {
   url: "https://TU-PROYECTO.supabase.co",
-  anonKey: "TU_SUPABASE_ANON_KEY_AQUI"
+  anonKey: "TU_ANON_PUBLIC_KEY"
 };
 ```
 
@@ -90,7 +92,8 @@ Nexar Admin no debe leer esta tabla desde frontend. Debe hacerlo desde un backen
 
 Recomendaciones:
 
-- guardar `SUPABASE_SERVICE_ROLE_KEY` solo en variables de entorno del admin/backend
+- GitHub Pages usa anon public key
+- guardar `SUPABASE_SERVICE_ROLE_KEY` solo en Nexar Admin o backend seguro
 - listar solicitudes pendientes
 - marcar solicitudes como `leida`
 - actualizar `estado` a valores como `contactado` o `demo_agendada`
@@ -99,5 +102,7 @@ Recomendaciones:
 
 - La `anon key` es publica y puede ir en GitHub Pages.
 - Eso no reemplaza RLS.
+- `RLS` debe permitir solo `INSERT` publico en `solicitudes_demo`.
 - La tabla no debe tener `SELECT` publico.
 - `service_role` jamas debe aparecer en `.js`, `.html` ni commits del frontend.
+- `service_role` jamas debe vivir en este repositorio publico.

@@ -8,10 +8,12 @@ La landing ahora registra solicitudes en la tabla `public.solicitudes_demo` de S
 
 Puntos clave:
 
-- el frontend usa solo `SUPABASE_URL` publica y `SUPABASE_ANON_KEY` publica
+- GitHub Pages usa solo `SUPABASE_URL` publica y `SUPABASE_ANON_KEY` publica
 - la seguridad depende de RLS
+- `RLS` debe permitir solo `INSERT` publico en `solicitudes_demo`
 - no debe existir `SELECT` publico sobre `solicitudes_demo`
 - `SUPABASE_SERVICE_ROLE_KEY` nunca debe usarse en frontend
+- `service_role` jamas va en este repo publico
 
 ## Archivos principales
 
@@ -40,11 +42,11 @@ Completa este archivo con:
 ```js
 window.NEXAR_SUPABASE_CONFIG = {
   url: "https://TU-PROYECTO.supabase.co",
-  anonKey: "TU_SUPABASE_ANON_KEY_AQUI"
+  anonKey: "TU_ANON_PUBLIC_KEY"
 };
 ```
 
-No coloques una `service_role` ahi.
+No coloques una `service_role` ahi. GitHub Pages usa anon public key y nada mas.
 
 ### 3. Probar local
 
@@ -64,7 +66,7 @@ Abre `http://localhost:8000`.
 
 Nexar Admin debe conectarse mediante backend seguro.
 
-- `service_role` solo en variable de entorno del admin/backend
+- `service_role` solo en Nexar Admin o backend seguro
 - listar solicitudes pendientes
 - marcar `leida`
 - actualizar `estado` a `contactado`, `demo_agendada` u otro flujo interno
@@ -75,7 +77,9 @@ Mas detalle en `docs/contrato_nexar_admin_solicitudes_demo.md`.
 
 - `anon key` publica: si
 - `service_role` en frontend: no
+- `service_role` en este repo publico: no
 - `RLS` habilitado: obligatorio
+- `RLS` con `INSERT` publico limitado a `solicitudes_demo`: obligatorio
 - `SELECT` publico: no
 
 ## Comando local recomendado
