@@ -78,8 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const _wn = atob("NTQ5MjY0NTg1ODg3NA=="); // ← reemplazá esto con tu base64
 
     const contactForm = document.getElementById("contactForm");
+    const contactMode = contactForm ? contactForm.dataset.contactMode : "";
 
-    if (contactForm) {
+    if (contactForm && contactMode !== "supabase") {
         contactForm.addEventListener("submit", function (e) {
             e.preventDefault();
 

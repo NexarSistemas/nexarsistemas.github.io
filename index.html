@@ -313,30 +313,32 @@
 <section id="contacto" class="contact-section">
     <h2>Contactanos 📬</h2>
     <p class="subtitle">
-        Completá el formulario y te respondemos por WhatsApp a la brevedad.
+        Completá el formulario y te contactamos a la brevedad.
     </p>
 
-    <form class="contact-form" id="contactForm" novalidate>
+    <form class="contact-form" id="contactForm" data-contact-mode="supabase" novalidate>
+
+        <div id="solicitud-demo-status" aria-live="polite"></div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="cf-nombre">Nombre completo <span class="required-mark">*</span></label>
-                <input type="text" id="cf-nombre" placeholder="Tu nombre" autocomplete="name">
+                <input type="text" id="cf-nombre" name="nombre" placeholder="Tu nombre" autocomplete="name">
             </div>
             <div class="form-group">
                 <label for="cf-email">Correo electrónico <span class="required-mark">*</span></label>
-                <input type="email" id="cf-email" placeholder="tu@email.com" autocomplete="email">
+                <input type="email" id="cf-email" name="email" placeholder="tu@email.com" autocomplete="email">
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
                 <label for="cf-telefono">Teléfono <span style="color:#555; font-weight:normal;">(opcional)</span></label>
-                <input type="tel" id="cf-telefono" placeholder="Ej: 264 412-3456" autocomplete="tel">
+                <input type="tel" id="cf-telefono" name="telefono" placeholder="Ej: 264 412-3456" autocomplete="tel">
             </div>
             <div class="form-group">
                 <label for="cf-producto">Producto de interés <span class="required-mark">*</span></label>
-                <select id="cf-producto">
+                <select id="cf-producto" name="producto">
                     <option value="" disabled selected>Seleccioná un producto</option>
                     <option value="Nexar Almacén 🏪">Nexar Almacén 🏪</option>
                     <option value="Nexar Tienda 🛍️">Nexar Tienda 🛍️</option>
@@ -350,7 +352,7 @@
 
         <div class="form-group">
             <label for="cf-consulta">Tipo de consulta <span class="required-mark">*</span></label>
-            <select id="cf-consulta">
+            <select id="cf-consulta" name="plan_interes">
                 <option value="" disabled selected>¿En qué te podemos ayudar?</option>
                 <option value="Solicitar una demo">📺 Solicitar una demo</option>
                 <option value="Solicitar descarga">⬇️ Solicitar descarga</option>
@@ -364,20 +366,20 @@
 
         <div class="form-group">
             <label for="cf-mensaje">Mensaje <span class="required-mark">*</span></label>
-            <textarea id="cf-mensaje" placeholder="Describí brevemente tu consulta o necesidad..."></textarea>
+            <textarea id="cf-mensaje" name="mensaje" placeholder="Describí brevemente tu consulta o necesidad..."></textarea>
         </div>
 
         <div>
             <button type="submit" class="btn-submit" id="cf-submit">
-                Enviar por WhatsApp ✉️
+                Enviar solicitud
             </button>
             <p class="form-notice">
-                * Campos obligatorios. Al enviar, se abrirá WhatsApp con tu mensaje listo para enviar.
+                * Campos obligatorios. Al enviar, registraremos tu solicitud para contactarte a la brevedad.
             </p>
         </div>
 
         <div class="form-success" id="cf-success">
-            ✅ ¡Listo! Tu WhatsApp se abrió con el mensaje. Te respondemos pronto.
+            ✅ ¡Listo! Tu solicitud fue enviada. Te respondemos pronto.
         </div>
 
     </form>
@@ -387,6 +389,11 @@
     <p>© 2026 Nexar Sistemas · Todos los derechos reservados</p>
 </footer>
 
+<!-- Configuración de Supabase (debe existir en assets/js/supabase-config.js) -->
+<script src="assets/js/supabase-config.js"></script>
+
+<!-- Scripts principales -->
+<script src="assets/js/solicitud-demo.js"></script>
 <script src="./js/main.js"></script>
 
 </body>
