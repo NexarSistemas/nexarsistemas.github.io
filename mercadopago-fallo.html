@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago no completado | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="./assets/logon.png">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="payment-page">
+
+<main class="payment-shell">
+    <div class="payment-topbar">
+        <a href="./index.html" class="payment-brand">
+            <img src="./assets/logon.png" alt="Nexar Sistemas">
+            <span>Nexar Sistemas</span>
+        </a>
+        <a href="./index.html" class="payment-backlink">Volver al sitio principal</a>
+    </div>
+
+    <section class="payment-card">
+        <article class="payment-panel">
+            <span class="payment-badge">Mercado Pago no confirmado</span>
+            <div class="payment-icon" aria-hidden="true">!</div>
+            <h1>El pago no pudo completarse</h1>
+            <p class="payment-lead">
+                No recibimos una aprobacion final del pago. Puede tratarse de una cancelacion,
+                rechazo o interrupcion durante el proceso. Si queres, podes intentarlo nuevamente
+                o escribirnos para revisar el caso.
+            </p>
+
+            <div class="payment-highlight">
+                <div class="card-mini">
+                    <span class="card-mini-label">Estado</span>
+                    <span class="card-mini-value" id="mp-status">No aprobado</span>
+                </div>
+                <div class="card-mini">
+                    <span class="card-mini-label">Pago</span>
+                    <span class="card-mini-value" id="mp-payment-id">Pendiente de identificacion</span>
+                </div>
+            </div>
+
+            <div class="payment-actions">
+                <a href="./index.html" class="download-link">Volver al inicio</a>
+                <a href="./index.html#contacto" class="btn-secondary" style="border-color: #7a1f1f; color: #7a1f1f;">Contactar soporte</a>
+            </div>
+
+            <p class="payment-note">
+                Si el problema persiste, compartinos el identificador del pago o la referencia para ayudarte mas rapido.
+            </p>
+        </article>
+
+        <aside class="payment-sidepanel">
+            <h2>Que podes hacer ahora</h2>
+
+            <div class="payment-list">
+                <div class="payment-item">
+                    <strong>1. Revisar el medio de pago</strong>
+                    <span>Verifica fondos, limites o datos cargados antes de volver a intentarlo.</span>
+                </div>
+                <div class="payment-item">
+                    <strong>2. Reintentar la operacion</strong>
+                    <span>Podes iniciar nuevamente el pago desde el enlace o propuesta original.</span>
+                </div>
+                <div class="payment-item">
+                    <strong>3. Pedir asistencia</strong>
+                    <span>Si queres, revisamos juntos el caso con los datos visibles en esta pagina.</span>
+                </div>
+            </div>
+
+            <h2>Detalles de la operacion</h2>
+            <dl class="payment-detail-list">
+                <div class="payment-detail">
+                    <dt>Payment ID</dt>
+                    <dd id="mp-payment-id-detail">No informado</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Merchant Order</dt>
+                    <dd id="mp-order-id">No informado</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Referencia</dt>
+                    <dd id="mp-reference">No informada</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Preferencia</dt>
+                    <dd id="mp-preference-id">No informada</dd>
+                </div>
+            </dl>
+        </aside>
+    </section>
+</main>
+
+<script src="./js/mercadopago-success.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago pendiente | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="./assets/logon.png">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="payment-page">
+
+<main class="payment-shell">
+    <div class="payment-topbar">
+        <a href="./index.html" class="payment-brand">
+            <img src="./assets/logon.png" alt="Nexar Sistemas">
+            <span>Nexar Sistemas</span>
+        </a>
+        <a href="./index.html" class="payment-backlink">Volver al sitio principal</a>
+    </div>
+
+    <section class="payment-card">
+        <article class="payment-panel">
+            <span class="payment-badge">Mercado Pago en revision</span>
+            <div class="payment-icon" aria-hidden="true">...</div>
+            <h1>Tu pago esta pendiente</h1>
+            <p class="payment-lead">
+                Recibimos la operacion, pero todavia no tenemos una confirmacion final del pago.
+                Esto puede depender del medio utilizado o de una validacion adicional de Mercado Pago.
+            </p>
+
+            <div class="payment-highlight">
+                <div class="card-mini">
+                    <span class="card-mini-label">Estado</span>
+                    <span class="card-mini-value" id="mp-status">Pendiente</span>
+                </div>
+                <div class="card-mini">
+                    <span class="card-mini-label">Pago</span>
+                    <span class="card-mini-value" id="mp-payment-id">Pendiente de identificacion</span>
+                </div>
+            </div>
+
+            <div class="payment-actions">
+                <a href="./index.html" class="download-link">Volver al inicio</a>
+                <a href="./index.html#contacto" class="btn-secondary" style="border-color: #6b4f1d; color: #6b4f1d;">Consultar soporte</a>
+            </div>
+
+            <p class="payment-note">
+                Cuando el pago cambie de estado, vamos a poder continuar con la activacion o seguimiento correspondiente.
+            </p>
+        </article>
+
+        <aside class="payment-sidepanel">
+            <h2>Que puede pasar ahora</h2>
+
+            <div class="payment-list">
+                <div class="payment-item">
+                    <strong>1. Confirmacion del medio</strong>
+                    <span>Algunos pagos necesitan una validacion extra o demoran unos minutos en impactar.</span>
+                </div>
+                <div class="payment-item">
+                    <strong>2. Actualizacion del estado</strong>
+                    <span>Mercado Pago puede cambiar la operacion a aprobada o rechazada automaticamente.</span>
+                </div>
+                <div class="payment-item">
+                    <strong>3. Seguimiento con soporte</strong>
+                    <span>Si tenes dudas, podemos revisar el avance con los datos visibles en esta pagina.</span>
+                </div>
+            </div>
+
+            <h2>Detalles de la operacion</h2>
+            <dl class="payment-detail-list">
+                <div class="payment-detail">
+                    <dt>Payment ID</dt>
+                    <dd id="mp-payment-id-detail">No informado</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Merchant Order</dt>
+                    <dd id="mp-order-id">No informado</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Referencia</dt>
+                    <dd id="mp-reference">No informada</dd>
+                </div>
+                <div class="payment-detail">
+                    <dt>Preferencia</dt>
+                    <dd id="mp-preference-id">No informada</dd>
+                </div>
+            </dl>
+        </aside>
+    </section>
+</main>
+
+<script src="./js/mercadopago-success.js"></script>
+
+</body>
+</html>
