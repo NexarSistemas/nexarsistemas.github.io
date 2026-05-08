@@ -226,6 +226,47 @@ button {
     transform: scale(0.98);
 }
 
+.is-disabled {
+    background: #9aa5b1;
+    color: #f7f8fa;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    opacity: 0.9;
+}
+
+.is-disabled:hover {
+    background: #9aa5b1;
+    box-shadow: none;
+    transform: none;
+}
+
+.development-note {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 560px;
+    margin: 0 auto 18px;
+    padding: 14px 16px;
+    border: 1px solid rgba(30, 58, 95, 0.14);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #f6f8fb 0%, #eef3f7 100%);
+    color: #32475b;
+}
+
+.development-note strong {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1e3a5f;
+}
+
+.development-note span {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 .download-link-alt {
     background: #1e3a5f;
 }
