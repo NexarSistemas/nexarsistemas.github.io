@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexar Sistemas — Kit de Marketing</title>
+<style>
+/*
+  SISTEMA DE DISEÑO EXACTO DEL SITIO NEXAR SISTEMAS
+  ─────────────────────────────────────────────────
+  Font:         Arial, sans-serif
+  Body bg:      #f7f8fa   |  texto: #171717 / #17212b
+  Acento verde: #00c853   |  hover: #00a844
+  Dark azul:    #17324a / #112434 / #12202e / #1e3a5f
+  Hero dark:    linear-gradient(135deg,#101010,#26313a)
+  Panel dark:   linear-gradient(180deg,#17324a,#112434)
+  Store dark:   linear-gradient(160deg,#112434,#18354e)
+  Store bg:     radial(rgba(0,200,83,0.16)…) + linear(#f6f3eb,#fcfcfb,#eef2f6)
+  Alt bg:       #edf1f4
+  Footer bg:    #0a0a1a  |  contacto: #0d0d2b
+  Kicker bg:    rgba(19,34,53,0.08)  color #2d495e
+  Proof pill:   rgba(255,255,255,0.88)  borde rgba(18,32,46,0.08)
+  Card bg:      white   sombra: 0 8px 24px rgba(0,0,0,0.08)
+  Card radius:  8px (básico) / 22px (store) / 24px (pricing)
+  Table head:   #17324a  |  even row: rgba(237,241,244,0.7)
+  Plan badge:   #00c853
+  Step circle:  #00c853  radius 14px
+  Texto sec:    #555 / #576473 / #52606d / #4c5c6b
+  Demo box:     linear-gradient(#fff7e8,#fff)
+  Price badge:  rgba(0,200,83,0.12)  color #08753a
+  Store section dark: linear-gradient(160deg,#112434,#18354e)
+*/
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f8fa;
+  color: #171717;
+}
+
+/* ── NAV KIT ── */
+.kit-nav {
+  background: #111;
+  padding: 0 15px;
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.kit-nav::-webkit-scrollbar { display: none; }
+.kit-brand {
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  padding: 0 18px 0 4px;
+  margin-right: 8px;
+  border-right: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.kit-btn {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255,255,255,0.55);
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  padding: 14px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s;
+  margin-bottom: -1px;
+}
+.kit-btn:hover { color: rgba(255,255,255,0.85); }
+.kit-btn.active { color: white; border-bottom-color: #00c853; }
+
+/* ── PÁGINAS ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ══════════════════════════════════════════
+   HUB
+══════════════════════════════════════════ */
+.hub {
+  background:
+    radial-gradient(circle at top left, rgba(0,200,83,0.16), transparent 28%),
+    linear-gradient(180deg, #f6f3eb 0%, #fcfcfb 20%, #eef2f6 100%);
+  min-height: calc(100vh - 45px);
+  padding: 64px 20px;
+  text-align: center;
+  color: #17212b;
+}
+.hub-kicker {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(19,34,53,0.08);
+  color: #2d495e;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.hub h1 {
+  font-size: 42px;
+  line-height: 1.05;
+  color: #12202e;
+  margin-bottom: 14px;
+}
+.hub > p {
+  font-size: 17px;
+  color: #4c5c6b;
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.65;
+}
+.hub-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  max-width: 940px;
+  margin: 0 auto;
+}
+.hub-card {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 34px rgba(18,32,46,0.08);
+  padding: 26px 22px;
+  width: 255px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+.hub-card:hover { transform: translateY(-3px); box-shadow: 0 20px 44px rgba(18,32,46,0.13); }
+.hub-card-num {
+  position: absolute; top: 18px; right: 22px;
+  font-size: 34px; font-weight: bold;
+  color: rgba(18,32,46,0.06);
+}
+.hub-card-tag {
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #5b6775; margin-bottom: 8px;
+}
+.hub-card h3 { font-size: 16px; color: #12202e; margin-bottom: 7px; }
+.hub-card p { font-size: 13px; color: #576473; line-height: 1.6; }
+
+/* ══════════════════════════════════════════
+   PRINT AREA
+══════════════════════════════════════════ */
+.print-area {
+  background: #edf1f4;
+  min-height: calc(100vh - 45px);
+  padding: 28px 20px;
+}
+.print-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.print-controls h2 { flex:1; font-size: 19px; color: #12202e; }
+.btn-print {
+  padding: 9px 18px;
+  background: #17324a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-print:hover { background: #112434; }
+.pages-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: center;
+}
+
+/* ── A4 ── */
+.a4 {
+  width: 794px;
+  min-height: 1123px;
+  background: white;
+  box-shadow: 0 8px 40px rgba(18,32,46,0.14);
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: #17212b;
+}
+
+/* ══════════════════════════════════════════
+   FOLLETO TIENDA — PÁG 1
+   Izq: dark panel  |  Der: store bg claro
+══════════════════════════════════════════ */
+.tp1 { display: grid; grid-template-columns: 1fr 1fr; min-height: 1123px; }
+
+.tp1-left {
+  background: linear-gradient(180deg, #17324a 0%, #112434 100%);
+  color: white;
+  padding: 50px 42px;
+  display: flex;
+  flex-direction: column;
+}
+.tp1-brand {
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 44px;
+}
+.tp1-kicker {
+  display: inline-block;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 16px; width: fit-content;
+}
+.tp1-h1 {
+  font-size: 42px; line-height: 1.0;
+  color: white; margin-bottom: 14px;
+}
+.tp1-subtitle {
+  font-size: 16px; line-height: 1.55;
+  color: rgba(255,255,255,0.84);
+  margin-bottom: 22px;
+}
+.tp1-lead {
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  line-height: 1.7; margin-bottom: 28px;
+}
+.tp1-proof { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+.tp1-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.82); font-size: 12px; font-weight: bold;
+  width: fit-content;
+}
+.tp1-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 42px; padding: 0 20px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 13px; font-weight: bold;
+  box-shadow: 0 14px 28px rgba(0,200,83,0.22);
+  width: fit-content; margin-bottom: 0;
+}
+.tp1-ideal {
+  margin-top: auto;
+  background: rgba(255,255,255,0.06);
+  border-left: 3px solid #00c853;
+  padding: 14px 16px; border-radius: 0 8px 8px 0;
+}
+.tp1-ideal strong {
+  display: block; font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #00c853; margin-bottom: 6px;
+}
+.tp1-ideal p { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.7; }
+
+.tp1-right {
+  background:
+    radial-gradient(circle at top right, rgba(0,200,83,0.08), transparent 40%),
+    linear-gradient(180deg, #f6f3eb 0%, #fcfcfb 15%, #eef2f6 100%);
+  padding: 50px 38px;
+  display: flex;
+  flex-direction: column;
+}
+.tp1-section-tag {
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #5b6775; margin-bottom: 18px;
+}
+.tp1-feats { margin-bottom: 28px; }
+.tp1-feat {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 13px 0; border-bottom: 1px solid rgba(18,32,46,0.08);
+}
+.tp1-feat:last-child { border-bottom: none; }
+.tp1-feat-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  box-shadow: 0 4px 10px rgba(18,32,46,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.tp1-feat h4 { font-size: 13px; color: #12202e; margin-bottom: 3px; }
+.tp1-feat p { font-size: 12px; color: #576473; line-height: 1.55; }
+
+/* Mini planes */
+.tp1-plans {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 22px;
+}
+.tp1-plan {
+  border-radius: 16px; padding: 14px 12px; text-align: center;
+  position: relative;
+}
+.tp1-plan.b {
+  background: white; border: 1px solid rgba(18,32,46,0.1);
+  box-shadow: 0 4px 12px rgba(18,32,46,0.07);
+}
+.tp1-plan.p {
+  background: linear-gradient(180deg,#17324a,#112434);
+  box-shadow: 0 10px 26px rgba(17,36,52,0.2);
+}
+.tp1-plan.f {
+  background: white; border: 1px solid rgba(18,32,46,0.1);
+  box-shadow: 0 4px 12px rgba(18,32,46,0.07);
+}
+.tp1-plan-badge {
+  position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+  background: #00c853; color: white;
+  font-size: 8px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+}
+.tp1-plan-tag {
+  display: block; font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px;
+}
+.tp1-plan.b .tp1-plan-tag, .tp1-plan.f .tp1-plan-tag { color: #5b6775; }
+.tp1-plan.p .tp1-plan-tag { color: rgba(255,255,255,0.65); }
+.tp1-plan-price { font-size: 15px; font-weight: bold; line-height: 1.1; }
+.tp1-plan.b .tp1-plan-price, .tp1-plan.f .tp1-plan-price { color: #12202e; }
+.tp1-plan.p .tp1-plan-price { color: white; }
+.tp1-plan-period { font-size: 10px; margin-top: 3px; color: #7a8795; }
+.tp1-plan.p .tp1-plan-period { color: rgba(255,255,255,0.55); }
+
+/* CTA box demo */
+.tp1-demo {
+  margin-top: auto;
+  background: linear-gradient(180deg,#fff7e8,#ffffff);
+  border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 22px;
+  box-shadow: 0 14px 34px rgba(18,32,46,0.08);
+  padding: 20px 22px; text-align: center;
+}
+.tp1-demo h4 { font-size: 15px; color: #12202e; margin-bottom: 5px; }
+.tp1-demo p { font-size: 12px; color: #576473; margin-bottom: 14px; line-height: 1.55; }
+.tp1-demo-wa {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 38px; padding: 0 18px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 12px; font-weight: bold;
+  box-shadow: 0 8px 18px rgba(0,200,83,0.22);
+}
+
+/* ══════════════════════════════════════════
+   FOLLETO TIENDA — PÁG 2
+══════════════════════════════════════════ */
+.tp2 {
+  background:
+    radial-gradient(circle at top left, rgba(0,200,83,0.08), transparent 28%),
+    linear-gradient(180deg, #f6f3eb 0%, #fcfcfb 15%, #eef2f6 100%);
+  padding: 50px 50px;
+  min-height: 1123px;
+  display: flex; flex-direction: column;
+  color: #17212b;
+}
+.tp2-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 32px; padding-bottom: 22px;
+  border-bottom: 1px solid rgba(18,32,46,0.1);
+}
+.tp2-kicker {
+  display: inline-block; padding: 6px 12px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.tp2-h2 { font-size: 30px; line-height: 1.08; color: #12202e; }
+.tp2-note { font-size: 12px; color: #576473; line-height: 1.7; text-align: right; max-width: 200px; }
+
+/* Cards planes */
+.tp2-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 16px; margin-bottom: 32px;
+  align-items: start;
+}
+.tp2-card {
+  background: white;
+  border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 24px;
+  box-shadow: 0 18px 42px rgba(18,32,46,0.08);
+  position: relative; overflow: hidden;
+}
+.tp2-card.featured {
+  background: linear-gradient(180deg,#17324a 0%,#112434 100%);
+  color: white;
+  transform: translateY(-8px);
+  box-shadow: 0 22px 55px rgba(17,36,52,0.22);
+}
+.tp2-card-badge {
+  position: absolute; top: -1px; right: 16px;
+  padding: 6px 12px; border-radius: 0 0 999px 999px;
+  background: #00c853; color: white;
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.tp2-card-head { padding: 22px 18px 0; }
+.tp2-card-tag {
+  display: inline-block; margin-bottom: 8px;
+  color: #5b6775; font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.tp2-card.featured .tp2-card-tag { color: rgba(255,255,255,0.65); }
+.tp2-card-name { font-size: 24px; font-weight: bold; color: #12202e; margin-bottom: 8px; }
+.tp2-card.featured .tp2-card-name { color: white; }
+.tp2-card-price { font-size: 26px; font-weight: bold; color: #12202e; line-height: 1; }
+.tp2-card.featured .tp2-card-price { color: white; }
+.tp2-card-price small { font-size: 13px; font-weight: normal; color: #576473; }
+.tp2-card.featured .tp2-card-price small { color: rgba(255,255,255,0.6); }
+/* precio lanzamiento */
+.tp2-price-old { font-size: 16px; font-weight: bold; color: #7a8795; text-decoration: line-through; margin-bottom: 2px; }
+.tp2-price-badge {
+  display: inline-flex; align-items: center;
+  padding: 5px 10px; border-radius: 999px;
+  background: rgba(0,200,83,0.12); color: #08753a;
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin: 6px 0;
+}
+.tp2-card-copy { font-size: 12px; color: #576473; line-height: 1.55; padding: 10px 18px 0; }
+.tp2-card.featured .tp2-card-copy { color: rgba(255,255,255,0.7); }
+.tp2-card-list { margin: 10px 18px 0; padding-left: 16px; font-size: 12px; line-height: 1.8; color: #17212b; }
+.tp2-card.featured .tp2-card-list { color: rgba(255,255,255,0.88); }
+.tp2-card-limit {
+  margin: 12px 18px 18px; padding-top: 12px;
+  border-top: 1px solid rgba(18,32,46,0.08);
+}
+.tp2-card.featured .tp2-card-limit { border-top-color: rgba(255,255,255,0.12); }
+.tp2-card-limit strong { display: block; font-size: 11px; margin-bottom: 3px; color: #12202e; }
+.tp2-card.featured .tp2-card-limit strong { color: rgba(255,255,255,0.85); }
+.tp2-card-limit span { font-size: 11px; color: #576473; line-height: 1.55; }
+.tp2-card.featured .tp2-card-limit span { color: rgba(255,255,255,0.55); }
+
+/* Tabla */
+.tp2-table-wrap {
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 18px 40px rgba(18,32,46,0.08);
+  margin-bottom: 24px;
+}
+.tp2-table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.94); font-size: 13px; }
+.tp2-table thead th {
+  background: #17324a; color: white; padding: 12px 16px;
+  text-align: left; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.tp2-table tbody td {
+  padding: 10px 16px; border-bottom: 1px solid rgba(18,32,46,0.07); color: #17212b;
+}
+.tp2-table tbody tr:nth-child(even) td { background: rgba(237,241,244,0.7); }
+.tp2-table tbody tr:last-child td { border-bottom: none; }
+.tp2-si { color: #00c853; font-weight: bold; }
+.tp2-no { color: #aab0ba; }
+.tp2-pr { color: #17324a; font-size: 11px; font-weight: bold; }
+
+.tp2-footer {
+  margin-top: auto;
+  background: linear-gradient(180deg,#17324a,#112434);
+  border-radius: 18px; padding: 20px 26px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: white;
+}
+.tp2-footer h4 { font-size: 14px; margin-bottom: 3px; }
+.tp2-footer p { font-size: 11px; color: rgba(255,255,255,0.55); }
+.tp2-footer-wa { font-size: 15px; font-weight: bold; color: #00c853; }
+
+/* ══════════════════════════════════════════
+   FOLLETO ALMACÉN — PÁG 1
+══════════════════════════════════════════ */
+.ap1 {
+  min-height: 1123px; display: flex; flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(0,200,83,0.08), transparent 30%),
+    linear-gradient(180deg, #f6f3eb 0%, #fcfcfb 15%, #eef2f6 100%);
+  color: #17212b;
+}
+.ap1-hero {
+  background: linear-gradient(160deg,#112434 0%,#18354e 100%);
+  color: white; padding: 46px 50px 40px;
+  position: relative; overflow: hidden;
+}
+.ap1-hero::before {
+  content:''; position:absolute; top:-70px; right:-70px;
+  width:280px; height:280px; border-radius:50%;
+  border:55px solid rgba(0,200,83,0.06);
+}
+.ap1-hero-grid {
+  display: grid; grid-template-columns: 1.3fr 0.7fr;
+  gap: 36px; align-items: center; position: relative;
+}
+.ap1-kicker {
+  display: inline-block; padding: 6px 12px; border-radius: 999px;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.88);
+  font-size: 11px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.ap1-h1 { font-size: 44px; line-height: 1.0; color: white; margin-bottom: 14px; }
+.ap1-subtitle { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.6; max-width: 360px; }
+.ap1-stats { display: flex; flex-direction: column; gap: 12px; }
+.ap1-stat {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; padding: 14px 16px;
+}
+.ap1-stat-num { font-size: 22px; font-weight: bold; color: white; margin-bottom: 2px; }
+.ap1-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+.ap1-proof {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  padding: 16px 50px; background: rgba(17,36,52,0.03);
+  border-bottom: 1px solid rgba(18,32,46,0.07);
+}
+.ap1-proof-pill {
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(255,255,255,0.88); border: 1px solid rgba(18,32,46,0.08);
+  color: #2d495e; font-size: 12px; font-weight: bold;
+}
+
+.ap1-body { padding: 36px 50px; flex:1; display:flex; flex-direction:column; }
+.ap1-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex:1; }
+.ap1-section-tag {
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #5b6775; margin-bottom: 16px;
+}
+.ap1-feat {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid rgba(18,32,46,0.07);
+}
+.ap1-feat:last-child { border-bottom: none; }
+.ap1-feat-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  box-shadow: 0 4px 10px rgba(18,32,46,0.07);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.ap1-feat-title { font-size: 13px; font-weight: bold; color: #12202e; margin-bottom: 3px; }
+.ap1-feat-desc { font-size: 11px; color: #576473; line-height: 1.55; }
+
+.ap1-plans { display: flex; flex-direction: column; gap: 10px; }
+.ap1-plan {
+  border-radius: 16px; padding: 16px 18px;
+  border: 1px solid rgba(18,32,46,0.08); position: relative;
+}
+.ap1-plan.b { background: white; box-shadow: 0 4px 14px rgba(18,32,46,0.07); }
+.ap1-plan.p { background: linear-gradient(180deg,#17324a,#112434); box-shadow: 0 12px 30px rgba(17,36,52,0.18); }
+.ap1-plan.f { background: white; box-shadow: 0 4px 14px rgba(18,32,46,0.07); }
+.ap1-plan-badge {
+  position: absolute; top: -9px; right: 14px;
+  padding: 4px 10px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ap1-plan-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.ap1-plan-name {
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.ap1-plan.b .ap1-plan-name { color: #5b6775; }
+.ap1-plan.p .ap1-plan-name { color: rgba(255,255,255,0.6); }
+.ap1-plan.f .ap1-plan-name { color: #5b6775; }
+.ap1-plan-price { font-size: 19px; font-weight: bold; }
+.ap1-plan.b .ap1-plan-price { color: #12202e; }
+.ap1-plan.p .ap1-plan-price { color: white; }
+.ap1-plan.f .ap1-plan-price { color: #12202e; }
+.ap1-plan-period { font-size: 11px; }
+.ap1-plan.b .ap1-plan-period { color: #7a8795; }
+.ap1-plan.p .ap1-plan-period { color: rgba(255,255,255,0.5); }
+.ap1-plan.f .ap1-plan-period { color: #7a8795; }
+.ap1-plan-feats { font-size: 11px; line-height: 1.7; }
+.ap1-plan.b .ap1-plan-feats { color: #576473; }
+.ap1-plan.p .ap1-plan-feats { color: rgba(255,255,255,0.62); }
+.ap1-plan.f .ap1-plan-feats { color: #576473; }
+
+.ap1-demo {
+  margin-top: 12px;
+  background: linear-gradient(180deg,#fff7e8,#ffffff);
+  border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 18px; box-shadow: 0 10px 26px rgba(18,32,46,0.07);
+  padding: 16px 18px; text-align: center;
+}
+.ap1-demo h4 { font-size: 14px; color: #12202e; margin-bottom: 4px; }
+.ap1-demo p { font-size: 11px; color: #576473; margin-bottom: 12px; line-height: 1.55; }
+.ap1-demo-btn {
+  display: inline-flex; align-items: center;
+  min-height: 36px; padding: 0 16px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 12px; font-weight: bold;
+  box-shadow: 0 8px 16px rgba(0,200,83,0.22);
+}
+
+/* ══════════════════════════════════════════
+   FOLLETO ALMACÉN — PÁG 2
+══════════════════════════════════════════ */
+.ap2 {
+  background: linear-gradient(160deg,#112434 0%,#18354e 100%);
+  color: white; padding: 50px;
+  min-height: 1123px; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.ap2::before {
+  content:''; position:absolute; top:-100px; right:-100px;
+  width:420px; height:420px; border-radius:50%;
+  border:70px solid rgba(0,200,83,0.05);
+}
+.ap2-kicker {
+  display: inline-block; padding: 6px 12px; border-radius: 999px;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.88);
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 12px; position: relative;
+}
+.ap2-h2 { font-size: 32px; line-height: 1.08; color: white; margin-bottom: 8px; position: relative; }
+.ap2-sub { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.65; max-width: 520px; margin-bottom: 28px; position: relative; }
+
+.ap2-table-wrap {
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 18px 42px rgba(9,17,28,0.28);
+  margin-bottom: 28px; position: relative;
+}
+.ap2-table {
+  width: 100%; border-collapse: collapse;
+  background: rgba(255,255,255,0.94); font-size: 13px; color: #17212b;
+}
+.ap2-table thead th {
+  background: #112434; color: rgba(255,255,255,0.7);
+  padding: 12px 16px; text-align: left;
+  font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.ap2-table thead th:first-child { color: rgba(255,255,255,0.42); }
+.ap2-table tbody td { padding: 10px 16px; border-bottom: 1px solid rgba(18,32,46,0.07); }
+.ap2-table tbody tr:nth-child(even) td { background: rgba(237,241,244,0.5); }
+.ap2-table tbody tr:last-child td { border-bottom: none; }
+.ap2-si { color: #00c853; font-weight: bold; }
+.ap2-no { color: #aab0ba; }
+.ap2-pr { color: #17324a; font-size: 11px; font-weight: bold; }
+
+.ap2-perm {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 26px 28px;
+  margin-bottom: 24px; position: relative;
+}
+.ap2-perm-label {
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #00c853; margin-bottom: 8px;
+}
+.ap2-perm-title { font-size: 17px; font-weight: bold; color: white; margin-bottom: 16px; }
+.ap2-perm-steps {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
+}
+.ap2-step {
+  background: rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;
+}
+.ap2-step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 10px;
+  background: #00c853; color: white;
+  font-weight: bold; font-size: 14px; margin-bottom: 10px;
+}
+.ap2-step-text { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.65; }
+
+.ap2-footer {
+  margin-top: auto;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 18px; align-items: center;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px; padding: 22px 26px; position: relative;
+}
+.ap2-footer h4 { font-size: 15px; color: white; margin-bottom: 4px; }
+.ap2-footer p { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+.ap2-footer-wa { font-size: 14px; font-weight: bold; color: #00c853; }
+.ap2-badges { display: flex; flex-direction: column; gap: 8px; }
+.ap2-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+  font-size: 11px; color: rgba(255,255,255,0.72); white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════
+   SOCIAL AREA
+══════════════════════════════════════════ */
+.social-area {
+  background: #edf1f4;
+  min-height: calc(100vh - 45px);
+  padding: 28px 20px;
+}
+.social-area h2 { font-size: 19px; color: #12202e; margin-bottom: 6px; }
+.social-area .sub { font-size: 13px; color: #576473; margin-bottom: 28px; }
+.social-row { margin-bottom: 40px; }
+.social-row-label {
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #5b6775; margin-bottom: 14px;
+  padding-bottom: 8px; border-bottom: 1px solid rgba(18,32,46,0.1);
+}
+.social-grid { display: flex; flex-wrap: wrap; gap: 18px; }
+
+/* Square 1:1 */
+.sq {
+  width: 296px; height: 296px;
+  border-radius: 12px; overflow: hidden;
+  position: relative; flex-shrink: 0;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 8px 28px rgba(18,32,46,0.14);
+}
+/* Story 9:16 */
+.story {
+  width: 166px; height: 296px;
+  border-radius: 12px; overflow: hidden;
+  position: relative; flex-shrink: 0;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 8px 28px rgba(18,32,46,0.14);
+}
+
+/* ─ TIENDA FEED 1 ─ */
+.tf1 {
+  background: linear-gradient(135deg,#101010,#26313a);
+  padding: 22px; display: flex;
+  flex-direction: column; justify-content: space-between;
+}
+.tf1-kicker {
+  display: inline-block; padding: 4px 9px; border-radius: 999px;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.82);
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px; width: fit-content;
+}
+.tf1-h { font-size: 26px; font-weight: bold; color: white; line-height: 1.05; margin-bottom: 9px; }
+.tf1-desc { font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.65; }
+.tf1-wa {
+  display: inline-flex; align-items: center;
+  padding: 6px 12px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 10px; font-weight: bold;
+  margin-bottom: 8px; width: fit-content;
+}
+.tf1-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.tf1-pill {
+  padding: 4px 9px; border-radius: 999px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.75); font-size: 9px; font-weight: bold;
+}
+.tf1-brand {
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+}
+
+/* ─ TIENDA FEED 2 ─ */
+.tf2 {
+  background:
+    radial-gradient(circle at top left, rgba(0,200,83,0.2), transparent 45%),
+    linear-gradient(180deg,#f6f3eb,#eef2f6);
+  padding: 22px; display: flex;
+  flex-direction: column; justify-content: center; text-align: center;
+  position: relative;
+}
+.tf2-kicker {
+  display: inline-block; padding: 4px 9px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin: 0 auto 10px;
+}
+.tf2-plan { font-size: 12px; font-weight: bold; color: #5b6775; margin-bottom: 4px; }
+.tf2-price { font-size: 40px; font-weight: bold; color: #12202e; line-height: 1; margin-bottom: 3px; }
+.tf2-price-sub { font-size: 12px; color: #576473; margin-bottom: 14px; }
+.tf2-divider { width: 32px; height: 2px; background: rgba(18,32,46,0.1); margin: 0 auto 12px; }
+.tf2-copy { font-size: 12px; color: #4c5c6b; line-height: 1.65; margin-bottom: 14px; }
+.tf2-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 34px; padding: 0 16px; border-radius: 999px;
+  background: #00c853; color: white;
+  font-size: 11px; font-weight: bold;
+  box-shadow: 0 8px 16px rgba(0,200,83,0.22);
+  margin: 0 auto;
+}
+.tf2-brand {
+  position: absolute; bottom: 12px; right: 14px;
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(18,32,46,0.22);
+}
+
+/* ─ TIENDA STORY 1 ─ */
+.ts1 {
+  background: linear-gradient(135deg,#101010,#26313a);
+  padding: 17px 15px; display: flex;
+  flex-direction: column; justify-content: space-between;
+}
+.ts1-kicker {
+  display: inline-block; padding: 3px 8px; border-radius: 999px;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
+  font-size: 8px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 7px; width: fit-content;
+}
+.ts1-h { font-size: 18px; font-weight: bold; color: white; line-height: 1.1; }
+.ts1-mid { flex:1; display:flex; flex-direction:column; justify-content:center; gap:5px; padding:10px 0; }
+.ts1-item {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.06); border-radius: 7px;
+  padding: 7px 9px; font-size: 10px; color: rgba(255,255,255,0.78);
+}
+.ts1-check { color: #00c853; font-size: 11px; font-weight: bold; }
+.ts1-cta {
+  background: #00c853; border-radius: 7px;
+  padding: 9px; text-align: center;
+  font-size: 10px; font-weight: bold; color: white; margin-bottom: 5px;
+}
+.ts1-wa { text-align: center; font-size: 8px; color: rgba(255,255,255,0.32); }
+
+/* ─ TIENDA STORY 2 ─ */
+.ts2 {
+  background:
+    radial-gradient(circle at top, rgba(0,200,83,0.15), transparent 42%),
+    linear-gradient(180deg,#f6f3eb,#eef2f6);
+  padding: 17px 15px; display: flex;
+  flex-direction: column; justify-content: space-between;
+}
+.ts2-kicker {
+  display: inline-block; padding: 3px 8px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 8px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 7px; width: fit-content;
+}
+.ts2-h { font-size: 16px; font-weight: bold; color: #12202e; line-height: 1.1; }
+.ts2-mid { flex:1; display:flex; flex-direction:column; gap:5px; justify-content:center; padding:8px 0; }
+.ts2-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 9px; border-radius: 8px;
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  box-shadow: 0 2px 6px rgba(18,32,46,0.06);
+}
+.ts2-row.feat { background: linear-gradient(135deg,#17324a,#112434); }
+.ts2-row-name { font-size: 9px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: #5b6775; }
+.ts2-row.feat .ts2-row-name { color: rgba(255,255,255,0.6); }
+.ts2-row-price { font-size: 11px; font-weight: bold; color: #12202e; }
+.ts2-row.feat .ts2-row-price { color: white; }
+.ts2-cta {
+  background: #00c853; border-radius: 7px;
+  padding: 9px; text-align: center;
+  font-size: 10px; font-weight: bold; color: white;
+  box-shadow: 0 6px 14px rgba(0,200,83,0.22); margin-bottom: 4px;
+}
+.ts2-brand { text-align:center; font-size:8px; font-weight:bold; letter-spacing:0.08em; text-transform:uppercase; color:rgba(18,32,46,0.26); }
+
+/* ─ ALMACÉN FEED 1 ─ */
+.af1 {
+  background: linear-gradient(160deg,#112434,#18354e);
+  padding: 22px; display: flex;
+  flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.af1::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  border:35px solid rgba(0,200,83,0.07);
+}
+.af1-kicker {
+  display: inline-block; padding: 4px 9px; border-radius: 999px;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px; width: fit-content; position: relative;
+}
+.af1-h { font-size: 24px; font-weight: bold; color: white; line-height: 1.05; margin-bottom: 9px; position: relative; }
+.af1-desc { font-size: 11px; color: rgba(255,255,255,0.62); line-height: 1.65; position: relative; }
+.af1-facts { display: grid; grid-template-columns:1fr 1fr; gap: 8px; position: relative; }
+.af1-fact {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 9px 11px;
+}
+.af1-fact-num { font-size: 15px; font-weight: bold; color: white; }
+.af1-fact-label { font-size: 9px; color: rgba(255,255,255,0.48); margin-top: 2px; }
+
+/* ─ ALMACÉN FEED 2 ─ */
+.af2 {
+  background:
+    radial-gradient(circle at top left, rgba(0,200,83,0.14), transparent 38%),
+    linear-gradient(180deg,#f6f3eb,#eef2f6);
+  padding: 22px; display: flex;
+  flex-direction: column; justify-content: center;
+  position: relative;
+}
+.af2-kicker {
+  display: inline-block; padding: 4px 9px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px; width: fit-content;
+}
+.af2-h { font-size: 18px; font-weight: bold; color: #12202e; line-height: 1.15; margin-bottom: 12px; }
+.af2-plans { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.af2-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 10px; border-radius: 8px;
+}
+.af2-row.b { background: white; border: 1px solid rgba(18,32,46,0.08); box-shadow: 0 2px 6px rgba(18,32,46,0.05); }
+.af2-row.p { background: linear-gradient(135deg,#17324a,#112434); box-shadow: 0 6px 16px rgba(17,36,52,0.18); }
+.af2-row.f { background: white; border: 1px solid rgba(18,32,46,0.08); box-shadow: 0 2px 6px rgba(18,32,46,0.05); }
+.af2-row-name { font-size: 9px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; }
+.af2-row.b .af2-row-name { color: #5b6775; }
+.af2-row.p .af2-row-name { color: rgba(255,255,255,0.58); }
+.af2-row.f .af2-row-name { color: #5b6775; }
+.af2-row-price { font-size: 12px; font-weight: bold; }
+.af2-row.b .af2-row-price { color: #12202e; }
+.af2-row.p .af2-row-price { color: white; }
+.af2-row.f .af2-row-price { color: #12202e; }
+.af2-brand {
+  position: absolute; bottom: 12px; right: 14px;
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(18,32,46,0.2);
+}
+
+/* ─ ALMACÉN STORY 1 ─ */
+.as1 {
+  background: linear-gradient(160deg,#112434,#18354e);
+  padding: 17px 15px; display: flex;
+  flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.as1::before {
+  content:''; position:absolute; top:-25px; right:-25px;
+  width:100px; height:100px; border-radius:50%;
+  border:22px solid rgba(0,200,83,0.08);
+}
+.as1-kicker {
+  display: inline-block; padding: 3px 8px; border-radius: 999px;
+  background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.82);
+  font-size: 8px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 7px; width: fit-content; position: relative;
+}
+.as1-h { font-size: 17px; font-weight: bold; color: white; line-height: 1.1; position: relative; }
+.as1-mid { flex:1; display:flex; flex-direction:column; justify-content:center; gap:5px; padding:10px 0; }
+.as1-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: rgba(255,255,255,0.78); }
+.as1-dot { width: 6px; height: 6px; border-radius: 50%; background: #00c853; flex-shrink: 0; }
+.as1-cta {
+  background: #00c853; border-radius: 7px;
+  padding: 9px; text-align: center;
+  font-size: 10px; font-weight: bold; color: white; margin-bottom: 5px;
+}
+.as1-sub { text-align: center; font-size: 8px; color: rgba(255,255,255,0.32); }
+
+/* ─ ALMACÉN STORY 2 ─ */
+.as2 {
+  background:
+    radial-gradient(circle at top, rgba(0,200,83,0.13), transparent 42%),
+    linear-gradient(180deg,#f6f3eb,#eef2f6);
+  padding: 17px 15px; display: flex;
+  flex-direction: column; justify-content: space-between;
+}
+.as2-kicker {
+  display: inline-block; padding: 3px 8px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 8px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 7px; width: fit-content;
+}
+.as2-h { font-size: 15px; font-weight: bold; color: #12202e; line-height: 1.1; }
+.as2-mid { flex:1; display:flex; flex-direction:column; gap:5px; justify-content:center; padding:8px 0; }
+.as2-card {
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 9px; padding: 8px 10px;
+  box-shadow: 0 2px 7px rgba(18,32,46,0.05);
+}
+.as2-card.feat { background: linear-gradient(135deg,#17324a,#112434); }
+.as2-card-plan { font-size: 8px; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; color: #5b6775; margin-bottom: 2px; }
+.as2-card.feat .as2-card-plan { color: rgba(255,255,255,0.52); }
+.as2-card-price { font-size: 14px; font-weight: bold; color: #12202e; }
+.as2-card.feat .as2-card-price { color: white; }
+.as2-card-desc { font-size: 9px; color: #576473; margin-top: 1px; }
+.as2-card.feat .as2-card-desc { color: rgba(255,255,255,0.48); }
+.as2-cta {
+  background: #00c853; border-radius: 7px;
+  padding: 9px; text-align: center;
+  font-size: 10px; font-weight: bold; color: white;
+  box-shadow: 0 6px 14px rgba(0,200,83,0.22); margin-bottom: 4px;
+}
+.as2-brand { text-align:center; font-size:8px; font-weight:bold; letter-spacing:0.08em; text-transform:uppercase; color:rgba(18,32,46,0.26); }
+
+/* Copy sugerido */
+.copy-box {
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 18px; box-shadow: 0 8px 24px rgba(18,32,46,0.07);
+  padding: 22px 26px; max-width: 640px; margin-top: 6px;
+}
+.copy-tag {
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #5b6775; margin-bottom: 14px;
+}
+.copy-block { margin-bottom: 14px; }
+.copy-label {
+  display: inline-block; margin-bottom: 5px;
+  color: #17324a; font-size: 11px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.copy-text { font-size: 13px; color: #4c5c6b; line-height: 1.75; }
+
+/* ══════════════════════════════════════════
+   VISITA CLIENTE
+══════════════════════════════════════════ */
+.visita-area {
+  background: #edf1f4;
+  min-height: calc(100vh - 45px);
+  padding: 28px 20px;
+}
+.visita-area h2 { font-size: 19px; color: #12202e; margin-bottom: 6px; }
+.visita-area .sub { font-size: 13px; color: #576473; margin-bottom: 24px; }
+
+.doc {
+  width: 794px; background: white;
+  box-shadow: 0 8px 40px rgba(18,32,46,0.14);
+  border-radius: 4px; overflow: hidden;
+  margin: 0 auto; font-family: Arial, sans-serif; color: #17212b;
+}
+.doc-header {
+  background: linear-gradient(160deg,#112434 0%,#18354e 100%);
+  padding: 42px 50px; color: white; position: relative; overflow: hidden;
+}
+.doc-header::before {
+  content:''; position:absolute; top:-70px; right:60px;
+  width:260px; height:260px; border-radius:50%;
+  border:50px solid rgba(0,200,83,0.06);
+}
+.doc-header-grid {
+  display: flex; justify-content: space-between;
+  align-items: flex-end; position: relative;
+}
+.doc-header-tag {
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); margin-bottom: 9px;
+}
+.doc-h1 { font-size: 32px; line-height: 1.05; color: white; margin-bottom: 9px; }
+.doc-sub { font-size: 13px; color: rgba(255,255,255,0.58); line-height: 1.65; max-width: 370px; }
+.doc-brand {
+  font-size: 11px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 7px;
+}
+.doc-contact { font-size: 11px; color: rgba(255,255,255,0.38); line-height: 1.8; text-align: right; }
+.doc-wa { font-size: 13px; font-weight: bold; color: #00c853; display: block; }
+
+.doc-body { padding: 42px 50px; }
+.doc-kicker {
+  display: inline-block; padding: 5px 10px; border-radius: 999px;
+  background: rgba(19,34,53,0.08); color: #2d495e;
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 11px;
+}
+
+/* Intro/discurso */
+.doc-intro { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid rgba(18,32,46,0.08); }
+.doc-guion {
+  background: linear-gradient(180deg,#fff7e8,#ffffff);
+  border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 18px; box-shadow: 0 8px 24px rgba(18,32,46,0.07);
+  padding: 20px 24px; font-size: 14px; color: #3a4755;
+  line-height: 1.85; font-style: italic;
+}
+.doc-guion strong { font-style: normal; color: #12202e; }
+
+/* Problemas */
+.doc-problems {
+  background: #f7f8fa; border: 1px solid rgba(18,32,46,0.07);
+  border-radius: 18px; padding: 22px 26px; margin-bottom: 30px;
+}
+.doc-problems h3 { font-size: 15px; color: #12202e; margin-bottom: 14px; }
+.doc-prob-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.doc-prob {
+  background: white; border: 1px solid rgba(18,32,46,0.08);
+  border-radius: 12px; padding: 14px;
+  box-shadow: 0 4px 12px rgba(18,32,46,0.06);
+  border-left: 3px solid #00c853;
+}
+.doc-prob-ico { font-size: 17px; margin-bottom: 7px; }
+.doc-prob-label { font-size: 12px; font-weight: bold; color: #12202e; margin-bottom: 3px; }
+.doc-prob-text { font-size: 11px; color: #576473; line-height: 1.6; }
+
+/* Soluciones */
+.doc-sol { margin-bottom: 28px; }
+.doc-sol-title { font-size: 15px; color: #12202e; margin-bottom: 14px; }
+.doc-sol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.doc-sol-card {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(18,32,46,0.08);
+  box-shadow: 0 8px 24px rgba(18,32,46,0.08);
+}
+.doc-sol-head {
+  padding: 16px 18px;
+  background: linear-gradient(180deg,#17324a,#112434);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.doc-sol-name { font-size: 17px; font-weight: bold; color: white; }
+.doc-sol-sub { font-size: 11px; color: rgba(255,255,255,0.62); margin-top: 2px; }
+.doc-sol-tag {
+  font-size: 9px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: rgba(255,255,255,0.12); border-radius: 999px;
+  padding: 3px 9px; color: rgba(255,255,255,0.78);
+}
+.doc-sol-body { padding: 14px 18px; background: white; }
+.doc-sol-feat {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid rgba(18,32,46,0.05);
+  font-size: 12px; color: #3a4755;
+}
+.doc-sol-feat:last-of-type { border-bottom: none; }
+.doc-check { color: #00c853; font-weight: bold; }
+.doc-sol-price {
+  font-size: 12px; font-weight: bold; color: #17324a;
+  margin-top: 10px; padding-top: 9px;
+  border-top: 1px solid rgba(18,32,46,0.07);
+}
+
+/* Por qué */
+.doc-why {
+  background: linear-gradient(160deg,#112434,#18354e);
+  border-radius: 16px; padding: 22px 26px; margin-bottom: 28px;
+}
+.doc-why h3 { font-size: 14px; font-weight: bold; color: white; margin-bottom: 14px; }
+.doc-why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.doc-why-item {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 13px; text-align: center;
+}
+.doc-why-ico { font-size: 19px; margin-bottom: 7px; }
+.doc-why-label { font-size: 11px; font-weight: bold; color: white; margin-bottom: 3px; }
+.doc-why-text { font-size: 10px; color: rgba(255,255,255,0.48); line-height: 1.6; }
+
+/* Pasos */
+.doc-steps { margin-bottom: 28px; }
+.doc-steps h3 { font-size: 14px; color: #12202e; margin-bottom: 14px; }
+.doc-steps-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
+.doc-steps-row::before {
+  content:''; position:absolute;
+  top:19px; left:34px; right:34px;
+  height:2px; background:rgba(18,32,46,0.08);
+}
+.doc-step { text-align: center; position: relative; }
+.doc-step-num {
+  width: 38px; height: 38px;
+  background: #00c853; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold; font-size: 16px; color: white;
+  margin: 0 auto 10px; position: relative;
+  box-shadow: 0 8px 16px rgba(0,200,83,0.22);
+}
+.doc-step-label { font-size: 12px; font-weight: bold; color: #12202e; margin-bottom: 3px; }
+.doc-step-text { font-size: 10px; color: #576473; line-height: 1.6; padding: 0 5px; }
+
+/* CTA final */
+.doc-cta {
+  background: linear-gradient(180deg,#17324a,#112434);
+  border-radius: 16px; padding: 24px 26px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: white;
+}
+.doc-cta h3 { font-size: 16px; margin-bottom: 5px; }
+.doc-cta p { font-size: 12px; color: rgba(255,255,255,0.58); line-height: 1.65; }
+.doc-cta-wa { font-size: 16px; font-weight: bold; color: #00c853; display: block; margin-bottom: 4px; }
+.doc-cta-site { font-size: 11px; color: rgba(255,255,255,0.38); }
+
+.doc-footer {
+  background: #f7f8fa; border-top: 1px solid rgba(18,32,46,0.08);
+  padding: 13px 50px; display: flex;
+  align-items: center; justify-content: space-between;
+}
+.doc-footer-brand {
+  font-size: 10px; font-weight: bold;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: #aab0ba;
+}
+.doc-footer-line { font-size: 10px; color: #aab0ba; }
+
+/* ── PRINT ── */
+@media print {
+  .kit-nav, .print-controls { display:none; }
+  .print-area, .visita-area { background:white; padding:0; }
+  .pages-stack { gap:0; }
+  .a4, .doc { box-shadow:none; border-radius:0; }
+  .social-area, .hub { display:none; }
+}
+@media (max-width:860px) {
+  .a4, .doc { width:100%; min-height:auto; }
+  .tp1, .tp2-grid, .doc-sol-grid { grid-template-columns:1fr; }
+  .doc-why-grid, .doc-steps-row, .ap2-perm-steps { grid-template-columns:1fr 1fr; }
+  .doc-prob-grid { grid-template-columns:1fr 1fr; }
+  .ap2-footer { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="kit-nav">
+  <div class="kit-brand">NEXAR SISTEMAS · KIT</div>
+  <button class="kit-btn active" onclick="show('hub')">Inicio</button>
+  <button class="kit-btn" onclick="show('tienda-f')">📄 Folleto Tienda</button>
+  <button class="kit-btn" onclick="show('almacen-f')">📄 Folleto Almacén</button>
+  <button class="kit-btn" onclick="show('tienda-s')">📱 Social Tienda</button>
+  <button class="kit-btn" onclick="show('almacen-s')">📱 Social Almacén</button>
+  <button class="kit-btn" onclick="show('visita')">🤝 Visita Cliente</button>
+</nav>
+
+<!-- HUB -->
+<div id="hub" class="page active">
+  <div class="hub">
+    <div class="hub-kicker">Kit de Marketing · Nexar Sistemas</div>
+    <h1>Material comercial<br>listo para usar</h1>
+    <p>Folletos A4 imprimibles, publicaciones para Instagram y WhatsApp, y documento de presentación personal para visita a clientes.</p>
+    <div class="hub-grid">
+      <div class="hub-card" onclick="show('tienda-f')">
+        <div class="hub-card-num">2</div>
+        <div class="hub-card-tag">Nexar Tienda</div>
+        <h3>Folleto Imprimible</h3>
+        <p>2 páginas A4. Beneficios, planes detallados y tabla comparativa.</p>
+      </div>
+      <div class="hub-card" onclick="show('almacen-f')">
+        <div class="hub-card-num">2</div>
+        <div class="hub-card-tag">Nexar Almacén</div>
+        <h3>Folleto Imprimible</h3>
+        <p>2 páginas A4. Incluye sección de permanencia de licencia BASICA.</p>
+      </div>
+      <div class="hub-card" onclick="show('tienda-s')">
+        <div class="hub-card-num">4</div>
+        <div class="hub-card-tag">Nexar Tienda · Social</div>
+        <h3>Posts IG + Stories</h3>
+        <p>2 posts cuadrados para feed + 2 historias verticales con copy sugerido.</p>
+      </div>
+      <div class="hub-card" onclick="show('almacen-s')">
+        <div class="hub-card-num">4</div>
+        <div class="hub-card-tag">Nexar Almacén · Social</div>
+        <h3>Posts IG + Stories</h3>
+        <p>2 posts cuadrados para feed + 2 historias verticales con copy sugerido.</p>
+      </div>
+      <div class="hub-card" onclick="show('visita')">
+        <div class="hub-card-num">1</div>
+        <div class="hub-card-tag">Ambos productos</div>
+        <h3>Presentación de Visita</h3>
+        <p>Guión, problemas, soluciones, diferenciadores y CTA para el cierre.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOLLETO TIENDA -->
+<div id="tienda-f" class="page">
+  <div class="print-area">
+    <div class="print-controls">
+      <h2>Folleto Nexar Tienda — 2 páginas A4</h2>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+    <div class="pages-stack">
+
+      <!-- PÁG 1 -->
+      <div class="a4">
+        <div class="tp1">
+          <div class="tp1-left">
+            <div class="tp1-brand">Nexar Sistemas · Nexar Tienda</div>
+            <div>
+              <div class="tp1-kicker">App desktop · Comercios chicos Argentina</div>
+              <h2 class="tp1-h1">Nexar Tienda</h2>
+              <p class="tp1-subtitle">Controlá ventas, stock, caja, gastos y ganancias desde una app simple para tu comercio.</p>
+              <p class="tp1-lead">Funciona localmente en tu PC, sin depender de internet. Ideal para kioscos, despensas, minimercados y ferreterías. Dejá atrás el Excel.</p>
+              <div class="tp1-proof">
+                <div class="tp1-pill">🖥️ Funciona localmente en tu PC</div>
+                <div class="tp1-pill">📶 Sin internet para vender</div>
+                <div class="tp1-pill">🔒 Tus datos en tu computadora</div>
+              </div>
+              <div class="tp1-btn">Pedí tu demo por WhatsApp</div>
+            </div>
+            <div class="tp1-ideal">
+              <strong>Ideal para</strong>
+              <p>Kioscos · Despensas · Minimercados · Ferreterías · Comercios chicos en Argentina</p>
+            </div>
+          </div>
+          <div class="tp1-right">
+            <div class="tp1-section-tag">Lo que resolvés todos los días</div>
+            <div class="tp1-feats">
+              <div class="tp1-feat"><div class="tp1-feat-icon">🛒</div><div><h4>Ventas rápidas</h4><p>Flujo de venta ágil pensado para el mostrador. Atendé más en menos tiempo.</p></div></div>
+              <div class="tp1-feat"><div class="tp1-feat-icon">📦</div><div><h4>Control de stock</h4><p>Seguí productos, movimientos y disponibilidad sin planillas separadas.</p></div></div>
+              <div class="tp1-feat"><div class="tp1-feat-icon">💰</div><div><h4>Caja diaria</h4><p>Registrá ingresos y movimientos. Cerrá cada día sabiendo dónde estás.</p></div></div>
+              <div class="tp1-feat"><div class="tp1-feat-icon">📋</div><div><h4>Gastos del negocio</h4><p>Cargá gastos básicos y ordená la operación cotidiana del comercio.</p></div></div>
+              <div class="tp1-feat"><div class="tp1-feat-icon">📊</div><div><h4>Reportes (PRO y FULL)</h4><p>Historial, análisis de ganancias y exportaciones para tomar mejores decisiones.</p></div></div>
+            </div>
+            <div class="tp1-plans">
+              <div class="tp1-plan b">
+                <span class="tp1-plan-tag">BASICA</span>
+                <div class="tp1-plan-price">$49.900</div>
+                <div class="tp1-plan-period">pago único</div>
+              </div>
+              <div class="tp1-plan p">
+                <div class="tp1-plan-badge">Recomendado</div>
+                <span class="tp1-plan-tag">PRO</span>
+                <div class="tp1-plan-price">$9.900</div>
+                <div class="tp1-plan-period">ARS/mes</div>
+              </div>
+              <div class="tp1-plan f">
+                <span class="tp1-plan-tag">FULL</span>
+                <div class="tp1-plan-price">$19.900</div>
+                <div class="tp1-plan-period">ARS/mes</div>
+              </div>
+            </div>
+            <div class="tp1-demo">
+              <h4>Probá Nexar Tienda sin cargo</h4>
+              <p>Te mostramos el flujo y decidimos juntos qué plan encaja con tu negocio.</p>
+              <div class="tp1-demo-wa">WhatsApp: +54 9 264 585-8874</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PÁG 2 -->
+      <div class="a4">
+        <div class="tp2">
+          <div class="tp2-header">
+            <div>
+              <div class="tp2-kicker">Planes y precios · Nexar Tienda</div>
+              <h2 class="tp2-h2">Elegí el plan que encaja<br>con tu etapa</h2>
+            </div>
+            <div class="tp2-note">Empezás con BASICA y actualizás a PRO o FULL cuando lo necesités. Sin promesas vacías.</div>
+          </div>
+
+          <div class="tp2-grid">
+            <div class="tp2-card">
+              <div class="tp2-card-head">
+                <div class="tp2-card-tag">Para empezar</div>
+                <div class="tp2-card-name">BASICA</div>
+                <div class="tp2-card-price">$49.900 <small>pago único</small></div>
+              </div>
+              <p class="tp2-card-copy">Ideal para ordenar lo esencial sin sumar complejidad al negocio.</p>
+              <ul class="tp2-card-list">
+                <li>Productos</li><li>Clientes</li><li>Proveedores</li>
+                <li>Ventas / POS</li><li>Stock</li><li>Caja</li><li>Gastos básicos</li>
+              </ul>
+              <div class="tp2-card-limit">
+                <strong>Limitaciones</strong>
+                <span>1 usuario, productos limitados, sin reportes avanzados, sin exportación, sin multiusuario ni multinegocio.</span>
+              </div>
+            </div>
+            <div class="tp2-card featured">
+              <div class="tp2-card-badge">Recomendado</div>
+              <div class="tp2-card-head">
+                <div class="tp2-card-tag">Para gestionar en serio</div>
+                <div class="tp2-card-name">PRO</div>
+                <div class="tp2-card-price">$9.900 <small>ARS/mes</small></div>
+              </div>
+              <p class="tp2-card-copy">Para comercios que necesitan más historial, reportes y análisis.</p>
+              <ul class="tp2-card-list">
+                <li>Todo BASICA incluido</li><li>Módulo de compras</li>
+                <li>Historial completo</li><li>Reportes y análisis</li>
+                <li>Exportación de datos</li><li>Análisis de ganancia</li>
+                <li>Multiusuario básico</li>
+              </ul>
+              <div class="tp2-card-limit">
+                <strong>Limitaciones</strong>
+                <span>Sin multinegocio, sin temporadas avanzadas y sin facturación ARCA.</span>
+              </div>
+            </div>
+            <div class="tp2-card">
+              <div class="tp2-card-head">
+                <div class="tp2-card-tag">Para crecer</div>
+                <div class="tp2-card-name">FULL</div>
+                <div class="tp2-price-old">$24.900</div>
+                <div class="tp2-card-price">$19.900 <small>ARS/mes</small></div>
+                <div class="tp2-price-badge">Precio lanzamiento</div>
+              </div>
+              <p class="tp2-card-copy">Para negocios que quieren escalar, sumar sucursales o prepararse para nuevas integraciones.</p>
+              <ul class="tp2-card-list">
+                <li>Todo PRO incluido</li><li>Temporadas</li>
+                <li>Multinegocio</li><li>Futuras integraciones</li>
+                <li>Facturación ARCA <em>(próximamente)</em></li>
+                <li>Módulos de IA <em>(próximamente)</em></li>
+              </ul>
+              <div class="tp2-card-limit">
+                <strong>En evolución</strong>
+                <span>ARCA e IA son módulos próximos, no funciones entregadas hoy.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tp2-table-wrap">
+            <table class="tp2-table">
+              <thead>
+                <tr>
+                  <th>Función</th><th>BASICA</th><th>PRO</th><th>FULL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Ventas / POS</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Productos y stock</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Caja</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Gastos</td><td>Básicos</td><td class="tp2-si">Completo</td><td class="tp2-si">Completo</td></tr>
+                <tr><td>Módulo compras</td><td class="tp2-no">No</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Reportes e historial</td><td class="tp2-no">No</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Exportación</td><td class="tp2-no">No</td><td class="tp2-si">Sí</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Multiusuario</td><td class="tp2-no">No</td><td>Básico</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Temporadas / Multinegocio</td><td class="tp2-no">No</td><td class="tp2-no">No</td><td class="tp2-si">Sí</td></tr>
+                <tr><td>Facturación ARCA</td><td class="tp2-no">No</td><td class="tp2-no">No</td><td class="tp2-pr">Próximamente</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tp2-footer">
+            <div>
+              <h4>Demo sin compromiso · Consultá por WhatsApp</h4>
+              <p>nexarsistemas.github.io/nexar-tienda · © 2026 Nexar Sistemas</p>
+            </div>
+            <div class="tp2-footer-wa">+54 9 264 585-8874</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOLLETO ALMACÉN -->
+<div id="almacen-f" class="page">
+  <div class="print-area">
+    <div class="print-controls">
+      <h2>Folleto Nexar Almacén — 2 páginas A4</h2>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+    <div class="pages-stack">
+
+      <!-- PÁG 1 -->
+      <div class="a4">
+        <div class="ap1">
+          <div class="ap1-hero">
+            <div class="ap1-hero-grid">
+              <div>
+                <div class="ap1-kicker">App desktop · Almacenes Argentina</div>
+                <h1 class="ap1-h1">Nexar Almacén</h1>
+                <p class="ap1-subtitle">Ordená ventas, stock y caja desde una app local y simple. Pensada para almacenes, despensas y autoservicios chicos que quieren dejar atrás las planillas.</p>
+              </div>
+              <div class="ap1-stats">
+                <div class="ap1-stat"><div class="ap1-stat-num">100%</div><div class="ap1-stat-label">Sin internet</div></div>
+                <div class="ap1-stat"><div class="ap1-stat-num">3</div><div class="ap1-stat-label">Planes según tu etapa</div></div>
+                <div class="ap1-stat"><div class="ap1-stat-num">∞</div><div class="ap1-stat-label">BASICA permanente</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="ap1-proof">
+            <div class="ap1-proof-pill">🖥️ Funciona localmente en tu PC</div>
+            <div class="ap1-proof-pill">📶 Sin internet para vender</div>
+            <div class="ap1-proof-pill">🔒 Tus datos en tu computadora</div>
+          </div>
+          <div class="ap1-body">
+            <div class="ap1-body-grid">
+              <div>
+                <div class="ap1-section-tag">Lo que resolvés en tu almacén</div>
+                <div class="ap1-feat"><div class="ap1-feat-icon">🛒</div><div><div class="ap1-feat-title">Ventas ágiles</div><div class="ap1-feat-desc">Registrá ventas rápido. Menos cola, mejor atención en el mostrador.</div></div></div>
+                <div class="ap1-feat"><div class="ap1-feat-icon">📦</div><div><div class="ap1-feat-title">Productos y stock</div><div class="ap1-feat-desc">Controlá disponibilidad y reposición sin planillas separadas.</div></div></div>
+                <div class="ap1-feat"><div class="ap1-feat-icon">💵</div><div><div class="ap1-feat-title">Caja diaria</div><div class="ap1-feat-desc">Seguí ingresos y movimientos con claridad todos los días.</div></div></div>
+                <div class="ap1-feat"><div class="ap1-feat-icon">📊</div><div><div class="ap1-feat-title">Compras y gastos</div><div class="ap1-feat-desc">En PRO y FULL sumás gestión completa de compras, gastos y reportes.</div></div></div>
+                <div class="ap1-feat"><div class="ap1-feat-icon">📈</div><div><div class="ap1-feat-title">Reportes e historial</div><div class="ap1-feat-desc">Analizá tu negocio con datos concretos y tomá mejores decisiones.</div></div></div>
+              </div>
+              <div>
+                <div class="ap1-section-tag">Elegí tu plan</div>
+                <div class="ap1-plans">
+                  <div class="ap1-plan b">
+                    <div class="ap1-plan-row">
+                      <div class="ap1-plan-name">BASICA</div>
+                      <div class="ap1-plan-price">$29.900 <span class="ap1-plan-period">único</span></div>
+                    </div>
+                    <div class="ap1-plan-feats">Ventas · Productos · Stock simple · Caja · Clientes y proveedores básicos</div>
+                  </div>
+                  <div class="ap1-plan p">
+                    <div class="ap1-plan-badge">Recomendado</div>
+                    <div class="ap1-plan-row">
+                      <div class="ap1-plan-name">PRO</div>
+                      <div class="ap1-plan-price">$9.900 <span class="ap1-plan-period">/mes</span></div>
+                    </div>
+                    <div class="ap1-plan-feats">Todo BASICA + Compras · Gastos · Reportes · Historial · Exportaciones · Stock avanzado</div>
+                  </div>
+                  <div class="ap1-plan f">
+                    <div class="ap1-plan-row">
+                      <div class="ap1-plan-name">FULL</div>
+                      <div class="ap1-plan-price">$19.900 <span class="ap1-plan-period">/mes</span></div>
+                    </div>
+                    <div class="ap1-plan-feats">Todo PRO + IA · Multiusuario · Multinegocio · Módulos premium futuros</div>
+                  </div>
+                </div>
+                <div class="ap1-demo">
+                  <h4>Demo sin cargo</h4>
+                  <p>Evaluamos juntos qué plan te conviene</p>
+                  <div class="ap1-demo-btn">WhatsApp: +54 9 264 585-8874</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PÁG 2 -->
+      <div class="a4">
+        <div class="ap2">
+          <div class="ap2-kicker">Comparativa y condiciones · Nexar Almacén</div>
+          <h2 class="ap2-h2">Qué incluye cada plan</h2>
+          <p class="ap2-sub">Una vista rápida de qué se destraba cuando pasás de BASICA a PRO o FULL. La licencia BASICA es permanente — la comprás una vez y la conservás siempre, aunque canceles la suscripción.</p>
+
+          <div class="ap2-table-wrap">
+            <table class="ap2-table">
+              <thead>
+                <tr><th>Función</th><th>BASICA</th><th>PRO</th><th>FULL</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Ventas</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Productos</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Stock</td><td>Simple</td><td class="ap2-si">Avanzado</td><td class="ap2-si">Avanzado</td></tr>
+                <tr><td>Caja</td><td>Básica</td><td class="ap2-si">Completa</td><td class="ap2-si">Completa</td></tr>
+                <tr><td>Clientes / Proveedores</td><td>Básicos</td><td class="ap2-si">Completo</td><td class="ap2-si">Completo</td></tr>
+                <tr><td>Compras</td><td class="ap2-no">No</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Gastos</td><td class="ap2-no">No</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Reportes e historial</td><td class="ap2-no">No</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Exportaciones</td><td class="ap2-no">No</td><td class="ap2-si">Sí</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>IA</td><td class="ap2-no">No</td><td class="ap2-no">No</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>Multiusuario / Multinegocio</td><td class="ap2-no">No</td><td>Parcial</td><td class="ap2-si">Sí</td></tr>
+                <tr><td>ARCA futura</td><td class="ap2-no">No</td><td class="ap2-no">No</td><td class="ap2-pr">Próximamente</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ap2-perm">
+            <div class="ap2-perm-label">Importante · Cómo funciona la permanencia de BASICA</div>
+            <div class="ap2-perm-title">La licencia BASICA no vence nunca</div>
+            <div class="ap2-perm-steps">
+              <div class="ap2-step"><div class="ap2-step-num">1</div><div class="ap2-step-text">BASICA se compra una vez y queda como derecho permanente del cliente.</div></div>
+              <div class="ap2-step"><div class="ap2-step-num">2</div><div class="ap2-step-text">PRO y FULL son suscripciones mensuales que suman módulos mientras estén vigentes.</div></div>
+              <div class="ap2-step"><div class="ap2-step-num">3</div><div class="ap2-step-text">Si tenés BASICA y cancelás PRO o FULL, seguís operando con BASICA sin problema.</div></div>
+              <div class="ap2-step"><div class="ap2-step-num">4</div><div class="ap2-step-text">Sin BASICA previa, la licencia queda vencida al cancelar la suscripción mensual.</div></div>
+            </div>
+          </div>
+
+          <div class="ap2-footer">
+            <div>
+              <h4>Demo sin cargo · Evaluamos qué plan te conviene</h4>
+              <p>Sin presión. La demo sirve para conocer el flujo real de trabajo.<br>nexarsistemas.github.io/nexar-almacen · © 2026 Nexar Sistemas</p>
+              <div class="ap2-footer-wa">+54 9 264 585-8874</div>
+            </div>
+            <div class="ap2-badges">
+              <div class="ap2-badge">🖥️ Sin internet requerido</div>
+              <div class="ap2-badge">🔒 Datos en tu PC</div>
+              <div class="ap2-badge">♾️ BASICA permanente</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL TIENDA -->
+<div id="tienda-s" class="page">
+  <div class="social-area">
+    <h2>Social Media — Nexar Tienda</h2>
+    <p class="sub">2 posts cuadrados para feed de Instagram · 2 historias verticales para IG y WhatsApp</p>
+
+    <div class="social-row">
+      <div class="social-row-label">Feed de Instagram — Cuadrado 1:1</div>
+      <div class="social-grid">
+        <div class="sq tf1">
+          <div>
+            <div class="tf1-kicker">Nexar Tienda</div>
+            <div class="tf1-h">Dejá el Excel<br>atrás.</div>
+            <div class="tf1-desc">Vendé, controlá stock y cerrá la caja desde una app que corre en tu PC. Sin internet.</div>
+          </div>
+          <div>
+            <div class="tf1-wa">Pedí tu demo gratis</div>
+            <div class="tf1-pills">
+              <div class="tf1-pill">🛒 Ventas</div>
+              <div class="tf1-pill">📦 Stock</div>
+              <div class="tf1-pill">💰 Caja</div>
+            </div>
+            <div class="tf1-brand">@nexarsistemas</div>
+          </div>
+        </div>
+        <div class="sq tf2">
+          <div class="tf2-kicker">Nexar Tienda · Plan PRO</div>
+          <div class="tf2-plan">Para gestionar en serio</div>
+          <div class="tf2-price">$9.900</div>
+          <div class="tf2-price-sub">ARS/mes · Nexar Tienda</div>
+          <div class="tf2-divider"></div>
+          <div class="tf2-copy">Reportes, historial, análisis de ganancia<br>y multiusuario para tu comercio.</div>
+          <div class="tf2-btn">Pedí tu demo →</div>
+          <div class="tf2-brand">@nexarsistemas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="social-row">
+      <div class="social-row-label">Historias — Instagram & WhatsApp 9:16</div>
+      <div class="social-grid">
+        <div class="story ts1">
+          <div>
+            <div class="ts1-kicker">Nexar Tienda</div>
+            <div class="ts1-h">Tu comercio<br>bajo control</div>
+          </div>
+          <div class="ts1-mid">
+            <div class="ts1-item"><span class="ts1-check">✓</span> Ventas rápidas en mostrador</div>
+            <div class="ts1-item"><span class="ts1-check">✓</span> Stock sin planillas</div>
+            <div class="ts1-item"><span class="ts1-check">✓</span> Caja clara cada día</div>
+            <div class="ts1-item"><span class="ts1-check">✓</span> Sin internet</div>
+          </div>
+          <div>
+            <div class="ts1-cta">Solicitá demo gratis</div>
+            <div class="ts1-wa">wa.me/5492645858874</div>
+          </div>
+        </div>
+        <div class="story ts2">
+          <div>
+            <div class="ts2-kicker">Nexar Tienda · Planes</div>
+            <div class="ts2-h">Empezás con BASICA,<br>escalás cuando<br>lo necesitás</div>
+          </div>
+          <div class="ts2-mid">
+            <div class="ts2-row"><div class="ts2-row-name">BASICA</div><div class="ts2-row-price">$49.900 único</div></div>
+            <div class="ts2-row feat"><div class="ts2-row-name">PRO</div><div class="ts2-row-price">$9.900/mes</div></div>
+            <div class="ts2-row"><div class="ts2-row-name">FULL</div><div class="ts2-row-price">$19.900/mes</div></div>
+          </div>
+          <div>
+            <div class="ts2-cta">Pedí tu demo por WhatsApp</div>
+            <div class="ts2-brand">Nexar Sistemas · @nexarsistemas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="copy-box">
+      <div class="copy-tag">Copy sugerido para cada publicación</div>
+      <div class="copy-block">
+        <div class="copy-label">Post 1 — Feed</div>
+        <div class="copy-text">¿Todavía usás Excel para tu negocio? 🤯<br>Con Nexar Tienda controlás ventas, stock y caja desde tu PC — sin internet, sin complicaciones.<br>👇 Pedí tu demo gratis por WhatsApp<br><br>#kiosco #despensa #minimercado #NexarTienda #comercio #Argentina</div>
+      </div>
+      <div class="copy-block">
+        <div class="copy-label">Post 2 — Feed</div>
+        <div class="copy-text">Plan PRO de Nexar Tienda: $9.900/mes 💪<br>Reportes, historial y análisis de ganancia. Empezás con BASICA (pago único) y escalás cuando lo necesitás.<br><br>#NexarTienda #gestioncomercial #softwareargentino</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL ALMACÉN -->
+<div id="almacen-s" class="page">
+  <div class="social-area">
+    <h2>Social Media — Nexar Almacén</h2>
+    <p class="sub">2 posts cuadrados para feed de Instagram · 2 historias verticales para IG y WhatsApp</p>
+
+    <div class="social-row">
+      <div class="social-row-label">Feed de Instagram — Cuadrado 1:1</div>
+      <div class="social-grid">
+        <div class="sq af1">
+          <div>
+            <div class="af1-kicker">Nexar Almacén</div>
+            <div class="af1-h">De las planillas<br>al control real.</div>
+            <div class="af1-desc">Vendé, controlá stock y cerrá la caja desde tu PC. Sin internet. Sin Excel.</div>
+          </div>
+          <div class="af1-facts">
+            <div class="af1-fact"><div class="af1-fact-num">100%</div><div class="af1-fact-label">Sin internet</div></div>
+            <div class="af1-fact"><div class="af1-fact-num">BASICA</div><div class="af1-fact-label">Permanente</div></div>
+            <div class="af1-fact"><div class="af1-fact-num">$29.900</div><div class="af1-fact-label">Licencia única</div></div>
+            <div class="af1-fact"><div class="af1-fact-num">Demo</div><div class="af1-fact-label">Sin cargo</div></div>
+          </div>
+        </div>
+        <div class="sq af2">
+          <div class="af2-kicker">Nexar Almacén · Planes</div>
+          <div class="af2-h">Empezás simple,<br>crecés cuando<br>lo necesitás.</div>
+          <div class="af2-plans">
+            <div class="af2-row b"><div class="af2-row-name">BASICA</div><div class="af2-row-price">$49.900 único</div></div>
+            <div class="af2-row p"><div class="af2-row-name">PRO</div><div class="af2-row-price">$9.900/mes</div></div>
+            <div class="af2-row f"><div class="af2-row-name">FULL</div><div class="af2-row-price">$19.900/mes</div></div>
+          </div>
+          <div class="af2-brand">@nexarsistemas · Demo gratis por WhatsApp</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="social-row">
+      <div class="social-row-label">Historias — Instagram & WhatsApp 9:16</div>
+      <div class="social-grid">
+        <div class="story as1">
+          <div>
+            <div class="as1-kicker">Nexar Almacén</div>
+            <div class="as1-h">Tu almacén<br>sin planillas</div>
+          </div>
+          <div class="as1-mid">
+            <div class="as1-item"><div class="as1-dot"></div>Ventas ágiles en mostrador</div>
+            <div class="as1-item"><div class="as1-dot"></div>Stock y reposición bajo control</div>
+            <div class="as1-item"><div class="as1-dot"></div>Caja ordenada cada día</div>
+            <div class="as1-item"><div class="as1-dot"></div>Datos en tu PC, sin internet</div>
+            <div class="as1-item"><div class="as1-dot"></div>BASICA permanente</div>
+          </div>
+          <div>
+            <div class="as1-cta">Pedí demo gratis</div>
+            <div class="as1-sub">wa.me/5492645858874</div>
+          </div>
+        </div>
+        <div class="story as2">
+          <div>
+            <div class="as2-kicker">Nexar Almacén</div>
+            <div class="as2-h">La licencia<br>BASICA no<br>vence nunca</div>
+          </div>
+          <div class="as2-mid">
+            <div class="as2-card"><div class="as2-card-plan">BASICA</div><div class="as2-card-price">$49.900</div><div class="as2-card-desc">Pago único · permanente</div></div>
+            <div class="as2-card feat"><div class="as2-card-plan">PRO</div><div class="as2-card-price">$9.900/mes</div><div class="as2-card-desc">Si cancelás, conservás BASICA</div></div>
+            <div class="as2-card"><div class="as2-card-plan">FULL</div><div class="as2-card-price">$19.900/mes</div><div class="as2-card-desc">Todos los módulos + IA (próx.)</div></div>
+          </div>
+          <div>
+            <div class="as2-cta">Consultá por WhatsApp</div>
+            <div class="as2-brand">Nexar Sistemas · @nexarsistemas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="copy-box">
+      <div class="copy-tag">Copy sugerido para cada publicación</div>
+      <div class="copy-block">
+        <div class="copy-label">Post 1 — Feed</div>
+        <div class="copy-text">¿Todavía manejás el almacén con papelitos y planillas? 📋<br>Nexar Almacén te da control real: ventas, stock y caja desde tu PC — sin internet, tus datos siempre en tu computadora.<br>👇 Pedí tu demo sin cargo<br><br>#almacen #despensa #autoservicio #NexarAlmacen #gestion #comercio</div>
+      </div>
+      <div class="copy-block">
+        <div class="copy-label">Post 2 — Feed</div>
+        <div class="copy-text">BASICA: $49.900 una sola vez 🔒<br>Licencia permanente para Nexar Almacén. Sumás PRO o FULL cuando necesitás más, y si cancelás, BASICA sigue siendo tuya. Sin letra chica. Sin sorpresas.<br><br>#NexarAlmacen #softwareargentino #almacen #transparencia</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VISITA CLIENTE -->
+<div id="visita" class="page">
+  <div class="visita-area">
+    <div class="print-controls">
+      <h2>Presentación Personal — Visita al Cliente</h2>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+
+    <div class="doc">
+      <div class="doc-header">
+        <div class="doc-header-grid">
+          <div>
+            <div class="doc-header-tag">Nexar Sistemas · Presentación Comercial 2026</div>
+            <h1 class="doc-h1">Más control,<br>menos planillas.</h1>
+            <p class="doc-sub">Software de gestión para comercios chicos en Argentina. Simple, local y sin depender de internet.</p>
+          </div>
+          <div>
+            <div class="doc-brand">Nexar Sistemas</div>
+            <div class="doc-contact">
+              nexarsistemas.github.io<br>
+              <span class="doc-wa">+54 9 264 585-8874</span>
+              Demo sin cargo disponible
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-body">
+
+        <!-- GUIÓN -->
+        <div class="doc-intro">
+          <div class="doc-kicker">Discurso de apertura · Cómo presentarte</div>
+          <div class="doc-guion">
+            «Buenos días/tardes. Mi nombre es [tu nombre] y soy parte de <strong>Nexar Sistemas</strong>. Desarrollamos software de gestión pensado especialmente para comercios chicos de Argentina — kioscos, despensas, almacenes, ferreterías.<br><br>
+            Le traigo hoy <strong>Nexar Tienda / Nexar Almacén</strong> — una aplicación de escritorio que le permite controlar ventas, stock, caja y gastos desde su propia computadora, <strong>sin necesidad de internet</strong> y sin que sus datos salgan a ningún servidor externo.<br><br>
+            La idea es simple: dejar atrás las planillas de Excel y los cuadernos, y empezar a gestionar el negocio con información real. <strong>¿Me permite mostrarle cómo funciona?»</strong>
+          </div>
+        </div>
+
+        <!-- PROBLEMAS -->
+        <div class="doc-problems">
+          <h3>Los problemas que resolvemos — Para conectar con el cliente</h3>
+          <div class="doc-prob-grid">
+            <div class="doc-prob"><div class="doc-prob-ico">📋</div><div class="doc-prob-label">Planillas caóticas</div><div class="doc-prob-text">Excel que crece sin control, datos duplicados o perdidos entre archivos.</div></div>
+            <div class="doc-prob"><div class="doc-prob-ico">📦</div><div class="doc-prob-label">Stock sin control</div><div class="doc-prob-text">No saber qué hay, qué falta o cuánto se perdió sin registros claros.</div></div>
+            <div class="doc-prob"><div class="doc-prob-ico">💸</div><div class="doc-prob-label">Caja desorganizada</div><div class="doc-prob-text">Cerrar el día sin saber exactamente cuánto entró y cuánto salió.</div></div>
+            <div class="doc-prob"><div class="doc-prob-ico">🌐</div><div class="doc-prob-label">Depende del internet</div><div class="doc-prob-text">Apps en la nube que se cortan cuando más se necesitan.</div></div>
+            <div class="doc-prob"><div class="doc-prob-ico">💰</div><div class="doc-prob-label">Sin rentabilidad clara</div><div class="doc-prob-text">Vender mucho pero no saber si el negocio realmente gana dinero.</div></div>
+            <div class="doc-prob"><div class="doc-prob-ico">🔒</div><div class="doc-prob-label">Datos en riesgo</div><div class="doc-prob-text">Información del negocio en servidores externos sin control.</div></div>
+          </div>
+        </div>
+
+        <!-- SOLUCIONES -->
+        <div class="doc-sol">
+          <div class="doc-kicker">Nuestras soluciones</div>
+          <div class="doc-sol-title">Dos productos, un solo objetivo: ordenar su comercio</div>
+          <div class="doc-sol-grid">
+            <div class="doc-sol-card">
+              <div class="doc-sol-head">
+                <div><div class="doc-sol-name">Nexar Tienda</div><div class="doc-sol-sub">Kioscos, ferreterías y comercios chicos</div></div>
+                <div class="doc-sol-tag">DESKTOP</div>
+              </div>
+              <div class="doc-sol-body">
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Ventas rápidas / POS</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Control de stock completo</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Caja diaria y gastos</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Reportes y análisis (PRO/FULL)</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Multiusuario y multinegocio</div>
+                <div class="doc-sol-price">BASICA $49.900 único · PRO $9.900/mes · FULL $19.900/mes</div>
+              </div>
+            </div>
+            <div class="doc-sol-card">
+              <div class="doc-sol-head">
+                <div><div class="doc-sol-name">Nexar Almacén</div><div class="doc-sol-sub">Almacenes, despensas y autoservicios</div></div>
+                <div class="doc-sol-tag">DESKTOP</div>
+              </div>
+              <div class="doc-sol-body">
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Ventas ágiles en mostrador</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Stock simple y avanzado</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Caja y clientes básicos</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> Compras, gastos y reportes (PRO/FULL)</div>
+                <div class="doc-sol-feat"><span class="doc-check">✓</span> IA y módulos premium (FULL)</div>
+                <div class="doc-sol-price">BASICA $49.900 único · PRO $9.900/mes · FULL $19.900/mes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POR QUÉ -->
+        <div class="doc-why">
+          <h3>¿Por qué elegir Nexar Sistemas?</h3>
+          <div class="doc-why-grid">
+            <div class="doc-why-item"><div class="doc-why-ico">🖥️</div><div class="doc-why-label">100% local</div><div class="doc-why-text">Corre en su PC. No depende de internet para vender.</div></div>
+            <div class="doc-why-item"><div class="doc-why-ico">🔒</div><div class="doc-why-label">Datos propios</div><div class="doc-why-text">Su información queda en su computadora, no en servidores externos.</div></div>
+            <div class="doc-why-item"><div class="doc-why-ico">📈</div><div class="doc-why-label">Crece con usted</div><div class="doc-why-text">Empieza con BASICA y suma módulos cuando el negocio lo justifica.</div></div>
+            <div class="doc-why-item"><div class="doc-why-ico">🇦🇷</div><div class="doc-why-label">Hecho en Argentina</div><div class="doc-why-text">Diseñado para la realidad del comercio argentino. Sin letra chica.</div></div>
+          </div>
+        </div>
+
+        <!-- PASOS -->
+        <div class="doc-steps">
+          <div class="doc-kicker">Proceso de incorporación</div>
+          <h3>De instalar a entender su negocio en pocos pasos</h3>
+          <div class="doc-steps-row">
+            <div class="doc-step"><div class="doc-step-num">1</div><div class="doc-step-label">Demo</div><div class="doc-step-text">Mostramos el flujo real y evaluamos juntos qué plan le conviene.</div></div>
+            <div class="doc-step"><div class="doc-step-num">2</div><div class="doc-step-label">Instalación</div><div class="doc-step-text">Recibe la app y la deja lista en su PC para trabajar localmente.</div></div>
+            <div class="doc-step"><div class="doc-step-num">3</div><div class="doc-step-label">Carga inicial</div><div class="doc-step-text">Organiza su catálogo y empieza a registrar ventas y stock.</div></div>
+            <div class="doc-step"><div class="doc-step-num">4</div><div class="doc-step-label">Operación</div><div class="doc-step-text">Usa la app todos los días. PRO/FULL agrega reportes y análisis.</div></div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="doc-cta">
+          <div>
+            <h3>Demo sin cargo · Hoy mismo</h3>
+            <p>Sin presión, sin compromiso. Mostramos el sistema y decidimos juntos<br>si BASICA, PRO o FULL es la mejor opción para su negocio.</p>
+          </div>
+          <div style="text-align:right">
+            <span class="doc-cta-wa">+54 9 264 585-8874</span>
+            <span class="doc-cta-site">nexarsistemas.github.io</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="doc-footer">
+        <div class="doc-footer-brand">Nexar Sistemas · 2026</div>
+        <div class="doc-footer-line">nexarsistemas.github.io/nexar-tienda · nexarsistemas.github.io/nexar-almacen</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.kit-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const map = {hub:0,'tienda-f':1,'almacen-f':2,'tienda-s':3,'almacen-s':4,'visita':5};
+  document.querySelectorAll('.kit-btn')[map[id]].classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
