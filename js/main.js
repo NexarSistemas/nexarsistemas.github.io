@@ -22,17 +22,22 @@ document.addEventListener("DOMContentLoaded", () => {
             const inquirySelect = document.getElementById("cf-consulta");
             const messageField = document.getElementById("cf-mensaje");
             const product = link.dataset.product;
+            const inquiry = link.dataset.inquiry || "Solicitar descarga";
 
             if (productSelect && product) {
                 productSelect.value = product;
             }
 
             if (inquirySelect) {
-                inquirySelect.value = "Solicitar descarga";
+                inquirySelect.value = inquiry;
             }
 
             if (messageField && !messageField.value.trim()) {
-                messageField.value = `Hola, quiero solicitar la descarga de ${product}.`;
+                if (inquiry === "Solicitar licencia") {
+                    messageField.value = `Hola, quiero solicitar una licencia de ${product}.`;
+                } else {
+                    messageField.value = `Hola, quiero solicitar la descarga de ${product}.`;
+                }
             }
         });
     });

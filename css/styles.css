@@ -920,6 +920,31 @@ footer {
     font-weight: bold;
 }
 
+.store-redirect-badge {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(0, 200, 83, 0.14);
+    color: #08753a;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.store-redirect-copy {
+    margin: 0 0 16px;
+    color: #35506a;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.store-redirect-copy a {
+    color: #0e6a39;
+    font-weight: bold;
+}
+
 .store-hero-panel {
     position: relative;
 }
@@ -1318,6 +1343,11 @@ footer {
     text-align: center;
     color: #667280;
     font-size: 13px;
+}
+
+.store-faq-wrap {
+    max-width: 820px;
+    margin: 0 auto;
 }
 
 @media (max-width: 980px) {
