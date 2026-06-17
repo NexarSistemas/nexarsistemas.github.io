@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal Vendedor | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/logon.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/portal-vendedor.css">
+</head>
+<body data-portal-page="login">
+<header class="navbar">
+    <div class="logo">
+        <img src="../assets/logon.png" alt="Nexar Sistemas">
+    </div>
+    <nav>
+        <a href="../index.html">Inicio</a>
+        <a href="./login.html">Portal Vendedor</a>
+    </nav>
+</header>
+
+<main class="portal-shell">
+    <section class="portal-auth-card">
+        <span class="portal-kicker">Acceso comercial</span>
+        <h1>Portal Vendedor</h1>
+        <p class="portal-copy">Ingresá con tu código de vendedor y tu contraseña para ver licencias y comisiones.</p>
+
+        <div id="portal-status" class="portal-status" aria-live="polite"></div>
+
+        <form id="portal-login-form" class="portal-form" novalidate>
+            <label for="codigo_vendedor">Código vendedor</label>
+            <input id="codigo_vendedor" name="codigo_vendedor" type="text" autocomplete="username" required>
+
+            <label for="password">Contraseña</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+            <button id="portal-login-submit" type="submit" class="download-link">Ingresar</button>
+        </form>
+
+        <p class="portal-help">Si no recordás tu acceso, pedí una nueva clave temporal a Nexar Sistemas.</p>
+    </section>
+</main>
+
+<script src="../assets/js/supabase-config.js"></script>
+<script src="./js/portal-vendedor.js"></script>
+</body>
+</html>
