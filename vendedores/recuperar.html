@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar acceso | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/logon.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/portal-vendedor.css">
+</head>
+<body data-portal-page="recovery">
+<header class="navbar">
+    <div class="logo">
+        <img src="../assets/logon.png" alt="Nexar Sistemas">
+    </div>
+    <nav>
+        <a href="../index.html">Inicio</a>
+        <a href="./login.html">Portal Vendedor</a>
+        <a href="./recuperar.html">Recuperar acceso</a>
+    </nav>
+</header>
+
+<main class="portal-shell">
+    <section class="portal-auth-card portal-recovery-card">
+        <span class="portal-kicker">Recuperación</span>
+        <h1>Solicitar recuperación</h1>
+        <p class="portal-copy">Completá tu código vendedor y un medio de contacto para que podamos ayudarte a recuperar el acceso.</p>
+
+        <div id="portal-status" class="portal-status" aria-live="polite"></div>
+
+        <form id="portal-recovery-form" class="portal-form" novalidate>
+            <label for="recovery_codigo_vendedor">Código vendedor</label>
+            <input id="recovery_codigo_vendedor" name="codigo_vendedor" type="text" autocomplete="username" required>
+
+            <label for="recovery_email">Email</label>
+            <input id="recovery_email" name="email" type="email" autocomplete="email">
+
+            <label for="recovery_telefono">Teléfono</label>
+            <input id="recovery_telefono" name="telefono" type="text" autocomplete="tel">
+
+            <label for="recovery_mensaje">Mensaje opcional</label>
+            <textarea id="recovery_mensaje" name="mensaje" rows="4" maxlength="500" placeholder="Contanos brevemente cómo preferís que te contactemos."></textarea>
+
+            <button id="portal-recovery-submit" type="submit" class="download-link">Enviar solicitud</button>
+        </form>
+
+        <p class="portal-inline-link"><a href="./login.html">Volver al login</a></p>
+    </section>
+</main>
+
+<script src="../assets/js/supabase-config.js"></script>
+<script src="./js/portal-vendedor.js"></script>
+</body>
+</html>

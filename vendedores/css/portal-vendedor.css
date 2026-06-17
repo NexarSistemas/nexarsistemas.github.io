@@ -24,6 +24,43 @@ body {
     padding: 28px;
 }
 
+.portal-profile-card {
+    max-width: 520px;
+}
+
+.portal-recovery-card {
+    max-width: 520px;
+}
+
+.portal-profile-section + .portal-profile-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #e6ebef;
+}
+
+.portal-profile-section h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+}
+
+.portal-readonly-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+}
+
+.portal-readonly-grid strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 15px;
+    color: #171717;
+}
+
+.portal-field-label {
+    color: #5b6873;
+    font-size: 13px;
+}
+
 .portal-kicker {
     display: inline-block;
     margin-bottom: 8px;
@@ -58,6 +95,16 @@ body {
     font-size: 15px;
 }
 
+.portal-form textarea {
+    min-height: 108px;
+    padding: 10px 12px;
+    border: 1px solid #cdd6dd;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+}
+
 .portal-form button {
     margin-top: 6px;
     border: none;
@@ -67,6 +114,17 @@ body {
     margin: 18px 0 0;
     color: #66727c;
     font-size: 13px;
+}
+
+.portal-inline-link {
+    margin: 14px 0 0;
+    font-size: 14px;
+}
+
+.portal-inline-link a {
+    color: #1e3a5f;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .portal-status {
@@ -236,6 +294,10 @@ body {
 @media (max-width: 900px) {
     .portal-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .portal-readonly-grid {
+        grid-template-columns: 1fr;
     }
 }
 

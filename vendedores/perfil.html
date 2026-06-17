@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil Vendedor | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/logon.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/portal-vendedor.css">
+</head>
+<body data-portal-page="profile">
+<header class="navbar">
+    <div class="logo">
+        <img src="../assets/logon.png" alt="Nexar Sistemas">
+    </div>
+    <nav>
+        <a href="../index.html">Inicio</a>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="./perfil.html">Perfil</a>
+        <a href="#" id="portal-logout-link">Salir</a>
+    </nav>
+</header>
+
+<main class="portal-shell">
+    <section class="portal-auth-card portal-profile-card">
+        <span class="portal-kicker">Perfil vendedor</span>
+        <h1 id="portal-profile-title">Mi perfil</h1>
+        <p id="portal-profile-copy" class="portal-copy">Actualizá tus datos de contacto y cobro, y gestioná tu contraseña desde este perfil.</p>
+
+        <section class="portal-profile-section">
+            <h2>Datos básicos</h2>
+            <div class="portal-readonly-grid">
+                <div><span class="portal-field-label">Código vendedor</span><strong id="profile_codigo_vendedor">-</strong></div>
+                <div><span class="portal-field-label">Nombre</span><strong id="profile_nombre">-</strong></div>
+                <div><span class="portal-field-label">Apellido</span><strong id="profile_apellido">-</strong></div>
+                <div><span class="portal-field-label">DNI</span><strong id="profile_dni">-</strong></div>
+            </div>
+        </section>
+
+        <section class="portal-profile-section">
+            <h2>Contacto y cobro</h2>
+            <div id="portal-profile-status" class="portal-status" aria-live="polite"></div>
+            <form id="portal-update-profile-form" class="portal-form" novalidate>
+                <label for="profile_email">Email</label>
+                <input id="profile_email" name="email" type="email" autocomplete="email">
+
+                <label for="profile_telefono">Teléfono</label>
+                <input id="profile_telefono" name="telefono" type="text" autocomplete="tel">
+
+                <label for="profile_alias_cbu">Alias / CBU</label>
+                <input id="profile_alias_cbu" name="alias_cbu" type="text" autocomplete="off">
+
+                <button id="portal-update-profile-submit" type="submit" class="download-link">Guardar datos</button>
+            </form>
+        </section>
+
+        <section class="portal-profile-section">
+            <h2>Seguridad</h2>
+            <div id="portal-password-status" class="portal-status" aria-live="polite"></div>
+
+            <form id="portal-change-password-form" class="portal-form" novalidate>
+                <label for="current_password">Contraseña actual</label>
+                <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+
+                <label for="new_password">Nueva contraseña</label>
+                <input id="new_password" name="new_password" type="password" autocomplete="new-password" required>
+
+                <label for="confirm_password">Confirmar nueva contraseña</label>
+                <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required>
+
+                <button id="portal-change-password-submit" type="submit" class="download-link">Guardar nueva contraseña</button>
+            </form>
+
+            <p class="portal-help">Usá una contraseña distinta de la actual. Cuando se actualice, vas a poder volver al dashboard.</p>
+        </section>
+    </section>
+</main>
+
+<script src="../assets/js/supabase-config.js"></script>
+<script src="./js/portal-vendedor.js"></script>
+</body>
+</html>

@@ -1,6 +1,11 @@
 const crypto = require("crypto");
 
 const SESSION_DURATION_HOURS = 12;
+const WERKZEUG_SCRYPT_N = 32768;
+const WERKZEUG_SCRYPT_R = 8;
+const WERKZEUG_SCRYPT_P = 1;
+const WERKZEUG_SCRYPT_KEYLEN = 64;
+const WERKZEUG_SALT_LENGTH = 16;
 
 function normalizeCode(value) {
   return String(value || "").trim().toUpperCase();
@@ -27,6 +32,14 @@ function timingSafeEqualHex(leftHex, rightHex) {
   return crypto.timingSafeEqual(left, right);
 }
 
+function getScryptMaxmem(cost, blockSize, parallelization) {
+  const minimumMaxmem = 64 * 1024 * 1024;
+  return Math.max(
+    minimumMaxmem,
+    (128 * cost * blockSize) + (128 * blockSize * parallelization) + (1024 * 1024)
+  );
+}
+
 function verifyScryptHash(password, storedHash) {
   const parts = storedHash.split("$");
   if (parts.length !== 3) {
@@ -43,16 +56,12 @@ function verifyScryptHash(password, storedHash) {
   const parallelization = Number(methodBits[3]);
   const salt = parts[1];
   const expectedHex = parts[2];
-  const minimumMaxmem = 64 * 1024 * 1024;
 
   if (!cost || !blockSize || !parallelization || !salt || !expectedHex) {
     return false;
   }
 
-  const maxmem = Math.max(
-    minimumMaxmem,
-    (128 * cost * blockSize) + (128 * blockSize * parallelization) + (1024 * 1024)
-  );
+  const maxmem = getScryptMaxmem(cost, blockSize, parallelization);
 
   const derived = crypto.scryptSync(password, salt, expectedHex.length / 2, {
     N: cost,
@@ -62,6 +71,31 @@ function verifyScryptHash(password, storedHash) {
   });
 
   return timingSafeEqualHex(derived.toString("hex"), expectedHex);
+}
+
+function generateWerkzeugSalt(length = WERKZEUG_SALT_LENGTH) {
+  const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const bytes = crypto.randomBytes(length);
+  let salt = "";
+
+  for (let index = 0; index < length; index += 1) {
+    salt += alphabet[bytes[index] % alphabet.length];
+  }
+
+  return salt;
+}
+
+function generateWerkzeugPasswordHash(password) {
+  const salt = generateWerkzeugSalt();
+  const maxmem = getScryptMaxmem(WERKZEUG_SCRYPT_N, WERKZEUG_SCRYPT_R, WERKZEUG_SCRYPT_P);
+  const derived = crypto.scryptSync(password, salt, WERKZEUG_SCRYPT_KEYLEN, {
+    N: WERKZEUG_SCRYPT_N,
+    r: WERKZEUG_SCRYPT_R,
+    p: WERKZEUG_SCRYPT_P,
+    maxmem
+  });
+
+  return `scrypt:${WERKZEUG_SCRYPT_N}:${WERKZEUG_SCRYPT_R}:${WERKZEUG_SCRYPT_P}$${salt}$${derived.toString("hex")}`;
 }
 
 function verifyPbkdf2Hash(password, storedHash) {
@@ -182,7 +216,7 @@ exports.handler = async function handler(event) {
     }
 
     const vendorRows = await supabaseFetch(
-      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
+      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
     );
     const vendor = Array.isArray(vendorRows) ? vendorRows[0] : null;
 
@@ -232,7 +266,8 @@ exports.handler = async function handler(event) {
           nombre: vendor.nombre,
           apellido: vendor.apellido,
           es_admin: Boolean(vendor.es_admin),
-          cobra_comision: vendor.cobra_comision !== false
+          cobra_comision: vendor.cobra_comision !== false,
+          password_change_required: vendor.password_change_required !== false
         }
       })
     };
@@ -244,3 +279,8 @@ exports.handler = async function handler(event) {
     };
   }
 };
+
+exports.verifyWerkzeugPassword = verifyWerkzeugPassword;
+exports.generateWerkzeugPasswordHash = generateWerkzeugPasswordHash;
+exports.supabaseFetch = supabaseFetch;
+exports.parseJson = parseJson;

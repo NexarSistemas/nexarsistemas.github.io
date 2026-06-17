@@ -1,6 +1,9 @@
 (function () {
   const STORAGE_KEY = "nexar.portal.vendedor.session";
   const LOGIN_ENDPOINT = "/.netlify/functions/portal-login-vendedor";
+  const CHANGE_PASSWORD_ENDPOINT = "/.netlify/functions/portal-change-password";
+  const UPDATE_PROFILE_ENDPOINT = "/.netlify/functions/portal-update-profile";
+  const PASSWORD_RECOVERY_ENDPOINT = "/.netlify/functions/portal-password-recovery";
   const DASHBOARD_RPC = "portal_dashboard_vendedor";
 
   const page = document.body ? document.body.dataset.portalPage : "";
@@ -22,12 +25,12 @@
     };
   }
 
-  function getStatusElement() {
-    return document.getElementById("portal-status");
+  function getStatusElement(statusId = "portal-status") {
+    return document.getElementById(statusId);
   }
 
-  function showStatus(message, type) {
-    const element = getStatusElement();
+  function showStatus(message, type, statusId = "portal-status") {
+    const element = getStatusElement(statusId);
     if (!element) {
       return;
     }
@@ -36,8 +39,8 @@
     element.className = `portal-status is-visible is-${type}`;
   }
 
-  function hideStatus() {
-    const element = getStatusElement();
+  function hideStatus(statusId = "portal-status") {
+    const element = getStatusElement(statusId);
     if (!element) {
       return;
     }
@@ -66,6 +69,18 @@
 
   function clearSession() {
     sessionStorage.removeItem(STORAGE_KEY);
+  }
+
+  function requiresPasswordChange(session) {
+    return Boolean(session && session.vendedor && session.vendedor.password_change_required);
+  }
+
+  function getDefaultPortalRoute(session) {
+    return requiresPasswordChange(session) ? "./perfil.html" : "./dashboard.html";
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
   function isExpired(session) {
@@ -194,10 +209,53 @@
     });
   }
 
+  async function fetchProfile(sessionToken) {
+    const response = await fetch(`${UPDATE_PROFILE_ENDPOINT}?session_token=${encodeURIComponent(sessionToken)}`, {
+      method: "GET"
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error((payload && payload.error) || "No pudimos cargar el perfil.");
+    }
+
+    return payload;
+  }
+
+  function renderProfileIdentity(vendedor) {
+    const labels = {
+      profile_codigo_vendedor: vendedor.codigo_vendedor || "-",
+      profile_nombre: vendedor.nombre || "-",
+      profile_apellido: vendedor.apellido || "-",
+      profile_dni: vendedor.dni || "-"
+    };
+
+    Object.entries(labels).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+      }
+    });
+
+    const emailField = document.getElementById("profile_email");
+    const telefonoField = document.getElementById("profile_telefono");
+    const aliasField = document.getElementById("profile_alias_cbu");
+
+    if (emailField) {
+      emailField.value = vendedor.email || "";
+    }
+    if (telefonoField) {
+      telefonoField.value = vendedor.telefono || "";
+    }
+    if (aliasField) {
+      aliasField.value = vendedor.alias_cbu || "";
+    }
+  }
+
   async function initLoginPage() {
     const existingSession = loadSession();
     if (existingSession && !isExpired(existingSession)) {
-      window.location.href = "./dashboard.html";
+      window.location.href = getDefaultPortalRoute(existingSession);
       return;
     }
 
@@ -249,13 +307,92 @@
         }
 
         saveSession(payload);
-        window.location.href = "./dashboard.html";
+        window.location.href = getDefaultPortalRoute(payload);
       } catch (error) {
         console.error("Portal vendedor: error al iniciar sesion.", error);
         showStatus("No pudimos iniciar sesion. Verificá tus datos e intentá nuevamente.", "error");
       } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Ingresar";
+      }
+    });
+  }
+
+  async function initRecoveryPage() {
+    const form = document.getElementById("portal-recovery-form");
+    const submitButton = document.getElementById("portal-recovery-submit");
+    if (!form || !submitButton) {
+      return;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      hideStatus();
+
+      const codigoField = document.getElementById("recovery_codigo_vendedor");
+      const emailField = document.getElementById("recovery_email");
+      const telefonoField = document.getElementById("recovery_telefono");
+      const mensajeField = document.getElementById("recovery_mensaje");
+
+      const codigo = codigoField ? codigoField.value.trim().toUpperCase() : "";
+      const email = emailField ? emailField.value.trim().toLowerCase() : "";
+      const telefono = telefonoField ? telefonoField.value.trim() : "";
+      const mensaje = mensajeField ? mensajeField.value.trim() : "";
+
+      if (!codigo) {
+        showStatus("Ingresá tu código vendedor para continuar.", "error");
+        return;
+      }
+
+      if (!email && !telefono) {
+        showStatus("Ingresá email o teléfono para continuar.", "error");
+        return;
+      }
+
+      if (email && !isValidEmail(email)) {
+        showStatus("Si informás email, debe tener un formato válido.", "error");
+        return;
+      }
+
+      if (mensaje.length > 500) {
+        showStatus("El mensaje es demasiado largo.", "error");
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Enviando...";
+      showStatus("Registrando solicitud...", "loading");
+
+      try {
+        const response = await fetch(PASSWORD_RECOVERY_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            codigo_vendedor: codigo,
+            email,
+            telefono,
+            mensaje
+          })
+        });
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error((payload && payload.error) || "No pudimos registrar la solicitud.");
+        }
+
+        form.reset();
+        showStatus(
+          (payload && payload.message) || "Si los datos son correctos, registramos tu solicitud.",
+          "success"
+        );
+      } catch (error) {
+        console.error("Portal vendedor: error al solicitar recuperacion.", error);
+        showStatus(error.message || "No pudimos registrar la solicitud.", "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Enviar solicitud";
       }
     });
   }
@@ -337,6 +474,11 @@
       return;
     }
 
+    if (requiresPasswordChange(session)) {
+      window.location.href = "./perfil.html";
+      return;
+    }
+
     showStatus("Cargando dashboard...", "loading");
 
     try {
@@ -346,7 +488,10 @@
 
       saveSession({
         ...session,
-        vendedor: payload.vendedor || session.vendedor
+        vendedor: {
+          ...(session.vendedor || {}),
+          ...(payload.vendedor || {})
+        }
       });
       renderDashboard(payload);
       hideStatus();
@@ -360,14 +505,205 @@
     }
   }
 
+  async function initProfilePage() {
+    bindLogout();
+
+    const session = loadSession();
+    if (!session || isExpired(session) || !session.session_token) {
+      clearSession();
+      window.location.href = "./login.html";
+      return;
+    }
+
+    const title = document.getElementById("portal-profile-title");
+    const copy = document.getElementById("portal-profile-copy");
+    const profileForm = document.getElementById("portal-update-profile-form");
+    const profileSubmitButton = document.getElementById("portal-update-profile-submit");
+    const passwordForm = document.getElementById("portal-change-password-form");
+    const passwordSubmitButton = document.getElementById("portal-change-password-submit");
+    const forcedChange = requiresPasswordChange(session);
+    let currentSession = session;
+
+    if (title) {
+      title.textContent = forcedChange ? "Completar perfil y cambiar contraseña" : "Mi perfil";
+    }
+
+    if (copy) {
+      copy.textContent = forcedChange
+        ? "Este es tu primer acceso o tenés una clave temporal. Primero revisá tus datos y definí una nueva contraseña."
+        : "Actualizá tus datos de contacto y cobro, y cambiá tu contraseña cuando lo necesites.";
+    }
+
+    try {
+      const payload = await fetchProfile(session.session_token);
+      currentSession = {
+        ...session,
+        vendedor: {
+          ...(session.vendedor || {}),
+          ...(payload.vendedor || {})
+        }
+      };
+      saveSession(currentSession);
+      renderProfileIdentity(currentSession.vendedor || {});
+    } catch (error) {
+      console.error("Portal vendedor: error al cargar perfil.", error);
+      clearSession();
+      showStatus(error.message || "No pudimos cargar tu perfil.", "error", "portal-profile-status");
+      setTimeout(() => {
+        window.location.href = "./login.html";
+      }, 1400);
+      return;
+    }
+
+    if (profileForm && profileSubmitButton) {
+      profileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        hideStatus("portal-profile-status");
+
+        const emailField = document.getElementById("profile_email");
+        const telefonoField = document.getElementById("profile_telefono");
+        const aliasField = document.getElementById("profile_alias_cbu");
+
+        const email = emailField ? emailField.value.trim().toLowerCase() : "";
+        const telefono = telefonoField ? telefonoField.value.trim() : "";
+        const aliasCbu = aliasField ? aliasField.value.trim() : "";
+
+        if (email && !isValidEmail(email)) {
+          showStatus("Si informás email, debe tener un formato válido.", "error", "portal-profile-status");
+          return;
+        }
+
+        profileSubmitButton.disabled = true;
+        profileSubmitButton.textContent = "Guardando...";
+        showStatus("Actualizando datos de contacto...", "loading", "portal-profile-status");
+
+        try {
+          const response = await fetch(UPDATE_PROFILE_ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              session_token: currentSession.session_token,
+              email,
+              telefono,
+              alias_cbu: aliasCbu
+            })
+          });
+
+          const payload = await response.json();
+          if (!response.ok) {
+            throw new Error((payload && payload.error) || "No pudimos actualizar el perfil.");
+          }
+
+          currentSession = {
+            ...currentSession,
+            vendedor: {
+              ...(currentSession.vendedor || {}),
+              ...(payload.vendedor || {})
+            }
+          };
+          saveSession(currentSession);
+          renderProfileIdentity(currentSession.vendedor || {});
+          showStatus("Datos actualizados correctamente.", "success", "portal-profile-status");
+        } catch (error) {
+          console.error("Portal vendedor: error al actualizar perfil.", error);
+          showStatus(error.message || "No pudimos actualizar el perfil.", "error", "portal-profile-status");
+        } finally {
+          profileSubmitButton.disabled = false;
+          profileSubmitButton.textContent = "Guardar datos";
+        }
+      });
+    }
+
+    if (!passwordForm || !passwordSubmitButton) {
+      return;
+    }
+
+    passwordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      hideStatus("portal-password-status");
+
+      const currentPasswordField = document.getElementById("current_password");
+      const newPasswordField = document.getElementById("new_password");
+      const confirmPasswordField = document.getElementById("confirm_password");
+
+      const currentPassword = currentPasswordField ? currentPasswordField.value : "";
+      const newPassword = newPasswordField ? newPasswordField.value : "";
+      const confirmPassword = confirmPasswordField ? confirmPasswordField.value : "";
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showStatus("Completá los tres campos para actualizar la contraseña.", "error", "portal-password-status");
+        return;
+      }
+
+      passwordSubmitButton.disabled = true;
+      passwordSubmitButton.textContent = "Guardando...";
+      showStatus("Actualizando contraseña...", "loading", "portal-password-status");
+
+      try {
+        const response = await fetch(CHANGE_PASSWORD_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            session_token: currentSession.session_token,
+            current_password: currentPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+          })
+        });
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error((payload && payload.error) || "No pudimos actualizar la contraseña.");
+        }
+
+        currentSession = {
+          ...currentSession,
+          vendedor: {
+            ...(currentSession.vendedor || {}),
+            ...(payload.vendedor || {}),
+            password_change_required: false
+          }
+        };
+        saveSession(currentSession);
+
+        passwordForm.reset();
+        showStatus("Contraseña actualizada correctamente. Ya podés continuar al dashboard.", "success", "portal-password-status");
+
+        setTimeout(() => {
+          window.location.href = "./dashboard.html";
+        }, 900);
+      } catch (error) {
+        console.error("Portal vendedor: error al cambiar contraseña.", error);
+        showStatus(error.message || "No pudimos actualizar la contraseña.", "error", "portal-password-status");
+      } finally {
+        passwordSubmitButton.disabled = false;
+        passwordSubmitButton.textContent = "Guardar nueva contraseña";
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     if (page === "login") {
       initLoginPage();
       return;
     }
 
+    if (page === "recovery") {
+      initRecoveryPage();
+      return;
+    }
+
     if (page === "dashboard") {
       initDashboardPage();
+      return;
+    }
+
+    if (page === "profile") {
+      initProfilePage();
     }
   });
 })();
