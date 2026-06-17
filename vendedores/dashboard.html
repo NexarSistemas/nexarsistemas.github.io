@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Vendedor | Nexar Sistemas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/logon.png">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/portal-vendedor.css">
+</head>
+<body data-portal-page="dashboard">
+<header class="navbar">
+    <div class="logo">
+        <img src="../assets/logon.png" alt="Nexar Sistemas">
+    </div>
+    <nav>
+        <a href="../index.html">Inicio</a>
+        <a href="./dashboard.html">Dashboard</a>
+        <a href="#" id="portal-logout-link">Salir</a>
+    </nav>
+</header>
+
+<main class="portal-shell portal-dashboard-shell">
+    <section class="portal-hero">
+        <div>
+            <span class="portal-kicker">Panel comercial</span>
+            <h1 id="portal-title">Dashboard vendedor</h1>
+            <p id="portal-subtitle" class="portal-copy">Cargando datos del portal...</p>
+        </div>
+        <button id="portal-logout-button" type="button" class="btn-secondary portal-logout-button">Cerrar sesión</button>
+    </section>
+
+    <div id="portal-status" class="portal-status" aria-live="polite"></div>
+
+    <section id="portal-summary" class="portal-grid"></section>
+
+    <section id="portal-admin-summary" class="portal-admin-summary" hidden></section>
+
+    <section class="portal-panel">
+        <div class="portal-panel-header">
+            <h2>Últimas licencias</h2>
+        </div>
+        <div id="portal-licenses" class="portal-table-wrap"></div>
+    </section>
+
+    <section class="portal-panel">
+        <div class="portal-panel-header">
+            <h2>Últimas comisiones</h2>
+        </div>
+        <div id="portal-commissions" class="portal-table-wrap"></div>
+    </section>
+</main>
+
+<script src="../assets/js/supabase-config.js"></script>
+<script src="./js/portal-vendedor.js"></script>
+</body>
+</html>
