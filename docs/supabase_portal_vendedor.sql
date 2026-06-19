@@ -32,7 +32,7 @@ on public.vendedores
 for select
 to anon
 using (
-    coalesce((current_setting('request.headers', true)::jsonb ->> 'x-portal-secret'), '') = 'nexar-portal-vendedor-2026-a7f93d11-4b8c-9e21-4c55f8d2ab71'
+    coalesce((current_setting('request.headers', true)::jsonb ->> 'x-portal-secret'), '') = '__PORTAL_VENDOR_SECRET__'
     and activo = true
 );
 
