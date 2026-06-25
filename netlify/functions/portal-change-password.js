@@ -2,12 +2,38 @@ const {
   generateWerkzeugPasswordHash,
   verifyWerkzeugPassword,
   supabaseFetch,
-  parseJson
+  parseJson,
+  maskToken
 } = require("./portal-login-vendedor");
 
-function isSessionExpired(value) {
-  const time = Date.parse(value || "");
-  return Number.isNaN(time) || time <= Date.now();
+function getSessionExpiryStatus(session, nowMs = Date.now()) {
+  if (!session) {
+    return { expired: true, reason: "session_not_found", expiresAtMs: null, nowMs };
+  }
+
+  const expiresAtMs = Date.parse(session.expires_at || "");
+  if (Number.isNaN(expiresAtMs)) {
+    return { expired: true, reason: "invalid_expires_at", expiresAtMs: null, nowMs };
+  }
+
+  if (expiresAtMs <= nowMs) {
+    return { expired: true, reason: "expires_at_lte_now", expiresAtMs, nowMs };
+  }
+
+  return { expired: false, reason: "valid", expiresAtMs, nowMs };
+}
+
+function logSessionValidation(session, status, sessionToken) {
+  console.info("Portal vendedor password session validation:", {
+    session_id: session ? session.id : null,
+    vendedor_id: session ? session.vendedor_id : null,
+    token_hint: maskToken(sessionToken),
+    session_created_at: session ? session.created_at : null,
+    session_expires_at: session ? session.expires_at : null,
+    now: new Date(status.nowMs).toISOString(),
+    expired: status.expired,
+    reason: status.reason
+  });
 }
 
 exports.handler = async function handler(event) {
@@ -47,11 +73,15 @@ exports.handler = async function handler(event) {
     }
 
     const sessionRows = await supabaseFetch(
-      `/rest/v1/portal_vendedor_sessions?select=id,vendedor_id,session_token,expires_at&session_token=eq.${encodeURIComponent(sessionToken)}&limit=1`
+      `/rest/v1/portal_vendedor_sessions?select=id,vendedor_id,session_token,created_at,expires_at&session_token=eq.${encodeURIComponent(sessionToken)}&limit=1`,
+      { keyName: "SUPABASE_SERVICE_ROLE_KEY" }
     );
     const session = Array.isArray(sessionRows) ? sessionRows[0] : null;
 
-    if (!session || isSessionExpired(session.expires_at)) {
+    const expiryStatus = getSessionExpiryStatus(session);
+    logSessionValidation(session, expiryStatus, sessionToken);
+
+    if (expiryStatus.expired) {
       return {
         statusCode: 401,
         body: JSON.stringify({ error: "La sesión no es válida o ya venció." })
@@ -59,7 +89,7 @@ exports.handler = async function handler(event) {
     }
 
     const vendorRows = await supabaseFetch(
-      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required&id=eq.${encodeURIComponent(session.vendedor_id)}&limit=1`
+      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required,pass_temp&id=eq.${encodeURIComponent(session.vendedor_id)}&limit=1`
     );
     const vendor = Array.isArray(vendorRows) ? vendorRows[0] : null;
 
@@ -85,6 +115,7 @@ exports.handler = async function handler(event) {
       body: JSON.stringify({
         password_hash: generateWerkzeugPasswordHash(newPassword),
         password_change_required: false,
+        pass_temp: false,
         ultimo_login: new Date().toISOString()
       })
     });
@@ -102,7 +133,8 @@ exports.handler = async function handler(event) {
           apellido: vendor.apellido,
           es_admin: Boolean(vendor.es_admin),
           cobra_comision: vendor.cobra_comision !== false,
-          password_change_required: false
+          password_change_required: false,
+          pass_temp: false
         }
       })
     };
@@ -114,3 +146,5 @@ exports.handler = async function handler(event) {
     };
   }
 };
+
+exports.getSessionExpiryStatus = getSessionExpiryStatus;
