@@ -13,10 +13,7 @@ function normalizeCode(value) {
 }
 
 function isPasswordChangeRequired(vendor) {
-  return Boolean(
-    vendor &&
-    (vendor.pass_temp === true || vendor.password_change_required === true || vendor.password_change_required !== false)
-  );
+  return Boolean(vendor && vendor.password_change_required === true);
 }
 
 function getSessionDurationMs(vendor) {
@@ -261,7 +258,7 @@ exports.handler = async function handler(event) {
     }
 
     const vendorRows = await supabaseFetch(
-      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required,pass_temp&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
+      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
     );
     const vendor = Array.isArray(vendorRows) ? vendorRows[0] : null;
 
@@ -278,6 +275,12 @@ exports.handler = async function handler(event) {
     const expiresAt = new Date(sessionCreatedAt.getTime() + sessionDurationMs).toISOString();
     const passwordChangeRequired = isPasswordChangeRequired(vendor);
 
+    console.info("Portal vendedor login password policy:", {
+      codigo_vendedor: vendor.codigo_vendedor,
+      vendedor_id: vendor.id,
+      password_change_required: passwordChangeRequired
+    });
+
     try {
       await supabaseFetch("/rest/v1/portal_vendedor_sessions", {
         method: "POST",
@@ -292,6 +295,14 @@ exports.handler = async function handler(event) {
           created_at: sessionCreatedAt.toISOString(),
           expires_at: expiresAt
         })
+      });
+
+      console.info("Portal vendedor session created:", {
+        codigo_vendedor: vendor.codigo_vendedor,
+        vendedor_id: vendor.id,
+        token_hint: maskToken(sessionToken),
+        expires_at: expiresAt,
+        password_change_required: passwordChangeRequired
       });
     } catch (error) {
       console.error("Portal vendedor session creation failed:", {
@@ -322,6 +333,14 @@ exports.handler = async function handler(event) {
         ultimo_login: new Date().toISOString()
       })
     });
+
+    if (passwordChangeRequired) {
+      console.info("Portal vendedor redirecting to forced password change:", {
+        codigo_vendedor: vendor.codigo_vendedor,
+        vendedor_id: vendor.id,
+        expires_at: expiresAt
+      });
+    }
 
     return {
       statusCode: 200,
