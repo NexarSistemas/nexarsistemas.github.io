@@ -82,6 +82,21 @@ Mas detalle en `docs/contrato_nexar_admin_solicitudes_demo.md`.
 - `RLS` con `INSERT` publico limitado a `solicitudes_demo`: obligatorio
 - `SELECT` publico: no
 
+## Netlify Functions
+
+Variables requeridas para las functions del portal vendedor:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `PORTAL_VENDOR_RPC_SECRET`
+- `SUPABASE_SERVICE_ROLE_KEY` solo para operaciones server-side de sesion
+
+Notas:
+
+- `SUPABASE_SERVICE_ROLE_KEY` debe configurarse solo en variables de entorno de Netlify Functions.
+- `SUPABASE_SERVICE_ROLE_KEY` nunca debe exponerse en `assets/js`, `vendedores/js` ni ningun archivo publico del frontend.
+- `SUPABASE_ANON_KEY` sigue siendo la key correcta para operaciones publicas protegidas por `RLS`.
+
 ## Comando local recomendado
 
 ```bash
