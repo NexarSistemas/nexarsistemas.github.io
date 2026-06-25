@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 
 const SESSION_DURATION_HOURS = 12;
+const TEMP_SESSION_DURATION_MINUTES = 60;
 const WERKZEUG_SCRYPT_N = 32768;
 const WERKZEUG_SCRYPT_R = 8;
 const WERKZEUG_SCRYPT_P = 1;
@@ -9,6 +10,28 @@ const WERKZEUG_SALT_LENGTH = 16;
 
 function normalizeCode(value) {
   return String(value || "").trim().toUpperCase();
+}
+
+function isPasswordChangeRequired(vendor) {
+  return Boolean(
+    vendor &&
+    (vendor.pass_temp === true || vendor.password_change_required === true || vendor.password_change_required !== false)
+  );
+}
+
+function getSessionDurationMs(vendor) {
+  return isPasswordChangeRequired(vendor)
+    ? TEMP_SESSION_DURATION_MINUTES * 60 * 1000
+    : SESSION_DURATION_HOURS * 60 * 60 * 1000;
+}
+
+function maskToken(value) {
+  const token = String(value || "");
+  if (token.length <= 12) {
+    return "[redacted]";
+  }
+
+  return `${token.slice(0, 6)}...${token.slice(-6)}`;
 }
 
 function parseJson(body) {
@@ -238,7 +261,7 @@ exports.handler = async function handler(event) {
     }
 
     const vendorRows = await supabaseFetch(
-      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
+      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required,pass_temp&codigo_vendedor=eq.${encodeURIComponent(codigo)}&limit=1`
     );
     const vendor = Array.isArray(vendorRows) ? vendorRows[0] : null;
 
@@ -250,7 +273,10 @@ exports.handler = async function handler(event) {
     }
 
     const sessionToken = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + SESSION_DURATION_HOURS * 60 * 60 * 1000).toISOString();
+    const sessionCreatedAt = new Date();
+    const sessionDurationMs = getSessionDurationMs(vendor);
+    const expiresAt = new Date(sessionCreatedAt.getTime() + sessionDurationMs).toISOString();
+    const passwordChangeRequired = isPasswordChangeRequired(vendor);
 
     try {
       await supabaseFetch("/rest/v1/portal_vendedor_sessions", {
@@ -263,6 +289,7 @@ exports.handler = async function handler(event) {
           vendedor_id: vendor.id,
           codigo_vendedor: vendor.codigo_vendedor,
           session_token: sessionToken,
+          created_at: sessionCreatedAt.toISOString(),
           expires_at: expiresAt
         })
       });
@@ -270,6 +297,10 @@ exports.handler = async function handler(event) {
       console.error("Portal vendedor session creation failed:", {
         codigo_vendedor: vendor.codigo_vendedor,
         vendedor_id: vendor.id,
+        session_created_at: sessionCreatedAt.toISOString(),
+        session_expires_at: expiresAt,
+        now: new Date().toISOString(),
+        token_hint: maskToken(sessionToken),
         detail: error.message || "unknown"
       });
 
@@ -306,7 +337,7 @@ exports.handler = async function handler(event) {
           apellido: vendor.apellido,
           es_admin: Boolean(vendor.es_admin),
           cobra_comision: vendor.cobra_comision !== false,
-          password_change_required: vendor.password_change_required !== false
+          password_change_required: passwordChangeRequired
         }
       })
     };
@@ -323,3 +354,6 @@ exports.verifyWerkzeugPassword = verifyWerkzeugPassword;
 exports.generateWerkzeugPasswordHash = generateWerkzeugPasswordHash;
 exports.supabaseFetch = supabaseFetch;
 exports.parseJson = parseJson;
+exports.isPasswordChangeRequired = isPasswordChangeRequired;
+exports.getSessionDurationMs = getSessionDurationMs;
+exports.maskToken = maskToken;

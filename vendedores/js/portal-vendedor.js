@@ -83,12 +83,23 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  function parseUtcTimestamp(value) {
+    if (typeof value !== "string" || !value.trim()) {
+      return Number.NaN;
+    }
+
+    const normalized = /(?:Z|[+-]\d{2}:?\d{2})$/.test(value.trim())
+      ? value.trim()
+      : `${value.trim()}Z`;
+    return Date.parse(normalized);
+  }
+
   function isExpired(session) {
     if (!session || !session.expires_at) {
       return true;
     }
 
-    const expiresAt = Date.parse(session.expires_at);
+    const expiresAt = parseUtcTimestamp(session.expires_at);
     return Number.isNaN(expiresAt) || expiresAt <= Date.now();
   }
 

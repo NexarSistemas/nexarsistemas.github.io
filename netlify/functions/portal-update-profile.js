@@ -1,4 +1,4 @@
-const { supabaseFetch, parseJson } = require("./portal-login-vendedor");
+const { supabaseFetch, parseJson, maskToken } = require("./portal-login-vendedor");
 
 const ALLOWED_UPDATE_FIELDS = new Set(["session_token", "email", "telefono", "alias_cbu"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -26,6 +26,36 @@ function buildVendorPayload(vendor) {
   };
 }
 
+function getSessionExpiryStatus(session, nowMs = Date.now()) {
+  if (!session) {
+    return { expired: true, reason: "session_not_found", expiresAtMs: null, nowMs };
+  }
+
+  const expiresAtMs = Date.parse(session.expires_at || "");
+  if (Number.isNaN(expiresAtMs)) {
+    return { expired: true, reason: "invalid_expires_at", expiresAtMs: null, nowMs };
+  }
+
+  if (expiresAtMs <= nowMs) {
+    return { expired: true, reason: "expires_at_lte_now", expiresAtMs, nowMs };
+  }
+
+  return { expired: false, reason: "valid", expiresAtMs, nowMs };
+}
+
+function logSessionValidation(session, status, sessionToken) {
+  console.info("Portal vendedor profile session validation:", {
+    session_id: session ? session.id : null,
+    vendedor_id: session ? session.vendedor_id : null,
+    token_hint: maskToken(sessionToken),
+    session_created_at: session ? session.created_at : null,
+    session_expires_at: session ? session.expires_at : null,
+    now: new Date(status.nowMs).toISOString(),
+    expired: status.expired,
+    reason: status.reason
+  });
+}
+
 function getSessionToken(event, body) {
   const queryToken = event.queryStringParameters && typeof event.queryStringParameters.session_token === "string"
     ? event.queryStringParameters.session_token
@@ -36,10 +66,13 @@ function getSessionToken(event, body) {
 
 async function resolveVendorFromSession(sessionToken) {
   const sessionRows = await supabaseFetch(
-    `/rest/v1/portal_vendedor_sessions?select=id,vendedor_id,session_token,expires_at&session_token=eq.${encodeURIComponent(sessionToken)}&limit=1`
+    `/rest/v1/portal_vendedor_sessions?select=id,vendedor_id,session_token,created_at,expires_at&session_token=eq.${encodeURIComponent(sessionToken)}&limit=1`,
+    { keyName: "SUPABASE_SERVICE_ROLE_KEY" }
   );
   const session = Array.isArray(sessionRows) ? sessionRows[0] : null;
-  if (!session) {
+  const expiryStatus = getSessionExpiryStatus(session);
+  logSessionValidation(session, expiryStatus, sessionToken);
+  if (expiryStatus.expired) {
     return null;
   }
 
