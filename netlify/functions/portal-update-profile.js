@@ -22,7 +22,7 @@ function buildVendorPayload(vendor) {
     alias_cbu: vendor.alias_cbu || "",
     es_admin: Boolean(vendor.es_admin),
     cobra_comision: vendor.cobra_comision !== false,
-    password_change_required: vendor.password_change_required !== false
+    password_change_required: vendor.password_change_required === true
   };
 }
 
@@ -105,7 +105,7 @@ exports.handler = async function handler(event) {
     if (!sessionToken) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "La sesión no es válida o ya venció." })
+        body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
 
@@ -113,7 +113,7 @@ exports.handler = async function handler(event) {
     if (!vendor) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "La sesión no es válida o ya venció." })
+        body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
 
@@ -143,7 +143,7 @@ exports.handler = async function handler(event) {
     if (email && !EMAIL_RE.test(email)) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Si informás email, debe tener un formato válido." })
+        body: JSON.stringify({ error: "Si informas email, debe tener un formato valido." })
       };
     }
 

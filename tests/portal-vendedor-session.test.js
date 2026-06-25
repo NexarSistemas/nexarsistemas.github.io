@@ -1,3 +1,5 @@
+const fs = require('node:fs');
+const path = require('node:path');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -9,7 +11,11 @@ process.env.PORTAL_VENDOR_RPC_SECRET = 'portal-secret';
 const login = require('../netlify/functions/portal-login-vendedor');
 const changePassword = require('../netlify/functions/portal-change-password');
 
-test('login con pass_temp=true crea sesión temporal válida', async () => {
+function readRepoFile(relativePath) {
+  return fs.readFileSync(path.join(__dirname, '..', relativePath), 'utf8');
+}
+
+test('login con password_change_required=true crea sesion temporal valida', async () => {
   const passwordHash = login.generateWerkzeugPasswordHash('Temp1234!');
   const requests = [];
 
@@ -26,8 +32,7 @@ test('login con pass_temp=true crea sesión temporal válida', async () => {
         es_admin: false,
         cobra_comision: true,
         password_hash: passwordHash,
-        password_change_required: false,
-        pass_temp: true
+        password_change_required: true
       }]), { status: 200 });
     }
 
@@ -58,11 +63,16 @@ test('login con pass_temp=true crea sesión temporal válida', async () => {
 
   assert.equal(response.statusCode, 200);
   assert.equal(payload.vendedor.password_change_required, true);
+  assert.equal('pass_temp' in payload.vendedor, false);
   assert.ok(payload.session_token);
+
+  const vendorSelectRequest = requests.find((request) => request.url.includes('/rest/v1/vendedores?'));
+  assert.ok(vendorSelectRequest);
+  assert.equal(vendorSelectRequest.url.includes('pass_temp'), false);
   assert.ok(requests.some((request) => request.url.includes('portal_vendedor_sessions')));
 });
 
-test('cambio de contraseña con sesión recién creada funciona y apaga pass_temp', async () => {
+test('cambio de contrasena con sesion recien creada deja password_change_required=false', async () => {
   const currentHash = login.generateWerkzeugPasswordHash('Temp1234!');
   const now = Date.now();
   const patches = [];
@@ -83,12 +93,13 @@ test('cambio de contraseña con sesión recién creada funciona y apaga pass_tem
       const body = JSON.parse(options.body);
       patches.push(body);
       assert.equal(body.password_change_required, false);
-      assert.equal(body.pass_temp, false);
+      assert.equal(Object.hasOwn(body, 'pass_temp'), false);
       assert.ok(login.verifyWerkzeugPassword('Nueva1234!', body.password_hash));
       return new Response(null, { status: 204 });
     }
 
     if (String(url).includes('/rest/v1/vendedores?')) {
+      assert.equal(String(url).includes('pass_temp'), false);
       return new Response(JSON.stringify([{
         id: 'vendor-1',
         codigo_vendedor: 'VEN001',
@@ -98,8 +109,7 @@ test('cambio de contraseña con sesión recién creada funciona y apaga pass_tem
         es_admin: false,
         cobra_comision: true,
         password_hash: currentHash,
-        password_change_required: true,
-        pass_temp: true
+        password_change_required: true
       }]), { status: 200 });
     }
 
@@ -116,12 +126,14 @@ test('cambio de contraseña con sesión recién creada funciona y apaga pass_tem
     })
   });
 
+  const payload = JSON.parse(response.body);
   assert.equal(response.statusCode, 200, response.body);
-  assert.equal(JSON.parse(response.body).vendedor.pass_temp, false);
+  assert.equal(payload.vendedor.password_change_required, false);
+  assert.equal(Object.hasOwn(payload.vendedor, 'pass_temp'), false);
   assert.equal(patches.length, 1);
 });
 
-test('sesión vencida rechaza correctamente', () => {
+test('sesion vencida rechaza correctamente', () => {
   const now = Date.parse('2026-06-25T12:00:00.000Z');
   const status = changePassword.getSessionExpiryStatus({ expires_at: '2026-06-25T11:59:59.000Z' }, now);
 
@@ -129,7 +141,7 @@ test('sesión vencida rechaza correctamente', () => {
   assert.equal(status.reason, 'expires_at_lte_now');
 });
 
-test('login normal con pass_temp=false conserva sesión larga', async () => {
+test('login normal con password_change_required=false conserva sesion larga', async () => {
   const passwordHash = login.generateWerkzeugPasswordHash('Normal1234!');
   let sessionBody;
 
@@ -144,8 +156,7 @@ test('login normal con pass_temp=false conserva sesión larga', async () => {
         es_admin: false,
         cobra_comision: true,
         password_hash: passwordHash,
-        password_change_required: false,
-        pass_temp: false
+        password_change_required: false
       }]), { status: 200 });
     }
 
@@ -169,4 +180,18 @@ test('login normal con pass_temp=false conserva sesión larga', async () => {
   assert.equal(response.statusCode, 200);
   assert.equal(JSON.parse(response.body).vendedor.password_change_required, false);
   assert.equal(Date.parse(sessionBody.expires_at) - Date.parse(sessionBody.created_at), 12 * 60 * 60 * 1000);
+});
+
+test('pass_temp no aparece en el codigo ejecutable del portal vendedor', () => {
+  const executableFiles = [
+    'netlify/functions/portal-login-vendedor.js',
+    'netlify/functions/portal-change-password.js',
+    'netlify/functions/portal-update-profile.js',
+    'vendedores/js/portal-vendedor.js'
+  ];
+
+  executableFiles.forEach((relativePath) => {
+    const content = readRepoFile(relativePath);
+    assert.equal(content.includes('pass_temp'), false, `${relativePath} todavia contiene pass_temp`);
+  });
 });

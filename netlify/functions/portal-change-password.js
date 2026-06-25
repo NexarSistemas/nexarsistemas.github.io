@@ -61,14 +61,14 @@ exports.handler = async function handler(event) {
     if (newPassword !== confirmPassword) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "La nueva contraseña y su confirmación deben coincidir." })
+        body: JSON.stringify({ error: "La nueva contrasena y su confirmacion deben coincidir." })
       };
     }
 
     if (newPassword === currentPassword) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "La nueva contraseña debe ser distinta de la actual." })
+        body: JSON.stringify({ error: "La nueva contrasena debe ser distinta de la actual." })
       };
     }
 
@@ -84,26 +84,33 @@ exports.handler = async function handler(event) {
     if (expiryStatus.expired) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "La sesión no es válida o ya venció." })
+        body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
 
     const vendorRows = await supabaseFetch(
-      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required,pass_temp&id=eq.${encodeURIComponent(session.vendedor_id)}&limit=1`
+      `/rest/v1/vendedores?select=id,codigo_vendedor,nombre,apellido,activo,es_admin,cobra_comision,password_hash,password_change_required&id=eq.${encodeURIComponent(session.vendedor_id)}&limit=1`
     );
     const vendor = Array.isArray(vendorRows) ? vendorRows[0] : null;
 
     if (!vendor || !vendor.activo) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "La sesión no es válida o ya venció." })
+        body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
+
+    const passwordChangeRequired = vendor.password_change_required === true;
+    console.info("Portal vendedor password change policy:", {
+      codigo_vendedor: vendor.codigo_vendedor,
+      vendedor_id: vendor.id,
+      password_change_required: passwordChangeRequired
+    });
 
     if (!verifyWerkzeugPassword(currentPassword, vendor.password_hash)) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ error: "La contraseña actual no es válida." })
+        body: JSON.stringify({ error: "La contrasena actual no es valida." })
       };
     }
 
@@ -115,9 +122,14 @@ exports.handler = async function handler(event) {
       body: JSON.stringify({
         password_hash: generateWerkzeugPasswordHash(newPassword),
         password_change_required: false,
-        pass_temp: false,
         ultimo_login: new Date().toISOString()
       })
+    });
+
+    console.info("Portal vendedor password updated:", {
+      codigo_vendedor: vendor.codigo_vendedor,
+      vendedor_id: vendor.id,
+      password_change_required: false
     });
 
     return {
@@ -133,8 +145,7 @@ exports.handler = async function handler(event) {
           apellido: vendor.apellido,
           es_admin: Boolean(vendor.es_admin),
           cobra_comision: vendor.cobra_comision !== false,
-          password_change_required: false,
-          pass_temp: false
+          password_change_required: false
         }
       })
     };
@@ -142,7 +153,7 @@ exports.handler = async function handler(event) {
     console.error("Portal vendedor change password error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "No pudimos actualizar la contraseña." })
+      body: JSON.stringify({ error: "No pudimos actualizar la contrasena." })
     };
   }
 };
