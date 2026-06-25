@@ -138,24 +138,44 @@ function verifyWerkzeugPassword(password, storedHash) {
   return false;
 }
 
-async function supabaseFetch(path, options = {}) {
-  const baseUrl = (process.env.SUPABASE_URL || "").trim();
-  const anonKey = (process.env.SUPABASE_ANON_KEY || "").trim();
-  const portalSecret = (process.env.PORTAL_VENDOR_RPC_SECRET || "").trim();
+function getSupabaseKey(keyName) {
+  return String(process.env[keyName] || "").trim();
+}
 
-  if (!baseUrl || !anonKey || !portalSecret) {
-    throw new Error("Falta configurar SUPABASE_URL, SUPABASE_ANON_KEY o PORTAL_VENDOR_RPC_SECRET.");
+function getRequiredPortalConfig() {
+  const config = {
+    supabaseUrl: String(process.env.SUPABASE_URL || "").trim(),
+    anonKey: getSupabaseKey("SUPABASE_ANON_KEY"),
+    serviceRoleKey: getSupabaseKey("SUPABASE_SERVICE_ROLE_KEY"),
+    portalSecret: String(process.env.PORTAL_VENDOR_RPC_SECRET || "").trim()
+  };
+
+  if (!config.supabaseUrl || !config.anonKey || !config.serviceRoleKey || !config.portalSecret) {
+    throw new Error(
+      "Falta configurar SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY o PORTAL_VENDOR_RPC_SECRET."
+    );
+  }
+
+  return config;
+}
+
+async function supabaseFetch(path, options = {}) {
+  const { supabaseUrl, anonKey, portalSecret } = getRequiredPortalConfig();
+  const authKey = getSupabaseKey(options.keyName || "SUPABASE_ANON_KEY");
+
+  if (!authKey) {
+    throw new Error(`Falta configurar ${options.keyName || "SUPABASE_ANON_KEY"}.`);
   }
 
   const headers = {
-    apikey: anonKey,
-    Authorization: `Bearer ${anonKey}`,
+    apikey: authKey,
+    Authorization: `Bearer ${authKey}`,
     "Content-Type": "application/json",
     "x-portal-secret": portalSecret,
     ...(options.headers || {})
   };
 
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(`${supabaseUrl}${path}`, {
     method: options.method || "GET",
     headers,
     body: options.body
@@ -204,6 +224,8 @@ exports.handler = async function handler(event) {
   }
 
   try {
+    getRequiredPortalConfig();
+
     const body = parseJson(event.body);
     const codigo = normalizeCode(body.codigo_vendedor);
     const password = typeof body.password === "string" ? body.password : "";
@@ -230,18 +252,35 @@ exports.handler = async function handler(event) {
     const sessionToken = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + SESSION_DURATION_HOURS * 60 * 60 * 1000).toISOString();
 
-    await supabaseFetch("/rest/v1/portal_vendedor_sessions", {
-      method: "POST",
-      headers: {
-        Prefer: "return=minimal"
-      },
-      body: JSON.stringify({
-        vendedor_id: vendor.id,
+    try {
+      await supabaseFetch("/rest/v1/portal_vendedor_sessions", {
+        method: "POST",
+        keyName: "SUPABASE_SERVICE_ROLE_KEY",
+        headers: {
+          Prefer: "return=minimal"
+        },
+        body: JSON.stringify({
+          vendedor_id: vendor.id,
+          codigo_vendedor: vendor.codigo_vendedor,
+          session_token: sessionToken,
+          expires_at: expiresAt
+        })
+      });
+    } catch (error) {
+      console.error("Portal vendedor session creation failed:", {
         codigo_vendedor: vendor.codigo_vendedor,
-        session_token: sessionToken,
-        expires_at: expiresAt
-      })
-    });
+        vendedor_id: vendor.id,
+        detail: error.message || "unknown"
+      });
+
+      return {
+        statusCode: 500,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ error: "No pudimos crear la sesion del portal." })
+      };
+    }
 
     await supabaseFetch(`/rest/v1/vendedores?id=eq.${encodeURIComponent(vendor.id)}`, {
       method: "PATCH",
