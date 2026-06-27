@@ -74,6 +74,47 @@ document.addEventListener("DOMContentLoaded", () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  function normalizeValue(value) {
+    return typeof value === "string"
+      ? value
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+      : "";
+  }
+
+  function isSupportRequest(producto, planInteres) {
+    const productoNormalizado = normalizeValue(producto);
+    const consultaNormalizada = normalizeValue(planInteres);
+
+    return (
+      productoNormalizado === "solicitud de soporte" ||
+      productoNormalizado === "otro / consulta general" ||
+      consultaNormalizada === "soporte tecnico" ||
+      consultaNormalizada === "informacion general" ||
+      consultaNormalizada === "otra consulta"
+    );
+  }
+
+  function getSupportMotive(planInteres) {
+    const consultaNormalizada = normalizeValue(planInteres);
+
+    if (consultaNormalizada === "soporte tecnico") {
+      return "consulta";
+    }
+
+    if (consultaNormalizada === "otra consulta") {
+      return "otro";
+    }
+
+    if (consultaNormalizada === "solicitar licencia") {
+      return "licencia";
+    }
+
+    return "consulta";
+  }
+
   function showStatus(message, type) {
     statusContainer.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
     statusContainer.style.display = "block";
@@ -129,18 +170,37 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const payload = {
-      nombre,
-      email,
-      telefono: telefono || null,
-      negocio: negocio || null,
-      producto: producto || null,
-      plan_interes: planInteres || null,
-      mensaje: mensaje || null,
-      estado: "pendiente",
-      origen: "web",
-      leida: false
-    };
+    const supportRequest = isSupportRequest(producto, planInteres);
+    const tableName = supportRequest ? "solicitudes_soporte" : "solicitudes_demo";
+    const payload = supportRequest
+      ? {
+          nombre,
+          email,
+          whatsapp: telefono || null,
+          negocio: negocio || null,
+          producto: producto || null,
+          motivo: getSupportMotive(planInteres),
+          mensaje: mensaje || null,
+          plan: planInteres || null,
+          estado: "pendiente",
+          technical_details: {
+            origen: "web",
+            telefono: telefono || null,
+            plan_interes: planInteres || null
+          }
+        }
+      : {
+          nombre,
+          email,
+          telefono: telefono || null,
+          negocio: negocio || null,
+          producto: producto || null,
+          plan_interes: planInteres || null,
+          mensaje: mensaje || null,
+          estado: "pendiente",
+          origen: "web",
+          leida: false
+        };
 
     if (submitButton) {
       submitButton.disabled = true;
@@ -154,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     showStatus("Enviando tu solicitud...", "loading");
 
     try {
-      const response = await fetch(`${supabaseUrl}/rest/v1/solicitudes_demo`, {
+      const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}`, {
         method: "POST",
         headers: {
           apikey: anonKey,
