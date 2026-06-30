@@ -1,9 +1,10 @@
-﻿# Legal Documents
+# Legal Docs Sync
 
-Estos documentos provienen de `nexar-legal` y no deben editarse manualmente en este repositorio.
+Este directorio se sincroniza desde la fuente oficial `nexar-legal`.
 
 - Fuente oficial: `nexar-legal`
-- Version sincronizada: `1.0.0`
-- Fecha: `2026-06-30`
+- Version legal: `1.0.0`
+- Fecha efectiva: `2026-06-30`
 
-Cualquier cambio legal debe realizarse en el repositorio fuente y luego volver a sincronizarse aqui.
+No editar manualmente estos archivos.
+Cualquier cambio debe realizarse primero en `nexar-legal` y luego volver a sincronizarse.
