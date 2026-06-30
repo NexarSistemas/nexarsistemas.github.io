@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "effective_date": "2026-06-30",
+  "status": "active",
+  "owner": "Nexar Sistemas",
+  "documents": {
+    "LICENSE": "1.0.0",
+    "EULA.md": "1.0.0",
+    "PRIVACY.md": "1.0.0",
+    "TERMS.md": "1.0.0",
+    "THIRD_PARTY.md": "1.0.0",
+    "TRADEMARKS.md": "1.0.0"
+  }
+}
