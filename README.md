@@ -2,6 +2,20 @@
 
 Landing estatica para `nexarsistemas.github.io`, compatible con GitHub Pages.
 
+## Estado
+
+- Estado del repositorio: activo
+- Version actual: `TODO(confirmar)`
+- Contexto central del ecosistema: `nexar-ai-context/CONTEXTO_NEXAR.md`
+
+## Stack
+
+- HTML
+- CSS
+- JavaScript
+- GitHub Pages
+- Supabase JS publico
+
 ## Solicitudes de demo con Supabase
 
 La landing ahora registra solicitudes en la tabla `public.solicitudes_demo` de Supabase.
