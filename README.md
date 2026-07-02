@@ -6,7 +6,7 @@ Landing estatica para `nexarsistemas.github.io`, compatible con GitHub Pages.
 
 - Estado del repositorio: activo
 - Version actual: `TODO(confirmar)`
-- Contexto central del ecosistema: `nexar-ai-context/CONTEXTO_NEXAR.md`
+- Contexto central del ecosistema: repo externo `nexar-ai-context`, archivo `CONTEXTO_NEXAR.md`
 
 ## Stack
 
@@ -86,6 +86,12 @@ Nexar Admin debe conectarse mediante backend seguro.
 - actualizar `estado` a `contactado`, `demo_agendada` u otro flujo interno
 
 Mas detalle en `docs/contrato_nexar_admin_solicitudes_demo.md`.
+
+## Vínculos comerciales relacionados
+
+- `index.html` y `assets/js/solicitud-demo.js` son la entrada pública para leads que luego consume `nexar-admin`.
+- `mercadopago-exito.html`, `mercadopago-fallo.html` y `mercadopago-pendiente.html` son superficies públicas de retorno ligadas a `nexar-pagos`.
+- Las `Netlify Functions` bajo `netlify/functions/` resuelven flujos server-side del portal vendedor y no deben confundirse con lógica pública de GitHub Pages.
 
 ## Seguridad
 
