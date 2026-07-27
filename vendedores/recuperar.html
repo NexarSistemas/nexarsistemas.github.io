@@ -6,19 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
     <link rel="icon" type="image/png" href="../assets/logon.png">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/site.css">
     <link rel="stylesheet" href="./css/portal-vendedor.css">
 </head>
-<body data-portal-page="recovery">
-<header class="navbar">
-    <div class="logo">
-        <img src="../assets/logon.png" alt="Nexar Sistemas">
+<body class="portal-page" data-portal-page="recovery">
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="../index.html" aria-label="Nexar Sistemas, inicio"><span class="brand-mark" aria-hidden="true">N</span><span><strong>Nexar</strong><small>Sistemas</small></span></a>
+        <nav class="header-nav" aria-label="Navegación del portal"><a href="../index.html">Nexar Sistemas</a><a href="./login.html">Acceso</a><a href="./recuperar.html" aria-current="page">Recuperar acceso</a></nav>
+        <div class="header-actions"><a class="button button-small" href="./login.html">Volver al acceso</a></div>
     </div>
-    <nav>
-        <a href="../index.html">Inicio</a>
-        <a href="./login.html">Portal Vendedor</a>
-        <a href="./recuperar.html">Recuperar acceso</a>
-    </nav>
 </header>
 
 <main class="portal-shell">
@@ -42,13 +39,15 @@
             <label for="recovery_mensaje">Mensaje opcional</label>
             <textarea id="recovery_mensaje" name="mensaje" rows="4" maxlength="500" placeholder="Contanos brevemente cómo preferís que te contactemos."></textarea>
 
-            <button id="portal-recovery-submit" type="submit" class="download-link">Enviar solicitud</button>
+            <button id="portal-recovery-submit" type="submit" class="button">Enviar solicitud</button>
         </form>
 
         <p class="portal-inline-link"><a href="./login.html">Volver al login</a></p>
+        <p class="portal-support">Consultas de recuperación: <a href="mailto:vendedores@nexarsistemas.com.ar">vendedores@nexarsistemas.com.ar</a></p>
     </section>
 </main>
 
+<script src="./js/portal-host.js"></script>
 <script src="../assets/js/supabase-config.js"></script>
 <script src="./js/portal-vendedor.js"></script>
 </body>

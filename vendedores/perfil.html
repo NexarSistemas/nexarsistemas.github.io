@@ -6,20 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
     <link rel="icon" type="image/png" href="../assets/logon.png">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/site.css">
     <link rel="stylesheet" href="./css/portal-vendedor.css">
 </head>
-<body data-portal-page="profile">
-<header class="navbar">
-    <div class="logo">
-        <img src="../assets/logon.png" alt="Nexar Sistemas">
+<body class="portal-page" data-portal-page="profile">
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="../index.html" aria-label="Nexar Sistemas, inicio"><span class="brand-mark" aria-hidden="true">N</span><span><strong>Nexar</strong><small>Sistemas</small></span></a>
+        <nav class="header-nav" aria-label="Navegación del portal"><a href="../index.html">Inicio</a><a href="./dashboard.html">Dashboard</a><a href="./perfil.html" aria-current="page">Perfil</a><a href="#" id="portal-logout-link">Salir</a></nav>
     </div>
-    <nav>
-        <a href="../index.html">Inicio</a>
-        <a href="./dashboard.html">Dashboard</a>
-        <a href="./perfil.html">Perfil</a>
-        <a href="#" id="portal-logout-link">Salir</a>
-    </nav>
 </header>
 
 <main class="portal-shell">
@@ -51,7 +46,7 @@
                 <label for="profile_alias_cbu">Alias / CBU</label>
                 <input id="profile_alias_cbu" name="alias_cbu" type="text" autocomplete="off">
 
-                <button id="portal-update-profile-submit" type="submit" class="download-link">Guardar datos</button>
+                <button id="portal-update-profile-submit" type="submit" class="button">Guardar datos</button>
             </form>
         </section>
 
@@ -69,14 +64,16 @@
                 <label for="confirm_password">Confirmar nueva contraseña</label>
                 <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" required>
 
-                <button id="portal-change-password-submit" type="submit" class="download-link">Guardar nueva contraseña</button>
+                <button id="portal-change-password-submit" type="submit" class="button">Guardar nueva contraseña</button>
             </form>
 
             <p class="portal-help">Usá una contraseña distinta de la actual. Cuando se actualice, vas a poder volver al dashboard.</p>
+            <p class="portal-support">Soporte del portal: <a href="mailto:vendedores@nexarsistemas.com.ar">vendedores@nexarsistemas.com.ar</a></p>
         </section>
     </section>
 </main>
 
+<script src="./js/portal-host.js"></script>
 <script src="../assets/js/supabase-config.js"></script>
 <script src="./js/portal-vendedor.js"></script>
 </body>

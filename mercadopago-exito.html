@@ -2,99 +2,70 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pago aprobado | Nexar Comercio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex">
+    <title>Pago aprobado | Nexar Comercio</title>
+    <meta name="robots" content="noindex,nofollow">
     <meta name="description" content="Confirmación de pago aprobado para Nexar Comercio.">
-    <meta property="og:title" content="Pago aprobado | Nexar Comercio">
-    <meta property="og:description" content="Confirmación de pago aprobado para Nexar Comercio.">
+    <link rel="canonical" href="https://nexarsistemas.com.ar/mercadopago-exito.html">
     <link rel="icon" type="image/png" href="./assets/logon.png">
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/site.css">
 </head>
 <body class="payment-page" data-status-default="approved">
-
-<main class="payment-shell">
-    <div class="payment-topbar">
-        <a href="./index.html" class="payment-brand">
-            <img src="./assets/logon.png" alt="Nexar Sistemas">
-            <span>Nexar Sistemas</span>
-        </a>
-        <a href="./index.html" class="payment-backlink">Volver al sitio principal</a>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="./index.html" aria-label="Nexar Sistemas, inicio"><span class="brand-mark" aria-hidden="true">N</span><span><strong>Nexar</strong><small>Sistemas</small></span></a>
+        <nav class="header-nav" aria-label="Navegación principal"><a href="./index.html">Inicio</a><a href="./nexar-comercio.html">Nexar Comercio</a><a href="./index.html#contacto">Contacto</a></nav>
+        <div class="header-actions"><a class="button button-small" href="./index.html">Volver a Nexar</a></div>
     </div>
-
-    <section class="payment-card">
-        <article class="payment-panel">
-            <span class="payment-badge">Mercado Pago confirmado</span>
-            <div class="payment-icon" aria-hidden="true">✓</div>
-            <h1>Pago realizado con exito</h1>
-            <p class="payment-lead">
-                Recibimos la confirmacion del pago correctamente. En breve vamos a continuar con la entrega,
-                activacion o contacto correspondiente segun la licencia o servicio de Nexar Comercio.
-            </p>
-
-            <div class="payment-highlight">
-                <div class="card-mini">
-                    <span class="card-mini-label">Estado</span>
-                    <span class="card-mini-value" id="mp-status">Aprobado</span>
+</header>
+<main class="payment-main" id="contenido">
+    <div class="container">
+        <section class="payment-layout" aria-labelledby="payment-title">
+            <article class="payment-panel">
+                <span class="payment-badge" id="payment-badge">Mercado Pago confirmado</span>
+                <div class="payment-status-icon" id="payment-icon" role="img" aria-label="Pago aprobado">✓</div>
+                <h1 id="payment-title">Pago realizado con éxito</h1>
+                <p class="payment-lead" id="payment-message">Recibimos la confirmación del pago. En breve continuaremos con la entrega, activación o contacto correspondiente para Nexar Comercio.</p>
+                <div class="payment-summary">
+                    <div><span>Estado</span><strong id="mp-status">Aprobado</strong></div>
+                    <div><span>Pago</span><strong id="mp-payment-id">Pendiente de identificación</strong></div>
                 </div>
-                <div class="card-mini">
-                    <span class="card-mini-label">Pago</span>
-                    <span class="card-mini-value" id="mp-payment-id">Pendiente de identificacion</span>
+                <p class="payment-param-warning" id="payment-param-warning" role="alert">No recibimos identificadores de la operación. Conservamos el estado de esta página, pero te recomendamos contactar a soporte antes de cerrar.</p>
+                <div class="payment-actions">
+                    <a class="button" href="./index.html">Volver a Nexar Sistemas</a>
+                    <a class="button button-outline" href="./nexar-comercio.html">Ir a Nexar Comercio</a>
                 </div>
-            </div>
-
-            <div class="payment-actions">
-                <a href="./index.html" class="download-link">Volver al inicio</a>
-                <a href="./index.html#contacto" class="btn-secondary" style="border-color: #1e3a5f; color: #1e3a5f;">Contactar soporte</a>
-            </div>
-
-            <p class="payment-note">
-                Si necesitás asistencia, guardá el identificador del pago y escribinos desde el formulario de contacto.
-            </p>
-        </article>
-
-        <aside class="payment-sidepanel">
-            <h2>Que sigue ahora</h2>
-
-            <div class="payment-list">
-                <div class="payment-item">
-                    <strong>1. Verificacion interna</strong>
-                    <span>Registramos la operacion y validamos los datos vinculados a la compra.</span>
+                <p class="payment-note">¿Necesitás ayuda? Escribí a <a href="mailto:soporte@nexarsistemas.com.ar">soporte@nexarsistemas.com.ar</a> o llamá al <a href="tel:+5492646616948">+5492646616948</a>.</p>
+            </article>
+            <aside class="payment-aside">
+                <h2 id="payment-next-title">Qué sigue ahora</h2>
+                <div class="payment-next-list" id="payment-next-list">
+                    <div><strong>1. Verificación interna</strong><span>Registramos la operación y validamos los datos vinculados a la compra.</span></div>
+                    <div><strong>2. Entrega o activación</strong><span>Enviamos acceso, instrucciones o seguimiento según el servicio contratado.</span></div>
+                    <div><strong>3. Soporte disponible</strong><span>Si algo no coincide, revisamos el pago con los datos que figuran aquí.</span></div>
                 </div>
-                <div class="payment-item">
-                    <strong>2. Entrega o activacion</strong>
-                    <span>Te enviamos acceso, instrucciones o seguimiento segun el servicio contratado.</span>
-                </div>
-                <div class="payment-item">
-                    <strong>3. Soporte disponible</strong>
-                    <span>Si algo no coincide, podemos revisar el pago con los datos que figuran abajo.</span>
-                </div>
-            </div>
-
-            <h2>Detalles de la operacion</h2>
-            <dl class="payment-detail-list">
-                <div class="payment-detail">
-                    <dt>Payment ID</dt>
-                    <dd id="mp-payment-id-detail">No informado</dd>
-                </div>
-                <div class="payment-detail">
-                    <dt>Merchant Order</dt>
-                    <dd id="mp-order-id">No informado</dd>
-                </div>
-                <div class="payment-detail">
-                    <dt>Referencia</dt>
-                    <dd id="mp-reference">No informada</dd>
-                </div>
-                <div class="payment-detail">
-                    <dt>Preferencia</dt>
-                    <dd id="mp-preference-id">No informada</dd>
-                </div>
-            </dl>
-        </aside>
-    </section>
+                <h2>Detalles de la operación</h2>
+                <dl class="payment-details">
+                    <div><dt>Estado recibido</dt><dd id="mp-status-raw">approved</dd></div>
+                    <div><dt>Payment ID</dt><dd id="mp-payment-id-detail">No informado</dd></div>
+                    <div><dt>Merchant Order</dt><dd id="mp-order-id">No informado</dd></div>
+                    <div><dt>Referencia</dt><dd id="mp-reference">No informada</dd></div>
+                    <div><dt>Preferencia</dt><dd id="mp-preference-id">No informada</dd></div>
+                </dl>
+            </aside>
+        </section>
+    </div>
 </main>
-
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <a class="brand brand-footer" href="./index.html"><span class="brand-mark" aria-hidden="true">N</span><span><strong>Nexar</strong><small>Sistemas</small></span></a>
+        <div class="footer-column"><strong>Productos</strong><a href="./nexar-comercio.html">Nexar Comercio</a><a href="./nexar-finanzas.html">Nexar Finanzas</a></div>
+        <div class="footer-column"><strong>Enlaces</strong><a href="./index.html">Inicio</a><a href="./vendedores/login.html">Acceso vendedores</a></div>
+        <div class="footer-column"><strong>Soporte</strong><a href="mailto:soporte@nexarsistemas.com.ar">soporte@nexarsistemas.com.ar</a><a href="tel:+5492646616948">+5492646616948</a></div>
+    </div>
+    <div class="container footer-bottom">© 2026 Nexar Sistemas. Todos los derechos reservados.</div>
+</footer>
 <script src="./js/mercadopago-success.js"></script>
-
 </body>
 </html>
