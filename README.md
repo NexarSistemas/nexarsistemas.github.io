@@ -1,124 +1,161 @@
-# Nexar Sistemas Landing
+# Nexar Sistemas
 
-Landing estatica para `nexarsistemas.github.io`, compatible con GitHub Pages.
+Sitio público estático de Nexar Sistemas, compatible con GitHub Pages y Netlify.
 
-## Estado
+- Dominio canónico: `https://nexarsistemas.com.ar`
+- Espejo GitHub Pages: `https://nexarsistemas.github.io`
+- Stack público: HTML, CSS y JavaScript sin proceso de build
+- Functions del portal: Netlify Functions
+- Datos públicos: Supabase REST/RPC con `anon key` y RLS
 
-- Estado del repositorio: activo
-- Version actual: `TODO(confirmar)`
-- Contexto central del ecosistema: repo externo `nexar-ai-context`, archivo `CONTEXTO_NEXAR.md`
+## Sistema visual
 
-## Stack
+El diseño vigente reproduce el proyecto público de ChatGPT Sites `Nexar Sistemas`, versión 3, publicado originalmente en:
 
-- HTML
-- CSS
-- JavaScript
-- GitHub Pages
-- Supabase JS publico
+`https://nexar-sistemas-landing.rolojnb.chatgpt.site/`
 
-## Solicitudes de demo con Supabase
+La fuente oficial del proyecto se obtuvo mediante el repositorio de origen administrado por ChatGPT Sites. La implementación React/Next del sitio de referencia no se trasladó como dependencia: su composición, variables, tipografía, tarjetas, botones, fondos, responsive y jerarquía se adaptaron a la arquitectura estática existente en `css/site.css`.
 
-La landing ahora registra solicitudes en la tabla `public.solicitudes_demo` de Supabase.
+Esto evita depender en producción del dominio de Sites y evita incorporar un framework o build innecesario. La única limitación deliberada es el uso de la pila tipográfica local del sistema en lugar de distribuir las fuentes internas del runtime de Sites.
 
-Puntos clave:
+La versión anterior al rediseño está respaldada, local y remotamente, en:
 
-- GitHub Pages usa solo `SUPABASE_URL` publica y `SUPABASE_ANON_KEY` publica
-- la seguridad depende de RLS
-- `RLS` debe permitir solo `INSERT` publico en `solicitudes_demo`
-- no debe existir `SELECT` publico sobre `solicitudes_demo`
-- `SUPABASE_SERVICE_ROLE_KEY` nunca debe usarse en frontend
-- `service_role` jamas va en este repo publico
+`backup/landing-before-chatgpt-site`
 
-## Archivos principales
+## Páginas públicas vigentes
 
-- `index.html`
-- `css/styles.css`
-- `js/main.js`
-- `assets/js/solicitud-demo.js`
-- `assets/js/supabase-config.js`
-- `assets/js/supabase-config.example.js`
-- `docs/supabase_solicitudes_demo.sql`
-- `docs/solicitudes-demo.md`
-- `docs/contrato_nexar_admin_solicitudes_demo.md`
+- `index.html`: marca, productos, comparación, contacto y acceso vendedores
+- `nexar-comercio.html`: producto, funciones, rubros y planes confirmados
+- `nexar-finanzas.html`: producto, funciones y planes confirmados
+- `mercadopago-exito.html`: retorno aprobado
+- `mercadopago-pendiente.html`: retorno pendiente
+- `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
+- `vendedores/login.html`: acceso al portal
+- `vendedores/recuperar.html`: solicitud de recuperación
+- `vendedores/dashboard.html`: dashboard autenticado
+- `vendedores/perfil.html`: perfil y cambio de contraseña
 
-## Setup rapido
+`css/site.css` centraliza el sistema visual público. `vendedores/css/portal-vendedor.css` agrega únicamente los componentes específicos del portal.
 
-### 1. Ejecutar SQL en Supabase
+Para incorporar una aplicación pública futura se agrega una tarjeta siguiendo el patrón `.product-card` y una página de producto que reutilice header, tokens, botones, secciones y footer. No se requiere un CMS ni otro framework.
 
-Ejecuta `docs/supabase_solicitudes_demo.sql` desde el `SQL Editor` del proyecto.
+## Contactos oficiales
 
-### 2. Configurar archivo publico para GitHub Pages
+- Ventas: `ventas@nexarsistemas.com.ar`
+- Soporte: `soporte@nexarsistemas.com.ar`
+- Portal y vendedores: `vendedores@nexarsistemas.com.ar`
+- Teléfono, WhatsApp y referencia para Telegram: `+5492646616948`
 
-Este repo usa la opcion recomendada para una landing publica: `assets/js/supabase-config.js` versionado.
+No se publica un enlace de Telegram porque no existe un nombre de usuario oficial verificable. No debe inventarse.
 
-Completa este archivo con:
+## Ejecución local
+
+```bash
+python3 -m http.server 8000
+```
+
+Abrir:
+
+`http://localhost:8000/`
+
+No es necesario instalar dependencias para la landing. Las pruebas existentes se ejecutan con Node:
+
+```bash
+node --test tests/portal-vendedor-session.test.js
+node tests/public-site.test.js
+```
+
+## GitHub Pages, Netlify y dominio
+
+- `CNAME` declara `nexarsistemas.com.ar` como dominio canónico de GitHub Pages.
+- `robots.txt` y `sitemap.xml` usan el dominio canónico.
+- Los enlaces internos son relativos para funcionar en ambos hosts.
+- Las páginas del portal requieren Netlify Functions. Si se abren desde `nexarsistemas.github.io`, `vendedores/js/portal-host.js` conserva ruta y parámetros y las lleva a `https://nexarsistemas.com.ar`, donde las Functions están disponibles.
+- No se modificaron DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
+
+## Solicitudes de contacto y demo con Supabase
+
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`.
+
+El frontend usa únicamente:
+
+- `SUPABASE_URL` pública
+- `SUPABASE_ANON_KEY` pública
+
+La seguridad depende de RLS:
+
+- permitir solo los `INSERT` públicos necesarios;
+- no habilitar `SELECT` público;
+- nunca exponer `SUPABASE_SERVICE_ROLE_KEY` en HTML, CSS, JavaScript o documentación pública.
+
+Configuración pública versionada:
 
 ```js
 window.NEXAR_SUPABASE_CONFIG = {
   url: "https://TU-PROYECTO.supabase.co",
-  anonKey: "TU_ANON_PUBLIC_KEY"
+  anonKey: "TU_SUPABASE_ANON_KEY_AQUI"
 };
 ```
 
-No coloques una `service_role` ahi. GitHub Pages usa anon public key y nada mas.
+Documentación relacionada:
 
-### 3. Probar local
+- `docs/solicitudes-demo.md`
+- `docs/supabase_solicitudes_demo.sql`
+- `docs/contrato_nexar_admin_solicitudes_demo.md`
 
-```bash
-python -m http.server 8000
-```
+Nexar Admin consume estas solicitudes desde un backend seguro. El contrato de tablas y estados no se modifica desde la landing.
 
-Abre `http://localhost:8000`.
+## Retornos de Mercado Pago
 
-### 4. Probar en Supabase
+Las tres URLs públicas y sus query strings se conservan:
 
-1. Abre el formulario en la landing.
-2. Envia una solicitud.
-3. Verifica que aparezca en `public.solicitudes_demo`.
+- `mercadopago-exito.html`
+- `mercadopago-pendiente.html`
+- `mercadopago-fallo.html`
 
-## Integracion con Nexar Admin
+`js/mercadopago-success.js` conserva los parámetros y aliases existentes:
 
-Nexar Admin debe conectarse mediante backend seguro.
+- `status` / `collection_status`
+- `payment_id` / `collection_id`
+- `merchant_order_id`
+- `external_reference`
+- `preference_id`
 
-- `service_role` solo en Nexar Admin o backend seguro
-- listar solicitudes pendientes
-- marcar `leida`
-- actualizar `estado` a `contactado`, `demo_agendada` u otro flujo interno
+La presentación distingue aprobado, pendiente, rechazado, fallido, cancelado y error técnico. Si no llegan identificadores, se muestra una advertencia visual sin reemplazar el estado predeterminado de la URL de retorno. No se modificaron URLs, redirecciones, webhooks ni contratos con `nexar-pagos`.
 
-Mas detalle en `docs/contrato_nexar_admin_solicitudes_demo.md`.
+## Portal de vendedores
 
-## Vínculos comerciales relacionados
+Se preservan:
 
-- `index.html` y `assets/js/solicitud-demo.js` son la entrada pública para leads que luego consume `nexar-admin`.
-- `mercadopago-exito.html`, `mercadopago-fallo.html` y `mercadopago-pendiente.html` son superficies públicas de retorno ligadas a `nexar-pagos`.
-- Las `Netlify Functions` bajo `netlify/functions/` resuelven flujos server-side del portal vendedor y no deben confundirse con lógica pública de GitHub Pages.
+- login y contraseña temporal;
+- sesión y expiración;
+- recuperación;
+- cambio de contraseña;
+- perfil;
+- dashboard;
+- llamadas a Netlify Functions;
+- llamadas Supabase protegidas;
+- mensajes de éxito y error.
 
-## Seguridad
-
-- `anon key` publica: si
-- `service_role` en frontend: no
-- `service_role` en este repo publico: no
-- `RLS` habilitado: obligatorio
-- `RLS` con `INSERT` publico limitado a `solicitudes_demo`: obligatorio
-- `SELECT` publico: no
-
-## Netlify Functions
-
-Variables requeridas para las functions del portal vendedor:
+Variables server-side requeridas por las Functions:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `PORTAL_VENDOR_RPC_SECRET`
-- `SUPABASE_SERVICE_ROLE_KEY` solo para operaciones server-side de sesion
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-Notas:
+`SUPABASE_SERVICE_ROLE_KEY` se usa únicamente dentro de Netlify Functions. Nunca debe copiarse al frontend.
 
-- `SUPABASE_SERVICE_ROLE_KEY` debe configurarse solo en variables de entorno de Netlify Functions.
-- `SUPABASE_SERVICE_ROLE_KEY` nunca debe exponerse en `assets/js`, `vendedores/js` ni ningun archivo publico del frontend.
-- `SUPABASE_ANON_KEY` sigue siendo la key correcta para operaciones publicas protegidas por `RLS`.
+## Validación automatizada
 
-## Comando local recomendado
+`tests/public-site.test.js` comprueba:
 
-```bash
-python -m http.server 8000
-```
+- existencia de las páginas principales;
+- uso del CSS visual compartido;
+- enlaces internos esenciales;
+- contactos oficiales;
+- ausencia de teléfonos anteriores conocidos;
+- parámetros contractuales de Mercado Pago;
+- IDs funcionales del portal.
+
+Si se modifican Functions, ejecutar además el test de sesión y `netlify dev`. El rediseño actual no modifica Functions ni contratos server-side.

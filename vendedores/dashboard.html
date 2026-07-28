@@ -6,20 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
     <link rel="icon" type="image/png" href="../assets/logon.png">
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/site.css">
     <link rel="stylesheet" href="./css/portal-vendedor.css">
 </head>
-<body data-portal-page="dashboard">
-<header class="navbar">
-    <div class="logo">
-        <img src="../assets/logon.png" alt="Nexar Sistemas">
+<body class="portal-page" data-portal-page="dashboard">
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="../index.html" aria-label="Nexar Sistemas, inicio"><span class="brand-mark" aria-hidden="true">N</span><span><strong>Nexar</strong><small>Sistemas</small></span></a>
+        <nav class="header-nav" aria-label="Navegación del portal"><a href="../index.html">Inicio</a><a href="./dashboard.html" aria-current="page">Dashboard</a><a href="./perfil.html">Perfil</a><a href="#" id="portal-logout-link">Salir</a></nav>
     </div>
-    <nav>
-        <a href="../index.html">Inicio</a>
-        <a href="./dashboard.html">Dashboard</a>
-        <a href="./perfil.html">Perfil</a>
-        <a href="#" id="portal-logout-link">Salir</a>
-    </nav>
 </header>
 
 <main class="portal-shell portal-dashboard-shell">
@@ -53,6 +48,7 @@
     </section>
 </main>
 
+<script src="./js/portal-host.js"></script>
 <script src="../assets/js/supabase-config.js"></script>
 <script src="./js/portal-vendedor.js"></script>
 </body>

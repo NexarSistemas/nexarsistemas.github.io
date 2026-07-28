@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /vendedores/dashboard.html
+Disallow: /vendedores/perfil.html
+Disallow: /mercadopago-exito.html
+Disallow: /mercadopago-pendiente.html
+Disallow: /mercadopago-fallo.html
+
+Sitemap: https://nexarsistemas.com.ar/sitemap.xml
