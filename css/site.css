@@ -1100,9 +1100,10 @@ a {
 }
 
 .fragment-anchor {
-    position: absolute;
+    display: block;
     width: 1px;
     height: 1px;
+    margin-bottom: -1px;
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
