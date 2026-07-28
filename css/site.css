@@ -101,42 +101,14 @@ a {
 .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
     min-width: max-content;
 }
 
-.brand-mark {
-    width: 42px;
+.brand-logo {
+    width: auto;
     height: 42px;
-    display: grid;
-    place-items: center;
-    color: var(--white);
-    background: var(--green);
-    border-radius: 12px;
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.brand > span:last-child {
-    display: flex;
-    flex-direction: column;
-    line-height: 1;
-}
-
-.brand strong {
-    font-size: 20px;
-    color: var(--navy);
-    letter-spacing: -0.5px;
-}
-
-.brand small {
-    margin-top: 5px;
-    color: var(--green-dark);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 2.4px;
-    text-transform: uppercase;
+    display: block;
+    object-fit: contain;
 }
 
 .header-nav {
@@ -623,22 +595,12 @@ a {
     padding: 38px 40px 35px;
 }
 
-.product-icon {
+.product-logo {
     width: 52px;
     height: 52px;
-    display: grid;
-    place-items: center;
+    display: block;
     margin-bottom: 25px;
-    border-radius: 13px;
-    color: var(--white);
-    background: var(--navy);
-    font-size: 23px;
-    font-weight: 800;
-}
-
-.finance-card .product-icon,
-.product-icon.finance {
-    background: var(--green);
+    object-fit: contain;
 }
 
 .product-label {
@@ -1086,10 +1048,6 @@ a {
     align-self: start;
 }
 
-.brand-footer strong {
-    color: var(--white);
-}
-
 .footer-column {
     display: flex;
     flex-direction: column;
@@ -1137,8 +1095,18 @@ a {
     box-shadow: 0 28px 65px rgba(11, 34, 57, 0.13);
 }
 
-.page-hero-panel .product-icon {
+.page-hero-panel .product-logo {
     margin-bottom: 20px;
+}
+
+.fragment-anchor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    scroll-margin-top: 78px;
 }
 
 .page-hero-panel h2 {
@@ -1470,13 +1438,8 @@ a {
         gap: 10px;
     }
 
-    .brand-mark {
-        width: 37px;
+    .brand-logo {
         height: 37px;
-    }
-
-    .brand strong {
-        font-size: 18px;
     }
 
     .header-actions > .button {
