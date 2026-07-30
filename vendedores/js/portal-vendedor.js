@@ -697,6 +697,119 @@
     });
   }
 
+  function isLocalHost() {
+    return ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+  }
+
+  function bindPrintSheets() {
+    let selectedSheet = null;
+
+    const clearPrintState = () => {
+      document.body.classList.remove("is-printing-sheet");
+      if (selectedSheet) {
+        selectedSheet.classList.remove("is-print-target");
+        selectedSheet = null;
+      }
+    };
+
+    window.addEventListener("afterprint", clearPrintState);
+
+    document.querySelectorAll("[data-print-sheet]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const sheetId = button.dataset.printSheet;
+        const sheet = document.getElementById(sheetId);
+        if (!sheet) {
+          return;
+        }
+
+        clearPrintState();
+        selectedSheet = sheet;
+        document.body.classList.add("is-printing-sheet");
+        selectedSheet.classList.add("is-print-target");
+        window.print();
+      });
+    });
+  }
+
+  function copyTextFallback(text) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+      return document.execCommand("copy");
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
+  function bindCopyTargets() {
+    const status = document.getElementById("copy-status");
+
+    document.querySelectorAll("[data-copy-target]").forEach((button) => {
+      let resetTimer = null;
+      const defaultLabel = button.textContent;
+
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        const text = target ? target.textContent.trim() : "";
+        let copied = false;
+
+        if (text && navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(text);
+            copied = true;
+          } catch (error) {
+            copied = false;
+          }
+        }
+
+        if (text && !copied) {
+          copied = copyTextFallback(text);
+        }
+
+        window.clearTimeout(resetTimer);
+        button.textContent = copied ? "Mensaje copiado" : "No se pudo copiar";
+        if (status) {
+          status.textContent = button.textContent;
+        }
+
+        resetTimer = window.setTimeout(() => {
+          button.textContent = defaultLabel;
+          if (status) {
+            status.textContent = "";
+          }
+        }, 1500);
+      });
+    });
+  }
+
+  function initMaterialPage() {
+    bindPrintSheets();
+    bindCopyTargets();
+
+    if (isLocalHost()) {
+      return;
+    }
+
+    bindLogout();
+
+    const session = loadSession();
+    if (!session || isExpired(session) || !session.session_token) {
+      clearSession();
+      window.location.href = "./login.html";
+      return;
+    }
+
+    if (requiresPasswordChange(session)) {
+      window.location.href = "./perfil.html";
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     if (page === "login") {
       initLoginPage();
@@ -715,6 +828,11 @@
 
     if (page === "profile") {
       initProfilePage();
+      return;
+    }
+
+    if (page === "material") {
+      initMaterialPage();
     }
   });
 })();
