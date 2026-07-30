@@ -111,6 +111,7 @@ test("el material comercial del portal no se publica ni se indexa", () => {
   assert.doesNotMatch(material, /data-portal-page="(?:dashboard|profile)"/);
   assert.doesNotMatch(portalScript, /page === "material"/);
   assert.doesNotMatch(portalScript, /function initMaterialPage\(\)/);
+  assert.match(portalScript, /document\.addEventListener\("DOMContentLoaded", \(\) => \{\s*bindLogout\(\);/);
   assert.doesNotMatch(portalScript, /function isLocalHost\(\)/);
   assert.doesNotMatch(portalScript, /\["localhost", "127\.0\.0\.1", "0\.0\.0\.0"\]/);
   assert.match(material, /id="commercial-sheet-comercio"/);

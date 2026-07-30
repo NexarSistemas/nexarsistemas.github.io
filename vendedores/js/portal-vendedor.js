@@ -212,6 +212,11 @@
     ].filter(Boolean);
 
     targets.forEach((element) => {
+      if (element.dataset.logoutBound === "true") {
+        return;
+      }
+
+      element.dataset.logoutBound = "true";
       element.addEventListener("click", (event) => {
         event.preventDefault();
         clearSession();
@@ -785,6 +790,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    bindLogout();
     bindPrintSheets();
     bindCopyTargets();
 
