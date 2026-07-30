@@ -56,6 +56,20 @@ document.addEventListener("DOMContentLoaded", () => {
         warning.classList.add("is-visible");
     }
 
+    const countdown = document.getElementById("payment-countdown");
+    if (countdown) {
+        let remainingSeconds = 20;
+        countdown.textContent = String(remainingSeconds);
+        const redirectTimer = window.setInterval(() => {
+            remainingSeconds -= 1;
+            countdown.textContent = String(Math.max(remainingSeconds, 0));
+            if (remainingSeconds <= 0) {
+                window.clearInterval(redirectTimer);
+                window.location.href = "./index.html";
+            }
+        }, 1000);
+    }
+
     if (document.body.dataset.statusDefault !== "rejected") {
         return;
     }

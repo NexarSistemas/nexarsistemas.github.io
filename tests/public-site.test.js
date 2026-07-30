@@ -8,6 +8,8 @@ const publicPages = [
   "index.html",
   "nexar-comercio.html",
   "nexar-finanzas.html",
+  "nexar-tienda.html",
+  "nexar-almacen.html",
   "mercadopago-exito.html",
   "mercadopago-pendiente.html",
   "mercadopago-fallo.html",
@@ -29,7 +31,7 @@ test("las superficies públicas principales existen y usan el sistema visual com
 });
 
 test("los enlaces internos esenciales apuntan a archivos existentes", () => {
-  const pagesToCheck = publicPages.slice(0, 7);
+  const pagesToCheck = publicPages.slice(0, 9);
   for (const page of pagesToCheck) {
     const html = read(page);
     const linkPattern = /href="([^"#?]+(?:\.html|\.css|\.png))[^"]*"/g;
@@ -48,6 +50,20 @@ test("los fragmentos de rubros de Nexar Comercio siguen disponibles", () => {
   assert.match(commerce, /id="modo-almacen"/);
   assert.match(commerce, /id="rubros"/);
   assert.match(read("nexar-almacen.html"), /href="\.\/nexar-comercio\.html#modo-almacen"/);
+});
+
+test("las páginas legacy redirigen a Nexar Comercio sin indexarse", () => {
+  const tienda = read("nexar-tienda.html");
+  assert.match(tienda, /<meta name="robots" content="noindex,follow">/);
+  assert.match(tienda, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/nexar-comercio\.html">/);
+  assert.match(tienda, /<meta http-equiv="refresh" content="2; url=\.\/nexar-comercio\.html">/);
+  assert.match(tienda, /href="\.\/nexar-comercio\.html"/);
+
+  const almacen = read("nexar-almacen.html");
+  assert.match(almacen, /<meta name="robots" content="noindex,follow">/);
+  assert.match(almacen, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/nexar-comercio\.html">/);
+  assert.match(almacen, /<meta http-equiv="refresh" content="2; url=\.\/nexar-comercio\.html#modo-almacen">/);
+  assert.match(almacen, /href="\.\/nexar-comercio\.html#modo-almacen"/);
 });
 
 test("los logos oficiales usan rutas existentes y mayúsculas exactas", () => {
@@ -112,6 +128,19 @@ test("los parámetros contractuales de Mercado Pago se preservan", () => {
     "preference_id"
   ]) {
     assert.match(script, new RegExp(`"${parameter}"`), parameter);
+  }
+});
+
+test("los retornos de Mercado Pago vuelven al inicio sin enlaces a Nexar Comercio", () => {
+  const script = read("js/mercadopago-success.js");
+  assert.match(script, /window\.location\.href = "\.\/index\.html"/);
+
+  for (const page of ["mercadopago-exito.html", "mercadopago-pendiente.html", "mercadopago-fallo.html"]) {
+    const html = read(page);
+    assert.match(html, /Nexar Sistemas/);
+    assert.match(html, /id="payment-countdown">20</);
+    assert.match(html, /Volver a Nexar Sistemas/);
+    assert.doesNotMatch(html, /href="\.\/nexar-comercio\.html/);
   }
 });
 
