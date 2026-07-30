@@ -109,9 +109,10 @@ test("el material comercial del portal no se publica ni se indexa", () => {
   assert.match(material, /<meta name="robots" content="noindex,nofollow">/);
   assert.match(material, /data-portal-page="material"/);
   assert.doesNotMatch(material, /data-portal-page="(?:dashboard|profile)"/);
-  assert.match(portalScript, /page === "material"/);
-  assert.match(portalScript, /function initMaterialPage\(\)/);
-  assert.match(portalScript, /\["localhost", "127\.0\.0\.1", "0\.0\.0\.0"\]/);
+  assert.doesNotMatch(portalScript, /page === "material"/);
+  assert.doesNotMatch(portalScript, /function initMaterialPage\(\)/);
+  assert.doesNotMatch(portalScript, /function isLocalHost\(\)/);
+  assert.doesNotMatch(portalScript, /\["localhost", "127\.0\.0\.1", "0\.0\.0\.0"\]/);
   assert.match(material, /id="commercial-sheet-comercio"/);
   assert.match(material, /id="commercial-sheet-finanzas"/);
   assert.match(material, /data-print-sheet="commercial-sheet-comercio"/);
