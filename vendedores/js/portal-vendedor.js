@@ -212,6 +212,11 @@
     ].filter(Boolean);
 
     targets.forEach((element) => {
+      if (element.dataset.logoutBound === "true") {
+        return;
+      }
+
+      element.dataset.logoutBound = "true";
       element.addEventListener("click", (event) => {
         event.preventDefault();
         clearSession();
@@ -697,10 +702,6 @@
     });
   }
 
-  function isLocalHost() {
-    return ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
-  }
-
   function bindPrintSheets() {
     let selectedSheet = null;
 
@@ -788,29 +789,11 @@
     });
   }
 
-  function initMaterialPage() {
+  document.addEventListener("DOMContentLoaded", () => {
+    bindLogout();
     bindPrintSheets();
     bindCopyTargets();
 
-    if (isLocalHost()) {
-      return;
-    }
-
-    bindLogout();
-
-    const session = loadSession();
-    if (!session || isExpired(session) || !session.session_token) {
-      clearSession();
-      window.location.href = "./login.html";
-      return;
-    }
-
-    if (requiresPasswordChange(session)) {
-      window.location.href = "./perfil.html";
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
     if (page === "login") {
       initLoginPage();
       return;
@@ -829,10 +812,6 @@
     if (page === "profile") {
       initProfilePage();
       return;
-    }
-
-    if (page === "material") {
-      initMaterialPage();
     }
   });
 })();
