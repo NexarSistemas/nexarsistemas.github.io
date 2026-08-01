@@ -6,7 +6,6 @@
 /tetris               /Tetris/                                                   301
 /tetris/*             /Tetris/:splat                                             301
 
-# Crucigrama se mantiene aislado del origen del portal de vendedores.
-# La redirección envía al usuario a la producción segura de Vercel.
-/nexar-crucigrama     https://nexar-crucigrama.vercel.app/                       302
-/nexar-crucigrama/*   https://nexar-crucigrama.vercel.app/:splat                 302
+# Crucigrama se mantiene aislado del portal en un subdominio propio servido por Vercel.
+/nexar-crucigrama     https://crucigrama.nexarsistemas.com.ar/                   302
+/nexar-crucigrama/*   https://crucigrama.nexarsistemas.com.ar/:splat             302
