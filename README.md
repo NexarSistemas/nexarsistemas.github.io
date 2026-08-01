@@ -67,12 +67,14 @@ node tests/public-site.test.js
 
 ## GitHub Pages, Netlify y dominio
 
-- `CNAME` declara `nexarsistemas.com.ar` como dominio canónico de GitHub Pages.
-- `nexarsistemas.github.io` funciona como espejo estático del sitio público y no sustituye al dominio canónico para los retornos de pagos ni para las rutas del portal.
+- `nexarsistemas.com.ar` es el dominio canónico y se sirve desde Netlify; el DNS no apunta a GitHub Pages.
+- El repositorio no debe incluir un archivo `CNAME` para `nexarsistemas.com.ar`, porque GitHub Pages no administra ese dominio.
+- `nexarsistemas.github.io` queda como publicación independiente de GitHub Pages y no sustituye al dominio canónico para los retornos de pagos, el portal ni las Netlify Functions.
+- `_redirects` define en Netlify las rutas públicas de juegos: `/Tetris/` obtiene la versión publicada por GitHub Pages del repositorio `NexarSistemas/Tetris`, y `/nexar-crucigrama/` redirige a la producción de Vercel.
 - `robots.txt` y `sitemap.xml` usan el dominio canónico.
 - Los enlaces internos son relativos para funcionar en ambos hosts.
 - El portal de vendedores usa Netlify Functions en rutas relativas `/.netlify/functions/...`. La lógica de host de `vendedores/js/portal-host.js` conserva ruta y parámetros y, si se carga desde `nexarsistemas.github.io`, redirige al dominio canónico `https://nexarsistemas.com.ar` para que las Functions queden servidas en la arquitectura correcta.
-- No se modificaron DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
+- No se modifican DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
 
 ## Solicitudes de contacto y demo con Supabase
 
