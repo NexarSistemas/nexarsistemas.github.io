@@ -6,11 +6,7 @@
 /tetris               /Tetris/                                                   301
 /tetris/*             /Tetris/:splat                                             301
 
-# Crucigrama mantiene la URL pública de Nexar y usa Vercel como origen.
-# Las APIs deben proxyearse explícitamente porque el frontend las pide desde /api.
-/api/questions        https://nexar-crucigrama.vercel.app/api/questions          200
-/api/questions/*      https://nexar-crucigrama.vercel.app/api/questions/:splat   200
-/api/health           https://nexar-crucigrama.vercel.app/api/health             200
-/api/health/*         https://nexar-crucigrama.vercel.app/api/health/:splat      200
-/nexar-crucigrama     https://nexar-crucigrama.vercel.app/                       200
-/nexar-crucigrama/*   https://nexar-crucigrama.vercel.app/:splat                 200
+# Crucigrama se mantiene aislado del origen del portal de vendedores.
+# La redirección envía al usuario a la producción segura de Vercel.
+/nexar-crucigrama     https://nexar-crucigrama.vercel.app/                       302
+/nexar-crucigrama/*   https://nexar-crucigrama.vercel.app/:splat                 302
