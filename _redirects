@@ -1,11 +1,16 @@
 # Juegos Nexar: el dominio principal lo sirve Netlify.
-# Tetris se mantiene en GitHub Pages y se muestra bajo la ruta del dominio.
-/Tetris               /Tetris/                                                   301
-/Tetris/*             https://nexarsistemas.github.io/Tetris/:splat              200
-/tetris               /Tetris/                                                   301
-/tetris/*             https://nexarsistemas.github.io/Tetris/:splat              200
 
-# Crucigrama usa Vercel porque allí viven también sus funciones /api.
-# La redirección conserva el funcionamiento completo de frontend y API.
-/nexar-crucigrama     https://nexar-crucigrama.vercel.app/                       302
-/nexar-crucigrama/*   https://nexar-crucigrama.vercel.app/:splat                 302
+# Tetris se sirve localmente desde este mismo deploy para evitar bucles
+# entre Netlify y el dominio personalizado histórico de GitHub Pages.
+/Tetris               /Tetris/                                                   301
+/tetris               /Tetris/                                                   301
+/tetris/*             /Tetris/:splat                                             301
+
+# Crucigrama mantiene la URL pública de Nexar y usa Vercel como origen.
+# Las APIs deben proxyearse explícitamente porque el frontend las pide desde /api.
+/api/questions        https://nexar-crucigrama.vercel.app/api/questions          200
+/api/questions/*      https://nexar-crucigrama.vercel.app/api/questions/:splat   200
+/api/health           https://nexar-crucigrama.vercel.app/api/health             200
+/api/health/*         https://nexar-crucigrama.vercel.app/api/health/:splat      200
+/nexar-crucigrama     /nexar-crucigrama/                                         301
+/nexar-crucigrama/*   https://nexar-crucigrama.vercel.app/:splat                 200
