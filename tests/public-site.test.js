@@ -13,6 +13,7 @@ const publicPages = [
   "mercadopago-exito.html",
   "mercadopago-pendiente.html",
   "mercadopago-fallo.html",
+  "mercadopago-suscripcion.html",
   "vendedores/login.html",
   "vendedores/recuperar.html",
   "vendedores/dashboard.html",
@@ -32,7 +33,7 @@ test("las superficies públicas principales existen y usan el sistema visual com
 });
 
 test("los enlaces internos esenciales apuntan a archivos existentes", () => {
-  const pagesToCheck = publicPages.slice(0, 9);
+  const pagesToCheck = publicPages.slice(0, 10);
   for (const page of pagesToCheck) {
     const html = read(page);
     const linkPattern = /href="([^"#?]+(?:\.html|\.css|\.png))[^"]*"/g;
@@ -160,7 +161,11 @@ test("el material comercial del portal no se publica ni se indexa", () => {
 });
 
 test("solo se publican los contactos oficiales", () => {
-  const scannedFiles = publicPages.concat(["js/main.js", "js/mercadopago-success.js"]);
+  const scannedFiles = publicPages.concat([
+    "js/main.js",
+    "js/mercadopago-success.js",
+    "js/mercadopago-subscription.js"
+  ]);
   const combined = scannedFiles.map(read).join("\n");
   const emails = new Set(combined.match(/[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}/gi) || []);
   const allowedEmails = new Set([
@@ -201,6 +206,19 @@ test("los retornos de Mercado Pago vuelven al inicio sin enlaces a Nexar Comerci
     assert.match(html, /Volver a Nexar Sistemas/);
     assert.doesNotMatch(html, /href="\.\/nexar-comercio\.html/);
   }
+});
+
+test("el retorno de suscripción agradece la adhesión y vuelve al inicio", () => {
+  const html = read("mercadopago-suscripcion.html");
+  const script = read("js/mercadopago-subscription.js");
+
+  assert.match(html, /¡Gracias por suscribirte!/);
+  assert.match(html, /id="subscription-countdown">15</);
+  assert.match(html, /src="\.\/js\/mercadopago-subscription\.js"/);
+  assert.match(html, /Volver a Nexar Sistemas/);
+  assert.doesNotMatch(html, /href="\.\/nexar-comercio\.html/);
+  assert.match(script, /let remainingSeconds = 15/);
+  assert.match(script, /window\.location\.href = "\.\/index\.html"/);
 });
 
 test("los IDs funcionales del portal de vendedores se preservan", () => {

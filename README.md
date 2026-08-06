@@ -30,6 +30,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 - `mercadopago-exito.html`: retorno aprobado
 - `mercadopago-pendiente.html`: retorno pendiente
 - `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
+- `mercadopago-suscripcion.html`: agradecimiento posterior a una adhesión, sin afirmar que el primer cobro esté acreditado
 - `vendedores/login.html`: acceso al portal
 - `vendedores/recuperar.html`: solicitud de recuperación
 - `vendedores/dashboard.html`: dashboard autenticado
@@ -110,11 +111,12 @@ Nexar Admin consume estas solicitudes desde un backend seguro. El contrato de ta
 
 ## Retornos de Mercado Pago
 
-Las tres URLs públicas y sus query strings se conservan:
+Se mantienen tres retornos de pagos y un retorno específico para adhesiones:
 
 - `mercadopago-exito.html`
 - `mercadopago-pendiente.html`
 - `mercadopago-fallo.html`
+- `mercadopago-suscripcion.html`
 
 `js/mercadopago-success.js` conserva los parámetros y aliases existentes:
 
@@ -124,7 +126,11 @@ Las tres URLs públicas y sus query strings se conservan:
 - `external_reference`
 - `preference_id`
 
-La presentación distingue aprobado, pendiente, rechazado, fallido, cancelado y error técnico. Si no llegan identificadores, se muestra una advertencia visual sin reemplazar el estado predeterminado de la URL de retorno. No se modificaron URLs, redirecciones, webhooks ni contratos con `nexar-pagos`.
+La presentación de pagos distingue aprobado, pendiente, rechazado, fallido, cancelado y error técnico. Si no llegan identificadores, se muestra una advertencia visual sin reemplazar el estado predeterminado de la URL de retorno.
+
+`mercadopago-suscripcion.html` se usa como sitio de redireccionamiento al completar una adhesión. Agradece la suscripción, aclara que la activación queda sujeta a validación y vuelve automáticamente al inicio después de 15 segundos. No interpreta el regreso como confirmación de que el primer cobro esté acreditado.
+
+No se modifican webhooks ni contratos server-side con `nexar-pagos`.
 
 ## Portal de vendedores
 
@@ -158,7 +164,8 @@ Variables server-side requeridas por las Functions:
 - enlaces internos esenciales;
 - contactos oficiales;
 - ausencia de teléfonos anteriores conocidos;
-- parámetros contractuales de Mercado Pago;
+- parámetros contractuales y retornos de Mercado Pago;
+- redirección del retorno de suscripción;
 - IDs funcionales del portal.
 
 Si se modifican Functions, ejecutar además el test de sesión y `netlify dev`. El rediseño actual no modifica Functions ni contratos server-side.
