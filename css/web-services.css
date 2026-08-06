@@ -18,14 +18,10 @@
 .web-service-icon {
     width: 52px;
     height: 52px;
-    display: grid;
-    place-items: center;
+    display: block;
     margin-bottom: 25px;
-    border-radius: 13px;
-    color: var(--green-dark);
-    background: var(--mint);
-    font-size: 24px;
-    font-weight: 900;
+    background: url("../assets/nexar-web.png") center / contain no-repeat;
+    font-size: 0;
 }
 
 .compare-letter.web {
