@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 globalThis.Netlify = {
@@ -21,6 +22,13 @@ function isEmailLookup(request) {
 function isDatabaseInsert(request) {
   return request.options.method === "POST" && !isEmailLookup(request);
 }
+
+test("la RPC documentada retorna desde cada tabla permitida", () => {
+  const sql = readFileSync(new URL("../docs/supabase_home_vendedores_novedades.sql", import.meta.url), "utf8");
+  assert.match(sql, /if p_table = 'solicitudes_vendedores' then[\s\S]*?limit 1;\s*return;/);
+  assert.match(sql, /elsif p_table = 'suscripciones_novedades' then[\s\S]*?limit 1;\s*return;/);
+  assert.match(sql, /else\s+raise exception 'Tabla no permitida para búsqueda de email\.';/);
+});
 
 test("la Function delega el rate limiting distribuido a Netlify", () => {
   assert.deepEqual(config, {

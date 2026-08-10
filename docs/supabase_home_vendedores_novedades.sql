@@ -54,15 +54,17 @@ begin
       from public.solicitudes_vendedores as s
       where lower(s.email) = lower(p_email)
       limit 1;
+    return;
   elsif p_table = 'suscripciones_novedades' then
     return query
       select s.id, s.email
       from public.suscripciones_novedades as s
       where lower(s.email) = lower(p_email)
       limit 1;
+    return;
+  else
+    raise exception 'Tabla no permitida para búsqueda de email.';
   end if;
-
-  raise exception 'Tabla no permitida para búsqueda de email.';
 end;
 $$;
 
