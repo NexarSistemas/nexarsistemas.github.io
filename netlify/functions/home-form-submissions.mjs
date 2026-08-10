@@ -70,7 +70,7 @@ async function supabaseRequest(config, path, options = {}) {
 async function alreadyExists(config, tableName, email) {
   const rows = await supabaseRequest(
     config,
-    `/rest/v1/${tableName}?select=id&email=ilike.${encodeURIComponent(email)}&limit=1`
+    `/rest/v1/${tableName}?select=id&email=eq.${encodeURIComponent(email)}&limit=1`
   );
   return Array.isArray(rows) && rows.length > 0;
 }
@@ -99,7 +99,7 @@ async function renewNewsletterSubscription(config, subscription) {
   if (await alreadyExists(config, "suscripciones_novedades", subscription.email)) {
     await supabaseRequest(
       config,
-      `/rest/v1/suscripciones_novedades?email=ilike.${encodeURIComponent(subscription.email)}`,
+      `/rest/v1/suscripciones_novedades?email=eq.${encodeURIComponent(subscription.email)}`,
       {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
@@ -123,7 +123,7 @@ async function renewNewsletterSubscription(config, subscription) {
     // actualización mantiene una sola fila y vuelve a emitir la sincronización.
     await supabaseRequest(
       config,
-      `/rest/v1/suscripciones_novedades?email=ilike.${encodeURIComponent(subscription.email)}`,
+      `/rest/v1/suscripciones_novedades?email=eq.${encodeURIComponent(subscription.email)}`,
       {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
