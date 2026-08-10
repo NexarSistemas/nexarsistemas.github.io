@@ -25,6 +25,10 @@ function normalizeEmail(value) {
   return normalizeText(value).toLowerCase();
 }
 
+function escapeLikePattern(value) {
+  return value.replaceAll("\\", "\\\\").replaceAll("%", "\\%").replaceAll("_", "\\_");
+}
+
 function validateLength(value, label, minimum, maximum) {
   if (value.length < minimum || value.length > maximum) {
     return `${label} debe tener entre ${minimum} y ${maximum} caracteres.`;
@@ -67,16 +71,17 @@ async function supabaseRequest(config, path, options = {}) {
   return payload;
 }
 
-async function alreadyExists(config, tableName, email) {
+async function findExistingByEmail(config, tableName, email) {
+  const escapedEmail = escapeLikePattern(email);
   const rows = await supabaseRequest(
     config,
-    `/rest/v1/${tableName}?select=id&email=eq.${encodeURIComponent(email)}&limit=1`
+    `/rest/v1/${tableName}?select=id,email&email=ilike.${encodeURIComponent(escapedEmail)}&limit=1`
   );
-  return Array.isArray(rows) && rows.length > 0;
+  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
 }
 
 async function insertIdempotently(config, tableName, email, payload) {
-  if (await alreadyExists(config, tableName, email)) {
+  if (await findExistingByEmail(config, tableName, email)) {
     return { duplicate: true };
   }
 
@@ -95,17 +100,18 @@ async function insertIdempotently(config, tableName, email, payload) {
   }
 }
 
+async function patchNewsletterById(config, id, payload) {
+  await supabaseRequest(config, `/rest/v1/suscripciones_novedades?id=eq.${encodeURIComponent(String(id))}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify(payload)
+  });
+}
+
 async function renewNewsletterSubscription(config, subscription) {
-  if (await alreadyExists(config, "suscripciones_novedades", subscription.email)) {
-    await supabaseRequest(
-      config,
-      `/rest/v1/suscripciones_novedades?email=eq.${encodeURIComponent(subscription.email)}`,
-      {
-        method: "PATCH",
-        headers: { Prefer: "return=minimal" },
-        body: JSON.stringify(subscription.payload)
-      }
-    );
+  const existing = await findExistingByEmail(config, "suscripciones_novedades", subscription.email);
+  if (existing) {
+    await patchNewsletterById(config, existing.id, subscription.payload);
     return { duplicate: true };
   }
 
@@ -119,17 +125,13 @@ async function renewNewsletterSubscription(config, subscription) {
   } catch (error) {
     if (error.code !== "23505") throw error;
 
-    // Otra solicitud pudo crear la fila entre la consulta y el INSERT. La
-    // actualización mantiene una sola fila y vuelve a emitir la sincronización.
-    await supabaseRequest(
-      config,
-      `/rest/v1/suscripciones_novedades?email=eq.${encodeURIComponent(subscription.email)}`,
-      {
-        method: "PATCH",
-        headers: { Prefer: "return=minimal" },
-        body: JSON.stringify(subscription.payload)
-      }
-    );
+    // Otra solicitud pudo crear la fila entre la consulta y el INSERT. Volvemos
+    // a localizarla de forma case-insensitive y actualizamos por su ID real.
+    const racedExisting = await findExistingByEmail(config, "suscripciones_novedades", subscription.email);
+    if (!racedExisting) {
+      throw new Error("No se pudo localizar la suscripción existente.");
+    }
+    await patchNewsletterById(config, racedExisting.id, subscription.payload);
     return { duplicate: true };
   }
 }
