@@ -808,10 +808,10 @@ a {
 }
 
 .seller-cta-inner {
-    display: flex;
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
     align-items: center;
-    justify-content: space-between;
-    gap: 70px;
+    gap: 64px;
 }
 
 .seller-cta h2 {
@@ -823,6 +823,36 @@ a {
     max-width: 700px;
     margin: 0;
     color: #b9c7d3;
+}
+
+.seller-benefits {
+    display: grid;
+    gap: 11px;
+    margin: 26px 0 0;
+    padding: 0;
+    color: #d4dee5;
+    font-size: 14px;
+    list-style: none;
+}
+
+.seller-benefits li {
+    display: flex;
+    gap: 10px;
+}
+
+.seller-benefits li::before {
+    content: "✓";
+    color: #7ee0aa;
+    font-weight: 800;
+}
+
+.seller-form {
+    color: var(--ink);
+    box-shadow: none;
+}
+
+.seller-form textarea {
+    min-height: 86px;
 }
 
 .faq-wrap {
@@ -874,6 +904,79 @@ a {
 
 .contact-section {
     background: var(--cream);
+}
+
+.newsletter-section {
+    background: var(--white);
+}
+
+.newsletter-inner {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    align-items: center;
+    gap: 72px;
+    padding: 42px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--mint);
+}
+
+.newsletter-inner h2 {
+    margin: 0 0 12px;
+    color: var(--navy);
+}
+
+.newsletter-inner p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.newsletter-form {
+    display: grid;
+    gap: 10px;
+}
+
+.newsletter-form > label:not(.consent-check) {
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.newsletter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.newsletter-actions input {
+    min-width: 0;
+    flex: 1;
+    min-height: 47px;
+    padding: 10px 12px;
+    border: 1px solid #b8d3c3;
+    border-radius: 9px;
+    color: var(--ink);
+    background: var(--white);
+}
+
+.newsletter-actions input:focus {
+    border-color: var(--green);
+    outline: 3px solid rgba(22, 163, 106, 0.14);
+}
+
+.consent-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    color: var(--navy);
+    font-size: 13px;
+}
+
+.consent-check input {
+    margin-top: 3px;
+}
+
+.newsletter-form > p {
+    font-size: 12px;
 }
 
 .contact-grid {
@@ -1388,7 +1491,9 @@ a {
     .page-hero-grid,
     .split-grid,
     .faq-wrap,
-    .contact-grid {
+    .contact-grid,
+    .newsletter-inner,
+    .seller-cta-inner {
         grid-template-columns: 1fr;
         gap: 55px;
     }
@@ -1403,12 +1508,6 @@ a {
 
     .feature-grid {
         grid-template-columns: 1fr 1fr;
-    }
-
-    .seller-cta-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 30px;
     }
 
     .footer-grid {
@@ -1522,6 +1621,19 @@ a {
 
     .seller-cta {
         padding: 75px 0;
+    }
+
+    .newsletter-inner {
+        padding: 28px 24px;
+        gap: 28px;
+    }
+
+    .newsletter-actions {
+        flex-direction: column;
+    }
+
+    .newsletter-actions .button {
+        width: 100%;
     }
 
     .faq-wrap {

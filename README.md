@@ -77,9 +77,9 @@ node tests/public-site.test.js
 - El portal de vendedores usa Netlify Functions en rutas relativas `/.netlify/functions/...`. La lógica de host de `vendedores/js/portal-host.js` conserva ruta y parámetros y, si se carga desde `nexarsistemas.github.io`, redirige al dominio canónico `https://nexarsistemas.com.ar` para que las Functions queden servidas en la arquitectura correcta.
 - No se modifican DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
 
-## Solicitudes de contacto y demo con Supabase
+## Solicitudes de contacto, vendedores y novedades con Supabase
 
-El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`.
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. La home también registra postulaciones en `public.solicitudes_vendedores` y suscripciones consentidas en `public.suscripciones_novedades` mediante `assets/js/home-forms.js`.
 
 El frontend usa únicamente:
 
@@ -106,6 +106,9 @@ Documentación relacionada:
 - `docs/solicitudes-demo.md`
 - `docs/supabase_solicitudes_demo.sql`
 - `docs/contrato_nexar_admin_solicitudes_demo.md`
+- `docs/supabase_home_vendedores_novedades.sql`
+
+`private.notify_admin_email()` entrega los eventos de estas dos tablas a la Edge Function `notify-admin`: las postulaciones se notifican a `admin@nexarsistemas.com.ar` y las suscripciones se agregan de forma idempotente al segmento Resend `Novedades Nexar`. La clave de Resend sigue siendo un secreto de Supabase y no existe en el frontend.
 
 Nexar Admin consume estas solicitudes desde un backend seguro. El contrato de tablas y estados no se modifica desde la landing.
 
