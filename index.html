@@ -33,7 +33,8 @@
             <a href="#contacto">Contacto</a>
         </nav>
         <div class="header-actions">
-            <a class="button button-small" href="https://wa.me/5492646616948" target="_blank" rel="noopener">Contactar</a>
+            <a class="button button-small" href="https://wa.me/5492646616948" target="_blank" rel="noopener">Hablar por WhatsApp</a>
+            <a class="button button-small button-outline seller-access" href="./vendedores/login.html">Acceso vendedores</a>
             <details class="mobile-nav">
                 <summary>Menú</summary>
                 <nav class="mobile-nav-links" aria-label="Navegación móvil">
@@ -42,6 +43,7 @@
                     <a href="#planes">Planes</a>
                     <a href="#preguntas">Preguntas</a>
                     <a href="#contacto">Contacto</a>
+                    <a href="https://wa.me/5492646616948" target="_blank" rel="noopener">Hablar por WhatsApp</a>
                     <a href="./vendedores/login.html">Acceso vendedores</a>
                 </nav>
             </details>
@@ -211,10 +213,41 @@
         <div class="container seller-cta-inner">
             <div>
                 <span class="eyebrow eyebrow-light">Vendedores y distribuidores</span>
-                <h2>Sumate a comercializar Nexar</h2>
-                <p>Accedé al portal para vendedores y utilizá las herramientas disponibles para ofrecer nuestros productos.</p>
+                <h2>Comercializá Nexar con acompañamiento</h2>
+                <p>Sumate a una propuesta de productos digitales, sin manejar stock y con herramientas para acompañar tu gestión comercial.</p>
+                <ul class="seller-benefits">
+                    <li>Comercialización de productos digitales, sin manejar stock.</li>
+                    <li>Posibilidad de ingresos vinculados a clientes recurrentes.</li>
+                    <li>Acceso a herramientas y portal propio para vendedores.</li>
+                    <li>Acompañamiento comercial de Nexar Sistemas.</li>
+                </ul>
             </div>
-            <a class="button button-light" href="./vendedores/login.html">Acceso vendedores</a>
+            <form class="contact-form seller-form" id="sellerApplicationForm" novalidate>
+                <div id="seller-application-status" aria-live="polite"></div>
+                <div class="form-group">
+                    <label for="seller-nombre">Nombre y apellido <span class="required-mark">*</span></label>
+                    <input type="text" id="seller-nombre" name="nombre" autocomplete="name" minlength="2" maxlength="200" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="seller-email">Email <span class="required-mark">*</span></label>
+                        <input type="email" id="seller-email" name="email" autocomplete="email" minlength="4" maxlength="254" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller-whatsapp">WhatsApp <span class="required-mark">*</span></label>
+                        <input type="tel" id="seller-whatsapp" name="whatsapp" autocomplete="tel" minlength="5" maxlength="60" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="seller-localidad">Localidad / provincia <span class="required-mark">*</span></label>
+                    <input type="text" id="seller-localidad" name="localidad_provincia" autocomplete="address-level1" minlength="2" maxlength="200" required>
+                </div>
+                <div class="form-group">
+                    <label for="seller-mensaje">Mensaje (opcional)</label>
+                    <textarea id="seller-mensaje" name="mensaje" maxlength="1000"></textarea>
+                </div>
+                <button type="submit" class="button">Enviar solicitud</button>
+            </form>
         </div>
     </section>
 
@@ -321,6 +354,26 @@
         </div>
     </section>
 
+    <section class="section newsletter-section" aria-labelledby="newsletter-title">
+        <div class="container newsletter-inner">
+            <div>
+                <span class="eyebrow">Novedades</span>
+                <h2 id="newsletter-title">Recibí novedades de Nexar</h2>
+                <p>Enterate de nuevas funciones, lanzamientos y novedades de nuestros productos.</p>
+            </div>
+            <form class="newsletter-form" id="newsletterForm" novalidate>
+                <div id="newsletter-status" aria-live="polite"></div>
+                <label for="newsletter-email">Email</label>
+                <div class="newsletter-actions">
+                    <input type="email" id="newsletter-email" name="email" autocomplete="email" minlength="4" maxlength="254" required>
+                    <button type="submit" class="button">Suscribirme</button>
+                </div>
+                <label class="consent-check" for="newsletter-consent"><input type="checkbox" id="newsletter-consent" name="consentimiento" required> Quiero recibir novedades de Nexar por email.</label>
+                <p>Podés darte de baja cuando quieras.</p>
+            </form>
+        </div>
+    </section>
+
     <section class="final-cta">
         <div class="container">
             <span class="eyebrow eyebrow-light">Empezá tu próximo proyecto</span>
@@ -343,5 +396,6 @@
 
 <script src="./assets/js/supabase-config.js"></script>
 <script src="./assets/js/solicitud-demo.js"></script>
+<script src="./assets/js/home-forms.js"></script>
 </body>
 </html>

@@ -77,18 +77,18 @@ node tests/public-site.test.js
 - El portal de vendedores usa Netlify Functions en rutas relativas `/.netlify/functions/...`. La lógica de host de `vendedores/js/portal-host.js` conserva ruta y parámetros y, si se carga desde `nexarsistemas.github.io`, redirige al dominio canónico `https://nexarsistemas.com.ar` para que las Functions queden servidas en la arquitectura correcta.
 - No se modifican DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
 
-## Solicitudes de contacto y demo con Supabase
+## Solicitudes de contacto, vendedores y novedades con Supabase
 
-El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`.
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. Los dos formularios nuevos de la home (postulación de vendedores y suscripción a novedades) envían sus datos únicamente a `/.netlify/functions/home-form-submissions`. La Netlify Function valida el payload, aplica rate limiting nativo de Netlify y, con credenciales solo server-side, consulta `public.find_home_submission_by_email` para identificar emails de forma exacta y case-insensitive antes de insertar o renovar consentimiento en `public.solicitudes_vendedores` y `public.suscripciones_novedades`.
 
 El frontend usa únicamente:
 
 - `SUPABASE_URL` pública
 - `SUPABASE_ANON_KEY` pública
 
-La seguridad depende de RLS:
+La seguridad de las tablas públicas depende de RLS:
 
-- permitir solo los `INSERT` públicos necesarios;
+- permitir solo los `INSERT` públicos necesarios para los flujos que sí los requieren;
 - no habilitar `SELECT` público;
 - nunca exponer `SUPABASE_SERVICE_ROLE_KEY` en HTML, CSS, JavaScript o documentación pública.
 
@@ -106,6 +106,11 @@ Documentación relacionada:
 - `docs/solicitudes-demo.md`
 - `docs/supabase_solicitudes_demo.sql`
 - `docs/contrato_nexar_admin_solicitudes_demo.md`
+- `docs/supabase_home_vendedores_novedades.sql`
+
+`private.notify_admin_email()` entrega los eventos de estas dos tablas a la Edge Function `notify-admin`: las postulaciones se notifican a `admin@nexarsistemas.com.ar` y las suscripciones se agregan de forma idempotente al segmento Resend `Novedades Nexar`. La clave de Resend sigue siendo un secreto de Supabase y no existe en el frontend.
+
+La Function requiere en Netlify `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`. Ambas credenciales son exclusivamente server-side y nunca deben incorporarse al frontend. Para estos dos formularios, aplicar el SQL documentado: revoca cualquier `INSERT` o policy de `anon`, crea la RPC `public.find_home_submission_by_email` con ejecución solo para `service_role` y configura los triggers de notificación. El formulario de contacto conserva su acceso público existente.
 
 Nexar Admin consume estas solicitudes desde un backend seguro. El contrato de tablas y estados no se modifica desde la landing.
 
@@ -168,4 +173,15 @@ Variables server-side requeridas por las Functions:
 - redirección del retorno de suscripción;
 - IDs funcionales del portal.
 
-Si se modifican Functions, ejecutar además el test de sesión y `netlify dev`. El rediseño actual no modifica Functions ni contratos server-side.
+Los formularios nuevos de la home modifican Functions y su contrato server-side documentado. Para validarlos, ejecutar:
+
+```bash
+node --check assets/js/home-forms.js
+node --check netlify/functions/home-form-submissions.mjs
+node --test tests/home-form-submissions.test.mjs
+node tests/public-site.test.js
+netlify dev
+git diff --check
+```
+
+`netlify dev` permite verificar localmente la integración de la Function con las variables server-side configuradas, sin exponerlas en el bundle público.

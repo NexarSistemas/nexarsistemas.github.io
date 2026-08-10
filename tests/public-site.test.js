@@ -233,3 +233,29 @@ test("los IDs funcionales del portal de vendedores se preservan", () => {
     assert.match(combined, new RegExp(`id="${id}"`), id);
   }
 });
+
+test("la home mantiene los accesos y formularios comerciales nuevos", () => {
+  const html = read("index.html");
+  const frontendScript = read("assets/js/home-forms.js");
+  const sql = read("docs/supabase_home_vendedores_novedades.sql");
+
+  assert.match(html, />Hablar por WhatsApp</);
+  assert.match(html, /href="\.\/vendedores\/login\.html">Acceso vendedores/);
+  assert.match(html, /id="sellerApplicationForm"/);
+  assert.match(html, /name="localidad_provincia"/);
+  assert.match(html, /id="newsletterForm"/);
+  assert.match(html, /id="newsletter-consent"/);
+  assert.match(html, /Podés darte de baja cuando quieras\./);
+  assert.match(html, /src="\.\/assets\/js\/home-forms\.js"/);
+  assert.match(frontendScript, /const HOME_FORMS_ENDPOINT = "\/.netlify\/functions\/home-form-submissions";/);
+  assert.doesNotMatch(frontendScript, /\/\.netlify\/functions\/(?!home-form-submissions\b)/);
+  assert.doesNotMatch(frontendScript, /\/rest\/v1\//);
+  assert.doesNotMatch(frontendScript, /anonKey|service_role|RESEND_API_KEY/i);
+  assert.doesNotMatch(frontendScript, /result\.duplicate/);
+  assert.match(frontendScript, /Tu solicitud fue recibida\. Te contactaremos pronto\./);
+  assert.match(frontendScript, /¡Listo! Procesamos tu suscripción\./);
+  assert.match(sql, /enable row level security/);
+  assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
+  assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
+  assert.match(sql, /private\.notify_admin_email\(\)/);
+});
