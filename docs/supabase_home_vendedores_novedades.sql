@@ -44,8 +44,9 @@ revoke usage, select on sequence public.suscripciones_novedades_id_seq from anon
 drop policy if exists "Permitir insertar suscripciones a novedades desde web" on public.suscripciones_novedades;
 
 drop trigger if exists notify_news_subscription_insert on public.suscripciones_novedades;
-create trigger notify_news_subscription_insert
-  after insert on public.suscripciones_novedades
+drop trigger if exists notify_news_subscription_consent_renewal on public.suscripciones_novedades;
+create trigger notify_news_subscription_consent_renewal
+  after insert or update of consentimiento, origen on public.suscripciones_novedades
   for each row execute function private.notify_admin_email();
 
 -- No crear policies SELECT, INSERT, UPDATE o DELETE para anon.

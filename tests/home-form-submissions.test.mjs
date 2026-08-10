@@ -44,11 +44,12 @@ test("la solicitud de vendedor se valida e inserta desde la Function", async () 
   assert.equal(JSON.parse(insert.options.body).email, "ana@example.com");
 });
 
-test("las suscripciones existentes no generan un segundo insert", async () => {
-  let postCalls = 0;
+test("la primera suscripción se inserta normalmente", async () => {
+  const requests = [];
   globalThis.fetch = async (url, options = {}) => {
-    if (options.method === "POST") postCalls += 1;
-    return new Response("[{\"id\":1}]", { status: 200 });
+    requests.push({ url: String(url), options });
+    if (options.method === "GET") return new Response("[]", { status: 200 });
+    return new Response("", { status: 201 });
   };
 
   const response = await handler(
@@ -60,8 +61,54 @@ test("las suscripciones existentes no generan un segundo insert", async () => {
   );
 
   assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { success: true, duplicate: false });
+  assert.equal(requests.filter((request) => request.options.method === "POST").length, 1);
+  assert.equal(requests.filter((request) => request.options.method === "PATCH").length, 0);
+});
+
+test("un email ya activo renueva el consentimiento sin crear otra fila", async () => {
+  const requests = [];
+  globalThis.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (options.method === "GET") return new Response("[{\"id\":1}]", { status: 200 });
+    return new Response(null, { status: 204 });
+  };
+
+  const response = await handler(
+    new Request("https://example.test/.netlify/functions/home-form-submissions", {
+      method: "POST",
+      body: JSON.stringify({ tipo: "suscripcion_novedades", email: "ana@example.com", consentimiento: true })
+    }),
+    { ip: "198.51.100.6" }
+  );
+
   assert.deepEqual(await response.json(), { success: true, duplicate: true });
-  assert.equal(postCalls, 0);
+  assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
+  const update = requests.find((request) => request.options.method === "PATCH");
+  assert.match(update.url, /\/rest\/v1\/suscripciones_novedades\?email=ilike\.ana%40example\.com/);
+  assert.deepEqual(JSON.parse(update.options.body), { email: "ana@example.com", consentimiento: true, origen: "web" });
+});
+
+test("una re-suscripción tras una baja vuelve a disparar la sincronización", async () => {
+  const requests = [];
+  globalThis.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (options.method === "GET") return new Response("[{\"id\":1}]", { status: 200 });
+    return new Response(null, { status: 204 });
+  };
+
+  const response = await handler(
+    new Request("https://example.test/.netlify/functions/home-form-submissions", {
+      method: "POST",
+      body: JSON.stringify({ tipo: "suscripcion_novedades", email: "vuelve@example.com", consentimiento: true })
+    }),
+    { ip: "198.51.100.7" }
+  );
+
+  assert.deepEqual(await response.json(), { success: true, duplicate: true });
+  const updates = requests.filter((request) => request.options.method === "PATCH");
+  assert.equal(updates.length, 1);
+  assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
 });
 
 test("la Function rechaza metodos, límites inválidos y exceso de intentos", async () => {

@@ -117,6 +117,45 @@ async function insertIdempotently(config, tableName, email, payload) {
   }
 }
 
+async function renewNewsletterSubscription(config, subscription) {
+  if (await alreadyExists(config, "suscripciones_novedades", subscription.email)) {
+    await supabaseRequest(
+      config,
+      `/rest/v1/suscripciones_novedades?email=ilike.${encodeURIComponent(subscription.email)}`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify(subscription.payload)
+      }
+    );
+    return { duplicate: true };
+  }
+
+  try {
+    await supabaseRequest(config, "/rest/v1/suscripciones_novedades", {
+      method: "POST",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify(subscription.payload)
+    });
+    return { duplicate: false };
+  } catch (error) {
+    if (error.code !== "23505") throw error;
+
+    // Otra solicitud pudo crear la fila entre la consulta y el INSERT. La
+    // actualización mantiene una sola fila y vuelve a emitir la sincronización.
+    await supabaseRequest(
+      config,
+      `/rest/v1/suscripciones_novedades?email=ilike.${encodeURIComponent(subscription.email)}`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify(subscription.payload)
+      }
+    );
+    return { duplicate: true };
+  }
+}
+
 function parseSellerApplication(body) {
   const nombre = normalizeText(body.nombre);
   const email = normalizeEmail(body.email);
@@ -184,7 +223,7 @@ export default async function handler(request, context) {
     }
     if (body?.tipo === "suscripcion_novedades") {
       const subscription = parseNewsletterSubscription(body);
-      const result = await insertIdempotently(config, "suscripciones_novedades", subscription.email, subscription.payload);
+      const result = await renewNewsletterSubscription(config, subscription);
       return json({ success: true, duplicate: result.duplicate });
     }
     return json({ error: "Tipo de formulario no válido." }, 400);
