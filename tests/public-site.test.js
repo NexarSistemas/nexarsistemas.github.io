@@ -236,7 +236,7 @@ test("los IDs funcionales del portal de vendedores se preservan", () => {
 
 test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const html = read("index.html");
-  const script = read("assets/js/home-forms.js");
+  const frontendScript = read("assets/js/home-forms.js");
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
   assert.match(html, />Hablar por WhatsApp</);
@@ -247,9 +247,10 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(html, /id="newsletter-consent"/);
   assert.match(html, /Podés darte de baja cuando quieras\./);
   assert.match(html, /src="\.\/assets\/js\/home-forms\.js"/);
-  assert.match(script, /\.netlify\/functions\/home-form-submissions/);
-  assert.doesNotMatch(script, /\/rest\/v1\//);
-  assert.doesNotMatch(script, /anonKey|service_role|RESEND_API_KEY/i);
+  assert.match(frontendScript, /const HOME_FORMS_ENDPOINT = "\/.netlify\/functions\/home-form-submissions";/);
+  assert.doesNotMatch(frontendScript, /\/\.netlify\/functions\/(?!home-form-submissions\b)/);
+  assert.doesNotMatch(frontendScript, /\/rest\/v1\//);
+  assert.doesNotMatch(frontendScript, /anonKey|service_role|RESEND_API_KEY/i);
   assert.match(sql, /enable row level security/);
   assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
