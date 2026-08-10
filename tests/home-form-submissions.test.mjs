@@ -97,7 +97,7 @@ test("un email ya activo renueva el consentimiento sin crear otra fila", async (
   assert.deepEqual(await response.json(), { success: true, duplicate: true });
   assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
   const update = requests.find((request) => request.options.method === "PATCH");
-  assert.match(update.url, /\/rest\/v1\/suscripciones_novedades\?email=ilike\.ana%40example\.com/);
+  assert.match(update.url, /\/rest\/v1\/suscripciones_novedades\?email=eq\.ana%40example\.com/);
   assert.deepEqual(JSON.parse(update.options.body), { email: "ana@example.com", consentimiento: true, origen: "web" });
 });
 
@@ -123,6 +123,27 @@ test("una re-suscripción tras una baja vuelve a disparar la sincronización", a
   assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
 });
 
+test("un email con guion bajo usa coincidencia exacta y no ILIKE", async () => {
+  const requests = [];
+  globalThis.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (options.method === "GET") return new Response("[]", { status: 200 });
+    return new Response("", { status: 201 });
+  };
+
+  await handler(
+    new Request("https://example.test/.netlify/functions/home-form-submissions", {
+      method: "POST",
+      body: JSON.stringify({ tipo: "suscripcion_novedades", email: "a_ice@example.com", consentimiento: true })
+    }),
+    { ip: "198.51.100.8" }
+  );
+
+  const lookup = requests.find((request) => request.options.method === undefined || request.options.method === "GET");
+  assert.match(lookup.url, /email=eq\.a_ice%40example\.com/);
+  assert.doesNotMatch(lookup.url, /email=ilike\./);
+});
+
 test("la Function rechaza métodos y límites inválidos", async () => {
   const methodResponse = await handler(new Request("https://example.test", { method: "GET" }), { ip: "198.51.100.3" });
   assert.equal(methodResponse.status, 405);
@@ -142,5 +163,4 @@ test("la Function rechaza métodos y límites inválidos", async () => {
   );
   assert.equal(invalidResponse.status, 400);
   assert.match((await invalidResponse.json()).error, /Nombre y apellido debe tener entre 2 y 200/);
-
 });
