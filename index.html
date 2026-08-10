@@ -226,25 +226,25 @@
                 <div id="seller-application-status" aria-live="polite"></div>
                 <div class="form-group">
                     <label for="seller-nombre">Nombre y apellido <span class="required-mark">*</span></label>
-                    <input type="text" id="seller-nombre" name="nombre" autocomplete="name" required>
+                    <input type="text" id="seller-nombre" name="nombre" autocomplete="name" minlength="2" maxlength="200" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="seller-email">Email <span class="required-mark">*</span></label>
-                        <input type="email" id="seller-email" name="email" autocomplete="email" required>
+                        <input type="email" id="seller-email" name="email" autocomplete="email" minlength="4" maxlength="254" required>
                     </div>
                     <div class="form-group">
                         <label for="seller-whatsapp">WhatsApp <span class="required-mark">*</span></label>
-                        <input type="tel" id="seller-whatsapp" name="whatsapp" autocomplete="tel" required>
+                        <input type="tel" id="seller-whatsapp" name="whatsapp" autocomplete="tel" minlength="5" maxlength="60" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="seller-localidad">Localidad / provincia <span class="required-mark">*</span></label>
-                    <input type="text" id="seller-localidad" name="localidad_provincia" autocomplete="address-level1" required>
+                    <input type="text" id="seller-localidad" name="localidad_provincia" autocomplete="address-level1" minlength="2" maxlength="200" required>
                 </div>
                 <div class="form-group">
                     <label for="seller-mensaje">Mensaje (opcional)</label>
-                    <textarea id="seller-mensaje" name="mensaje"></textarea>
+                    <textarea id="seller-mensaje" name="mensaje" maxlength="1000"></textarea>
                 </div>
                 <button type="submit" class="button">Enviar solicitud</button>
             </form>
@@ -365,7 +365,7 @@
                 <div id="newsletter-status" aria-live="polite"></div>
                 <label for="newsletter-email">Email</label>
                 <div class="newsletter-actions">
-                    <input type="email" id="newsletter-email" name="email" autocomplete="email" required>
+                    <input type="email" id="newsletter-email" name="email" autocomplete="email" minlength="4" maxlength="254" required>
                     <button type="submit" class="button">Suscribirme</button>
                 </div>
                 <label class="consent-check" for="newsletter-consent"><input type="checkbox" id="newsletter-consent" name="consentimiento" required> Quiero recibir novedades de Nexar por email.</label>

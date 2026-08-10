@@ -18,21 +18,9 @@ create unique index if not exists solicitudes_vendedores_email_unico_idx
   on public.solicitudes_vendedores (lower(email));
 
 alter table public.solicitudes_vendedores enable row level security;
-grant insert on public.solicitudes_vendedores to anon;
-grant usage, select on sequence public.solicitudes_vendedores_id_seq to anon;
+revoke insert on public.solicitudes_vendedores from anon;
+revoke usage, select on sequence public.solicitudes_vendedores_id_seq from anon;
 drop policy if exists "Permitir insertar solicitudes de vendedores desde web" on public.solicitudes_vendedores;
-create policy "Permitir insertar solicitudes de vendedores desde web"
-  on public.solicitudes_vendedores
-  for insert to anon
-  with check (
-    estado = 'pendiente'
-    and origen = 'web'
-    and length(trim(nombre)) between 2 and 200
-    and length(trim(email)) between 4 and 254
-    and length(trim(whatsapp)) between 5 and 60
-    and length(trim(localidad_provincia)) between 2 and 200
-    and (mensaje is null or length(mensaje) <= 1000)
-  );
 
 drop trigger if exists notify_seller_application_insert on public.solicitudes_vendedores;
 create trigger notify_seller_application_insert
@@ -51,22 +39,14 @@ create unique index if not exists suscripciones_novedades_email_unico_idx
   on public.suscripciones_novedades (lower(email));
 
 alter table public.suscripciones_novedades enable row level security;
-grant insert on public.suscripciones_novedades to anon;
-grant usage, select on sequence public.suscripciones_novedades_id_seq to anon;
+revoke insert on public.suscripciones_novedades from anon;
+revoke usage, select on sequence public.suscripciones_novedades_id_seq from anon;
 drop policy if exists "Permitir insertar suscripciones a novedades desde web" on public.suscripciones_novedades;
-create policy "Permitir insertar suscripciones a novedades desde web"
-  on public.suscripciones_novedades
-  for insert to anon
-  with check (
-    consentimiento is true
-    and origen = 'web'
-    and length(trim(email)) between 4 and 254
-  );
 
 drop trigger if exists notify_news_subscription_insert on public.suscripciones_novedades;
 create trigger notify_news_subscription_insert
   after insert on public.suscripciones_novedades
   for each row execute function private.notify_admin_email();
 
--- No crear policies SELECT, UPDATE o DELETE para anon.
+-- No crear policies SELECT, INSERT, UPDATE o DELETE para anon.
 -- Las claves privadas de Resend permanecen exclusivamente en la Edge Function notify-admin.

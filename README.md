@@ -79,7 +79,7 @@ node tests/public-site.test.js
 
 ## Solicitudes de contacto, vendedores y novedades con Supabase
 
-El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. La home también registra postulaciones en `public.solicitudes_vendedores` y suscripciones consentidas en `public.suscripciones_novedades` mediante `assets/js/home-forms.js`.
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. La home envía postulaciones y suscripciones consentidas a `/.netlify/functions/home-form-submissions`; la Function valida, limita abusos básicos e inserta en `public.solicitudes_vendedores` y `public.suscripciones_novedades` con credenciales server-side.
 
 El frontend usa únicamente:
 
@@ -109,6 +109,8 @@ Documentación relacionada:
 - `docs/supabase_home_vendedores_novedades.sql`
 
 `private.notify_admin_email()` entrega los eventos de estas dos tablas a la Edge Function `notify-admin`: las postulaciones se notifican a `admin@nexarsistemas.com.ar` y las suscripciones se agregan de forma idempotente al segmento Resend `Novedades Nexar`. La clave de Resend sigue siendo un secreto de Supabase y no existe en el frontend.
+
+La Function requiere en Netlify `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, ya usados por las Functions del portal. Para estos dos formularios, aplicar el SQL documentado revocando cualquier `INSERT` o policy de `anon`; el formulario de contacto conserva su acceso público existente.
 
 Nexar Admin consume estas solicitudes desde un backend seguro. El contrato de tablas y estados no se modifica desde la landing.
 

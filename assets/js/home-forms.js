@@ -1,13 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const config = window.NEXAR_SUPABASE_CONFIG || {};
-  const supabaseUrl = typeof config.url === "string" ? config.url.trim() : "";
-  const anonKey = typeof config.anonKey === "string" ? config.anonKey.trim() : "";
-  const hasConfig = Boolean(
-    supabaseUrl &&
-      anonKey &&
-      !supabaseUrl.includes("TU-PROYECTO") &&
-      !anonKey.includes("TU_SUPABASE_ANON_KEY_AQUI")
-  );
+  const HOME_FORMS_ENDPOINT = "/.netlify/functions/home-form-submissions";
 
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -21,28 +13,29 @@ document.addEventListener("DOMContentLoaded", () => {
     container.append(status);
   }
 
-  async function insert(tableName, payload) {
-    const response = await fetch(`${supabaseUrl}/rest/v1/${tableName}`, {
+  function validateLength(value, label, minimum, maximum) {
+    if (value.length < minimum || value.length > maximum) {
+      return `${label} debe tener entre ${minimum} y ${maximum} caracteres.`;
+    }
+
+    return "";
+  }
+
+  async function submitHomeForm(payload) {
+    const response = await fetch(HOME_FORMS_ENDPOINT, {
       method: "POST",
       headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
 
-    if (response.ok) {
-      return { inserted: true };
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.error || `No pudimos completar el envío (${response.status}).`);
     }
 
-    const error = await response.json().catch(() => ({}));
-    if (error.code === "23505") {
-      return { duplicate: true };
-    }
-
-    throw new Error(error.message || error.error || `Supabase respondio con estado ${response.status}.`);
+    return result;
   }
 
   function bindSellerApplication() {
@@ -55,14 +48,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+
       const nombre = form.elements.nombre.value.trim();
       const email = form.elements.email.value.trim().toLowerCase();
       const whatsapp = form.elements.whatsapp.value.trim();
       const localidad = form.elements.localidad_provincia.value.trim();
       const mensaje = form.elements.mensaje.value.trim();
 
-      if (!nombre || !email || !whatsapp || !localidad) {
-        setStatus(status, "Completá los campos obligatorios para enviar tu solicitud.", "error");
+      const nombreError = validateLength(nombre, "Nombre y apellido", 2, 200);
+      if (nombreError) {
+        setStatus(status, nombreError, "error");
+        return;
+      }
+      const emailLengthError = validateLength(email, "Email", 4, 254);
+      if (emailLengthError) {
+        setStatus(status, emailLengthError, "error");
+        form.elements.email.focus();
         return;
       }
       if (!isValidEmail(email)) {
@@ -70,19 +71,35 @@ document.addEventListener("DOMContentLoaded", () => {
         form.elements.email.focus();
         return;
       }
+      const whatsappError = validateLength(whatsapp, "WhatsApp", 5, 60);
+      if (whatsappError) {
+        setStatus(status, whatsappError, "error");
+        form.elements.whatsapp.focus();
+        return;
+      }
+      const localidadError = validateLength(localidad, "Localidad / provincia", 2, 200);
+      if (localidadError) {
+        setStatus(status, localidadError, "error");
+        form.elements.localidad_provincia.focus();
+        return;
+      }
+      if (mensaje.length > 1000) {
+        setStatus(status, "Mensaje puede tener como máximo 1000 caracteres.", "error");
+        form.elements.mensaje.focus();
+        return;
+      }
 
       submit.disabled = true;
       submit.textContent = "Enviando...";
       setStatus(status, "Enviando tu solicitud...", "loading");
       try {
-        const result = await insert("solicitudes_vendedores", {
+        const result = await submitHomeForm({
+          tipo: "solicitud_vendedor",
           nombre,
           email,
           whatsapp,
           localidad_provincia: localidad,
-          mensaje: mensaje || null,
-          estado: "pendiente",
-          origen: "web"
+          mensaje: mensaje || null
         });
         form.reset();
         setStatus(
@@ -112,9 +129,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+
       const email = form.elements.email.value.trim().toLowerCase();
       const consentimiento = form.elements.consentimiento.checked;
 
+      const emailLengthError = validateLength(email, "Email", 4, 254);
+      if (emailLengthError) {
+        setStatus(status, emailLengthError, "error");
+        form.elements.email.focus();
+        return;
+      }
       if (!isValidEmail(email)) {
         setStatus(status, "Ingresá un email válido.", "error");
         form.elements.email.focus();
@@ -130,10 +154,10 @@ document.addEventListener("DOMContentLoaded", () => {
       submit.textContent = "Suscribiendo...";
       setStatus(status, "Registrando tu suscripción...", "loading");
       try {
-        const result = await insert("suscripciones_novedades", {
+        const result = await submitHomeForm({
+          tipo: "suscripcion_novedades",
           email,
-          consentimiento: true,
-          origen: "web"
+          consentimiento: true
         });
         form.reset();
         setStatus(
@@ -151,11 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
         submit.textContent = originalLabel;
       }
     });
-  }
-
-  if (!hasConfig) {
-    console.warn("Formularios de home: falta configurar Supabase.");
-    return;
   }
 
   bindSellerApplication();
