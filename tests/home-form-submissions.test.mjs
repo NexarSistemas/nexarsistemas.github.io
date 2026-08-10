@@ -23,6 +23,13 @@ function isDatabaseInsert(request) {
   return request.options.method === "POST" && !isEmailLookup(request);
 }
 
+async function assertPublicSuccess(response) {
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.deepEqual(body, { success: true });
+  assert.equal(Object.hasOwn(body, "duplicate"), false);
+}
+
 test("la RPC documentada retorna desde cada tabla permitida", () => {
   const sql = readFileSync(new URL("../docs/supabase_home_vendedores_novedades.sql", import.meta.url), "utf8");
   assert.match(sql, /if p_table = 'solicitudes_vendedores' then[\s\S]*?limit 1;\s*return;/);
@@ -66,7 +73,7 @@ test("la solicitud de vendedor se valida e inserta desde la Function", async () 
   );
 
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { success: true, duplicate: false });
+  await assertPublicSuccess(response);
   const lookup = requests.find(isEmailLookup);
   assert.deepEqual(JSON.parse(lookup.options.body), {
     p_table: "solicitudes_vendedores",
@@ -75,6 +82,34 @@ test("la solicitud de vendedor se valida e inserta desde la Function", async () 
   const insert = requests.find(isDatabaseInsert);
   assert.match(insert.url, /\/rest\/v1\/solicitudes_vendedores$/);
   assert.equal(JSON.parse(insert.options.body).email, "ana@example.com");
+});
+
+test("una solicitud de vendedor existente devuelve el mismo éxito público", async () => {
+  const requests = [];
+  globalThis.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (String(url).includes("/rest/v1/rpc/find_home_submission_by_email")) {
+      return new Response('[{"id":2,"email":"ana@example.com"}]', { status: 200 });
+    }
+    return new Response(null, { status: 204 });
+  };
+
+  const response = await handler(
+    new Request("https://example.test/.netlify/functions/home-form-submissions", {
+      method: "POST",
+      body: JSON.stringify({
+        tipo: "solicitud_vendedor",
+        nombre: "Ana Pérez",
+        email: "ana@example.com",
+        whatsapp: "264 555 1234",
+        localidad_provincia: "San Juan"
+      })
+    }),
+    { ip: "198.51.100.13" }
+  );
+
+  await assertPublicSuccess(response);
+  assert.equal(requests.filter(isDatabaseInsert).length, 0);
 });
 
 test("la primera suscripción se inserta normalmente", async () => {
@@ -94,7 +129,7 @@ test("la primera suscripción se inserta normalmente", async () => {
   );
 
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { success: true, duplicate: false });
+  await assertPublicSuccess(response);
   assert.equal(requests.filter(isDatabaseInsert).length, 1);
   assert.equal(requests.filter((request) => request.options.method === "PATCH").length, 0);
 });
@@ -117,7 +152,7 @@ test("un email ya activo renueva el consentimiento por ID sin crear otra fila", 
     { ip: "198.51.100.6" }
   );
 
-  assert.deepEqual(await response.json(), { success: true, duplicate: true });
+  await assertPublicSuccess(response);
   assert.equal(requests.filter(isDatabaseInsert).length, 0);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /\/rest\/v1\/suscripciones_novedades\?id=eq\.1$/);
@@ -142,7 +177,7 @@ test("una re-suscripción tras una baja vuelve a disparar la sincronización", a
     { ip: "198.51.100.7" }
   );
 
-  assert.deepEqual(await response.json(), { success: true, duplicate: true });
+  await assertPublicSuccess(response);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /id=eq\.7$/);
   assert.equal(requests.filter(isDatabaseInsert).length, 0);
@@ -171,7 +206,7 @@ for (const email of [
       { ip: "198.51.100.8" }
     );
 
-    assert.deepEqual(await response.json(), { success: true, duplicate: false });
+    await assertPublicSuccess(response);
     const lookup = requests.find(isEmailLookup);
     assert.deepEqual(JSON.parse(lookup.options.body), {
       p_table: "suscripciones_novedades",
@@ -200,7 +235,7 @@ test("una fila existente con mayúsculas se localiza y renueva por su ID", async
     { ip: "198.51.100.9" }
   );
 
-  assert.deepEqual(await response.json(), { success: true, duplicate: true });
+  await assertPublicSuccess(response);
   const lookup = requests.find(isEmailLookup);
   assert.deepEqual(JSON.parse(lookup.options.body), {
     p_table: "suscripciones_novedades",
@@ -237,7 +272,7 @@ test("tras un 23505 vuelve a buscar la fila y la actualiza por ID", async () => 
     { ip: "198.51.100.10" }
   );
 
-  assert.deepEqual(await response.json(), { success: true, duplicate: true });
+  await assertPublicSuccess(response);
   assert.equal(lookups, 2);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /id=eq\.11$/);
@@ -267,8 +302,8 @@ test("tras un 23505 sin fila exacta la re-suscripción falla", async () => {
     { ip: "198.51.100.12" }
   );
 
-  assert.equal(response.status, 400);
-  assert.match((await response.json()).error, /No se pudo localizar la suscripción existente/);
+  assert.equal(response.status, 500);
+  assert.deepEqual(await response.json(), { error: "No pudimos procesar la solicitud." });
   assert.equal(requests.filter((request) => request.options.method === "PATCH").length, 0);
 });
 
@@ -296,7 +331,7 @@ test("un vendedor con comodín válido no queda como duplicado de otro email", a
     { ip: "198.51.100.11" }
   );
 
-  assert.deepEqual(await response.json(), { success: true, duplicate: false });
+  await assertPublicSuccess(response);
   const lookup = requests.find(isEmailLookup);
   assert.deepEqual(JSON.parse(lookup.options.body), {
     p_table: "solicitudes_vendedores",

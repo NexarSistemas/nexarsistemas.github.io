@@ -251,6 +251,9 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.doesNotMatch(frontendScript, /\/\.netlify\/functions\/(?!home-form-submissions\b)/);
   assert.doesNotMatch(frontendScript, /\/rest\/v1\//);
   assert.doesNotMatch(frontendScript, /anonKey|service_role|RESEND_API_KEY/i);
+  assert.doesNotMatch(frontendScript, /result\.duplicate/);
+  assert.match(frontendScript, /Tu solicitud fue recibida\. Te contactaremos pronto\./);
+  assert.match(frontendScript, /¡Listo! Procesamos tu suscripción\./);
   assert.match(sql, /enable row level security/);
   assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);

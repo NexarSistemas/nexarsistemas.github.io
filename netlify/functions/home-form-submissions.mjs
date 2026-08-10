@@ -1,5 +1,7 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+class ValidationError extends Error {}
+
 export const config = {
   path: "/.netlify/functions/home-form-submissions",
   rateLimit: {
@@ -84,7 +86,7 @@ async function findExistingByEmail(config, tableName, email) {
 
 async function insertIdempotently(config, tableName, email, payload) {
   if (await findExistingByEmail(config, tableName, email)) {
-    return { duplicate: true };
+    return;
   }
 
   try {
@@ -93,10 +95,9 @@ async function insertIdempotently(config, tableName, email, payload) {
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify(payload)
     });
-    return { duplicate: false };
   } catch (error) {
     if (error.code === "23505") {
-      return { duplicate: true };
+      return;
     }
     throw error;
   }
@@ -114,7 +115,7 @@ async function renewNewsletterSubscription(config, subscription) {
   const existing = await findExistingByEmail(config, "suscripciones_novedades", subscription.email);
   if (existing) {
     await patchNewsletterById(config, existing.id, { consentimiento: true, origen: "web" });
-    return { duplicate: true };
+    return;
   }
 
   try {
@@ -123,7 +124,6 @@ async function renewNewsletterSubscription(config, subscription) {
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify(subscription.payload)
     });
-    return { duplicate: false };
   } catch (error) {
     if (error.code !== "23505") throw error;
 
@@ -134,7 +134,6 @@ async function renewNewsletterSubscription(config, subscription) {
       throw new Error("No se pudo localizar la suscripción existente.");
     }
     await patchNewsletterById(config, racedExisting.id, { consentimiento: true, origen: "web" });
-    return { duplicate: true };
   }
 }
 
@@ -152,9 +151,9 @@ function parseSellerApplication(body) {
     validateLength(localidad, "Localidad / provincia", 2, 200)
   ];
   const failure = validations.find(Boolean);
-  if (failure) throw new Error(failure);
-  if (!EMAIL_RE.test(email)) throw new Error("Ingresá un email válido.");
-  if (mensaje.length > 1000) throw new Error("Mensaje puede tener como máximo 1000 caracteres.");
+  if (failure) throw new ValidationError(failure);
+  if (!EMAIL_RE.test(email)) throw new ValidationError("Ingresá un email válido.");
+  if (mensaje.length > 1000) throw new ValidationError("Mensaje puede tener como máximo 1000 caracteres.");
 
   return {
     email,
@@ -173,9 +172,9 @@ function parseSellerApplication(body) {
 function parseNewsletterSubscription(body) {
   const email = normalizeEmail(body.email);
   const emailLengthError = validateLength(email, "Email", 4, 254);
-  if (emailLengthError) throw new Error(emailLengthError);
-  if (!EMAIL_RE.test(email)) throw new Error("Ingresá un email válido.");
-  if (body.consentimiento !== true) throw new Error("Necesitamos tu consentimiento para enviarte novedades.");
+  if (emailLengthError) throw new ValidationError(emailLengthError);
+  if (!EMAIL_RE.test(email)) throw new ValidationError("Ingresá un email válido.");
+  if (body.consentimiento !== true) throw new ValidationError("Necesitamos tu consentimiento para enviarte novedades.");
 
   return { email, payload: { email, consentimiento: true, origen: "web" } };
 }
@@ -196,17 +195,20 @@ export default async function handler(request, context) {
     const config = getSupabaseConfig();
     if (body?.tipo === "solicitud_vendedor") {
       const application = parseSellerApplication(body);
-      const result = await insertIdempotently(config, "solicitudes_vendedores", application.email, application.payload);
-      return json({ success: true, duplicate: result.duplicate });
+      await insertIdempotently(config, "solicitudes_vendedores", application.email, application.payload);
+      return json({ success: true });
     }
     if (body?.tipo === "suscripcion_novedades") {
       const subscription = parseNewsletterSubscription(body);
-      const result = await renewNewsletterSubscription(config, subscription);
-      return json({ success: true, duplicate: result.duplicate });
+      await renewNewsletterSubscription(config, subscription);
+      return json({ success: true });
     }
     return json({ error: "Tipo de formulario no válido." }, 400);
   } catch (error) {
     console.error("Home forms submission failed:", { detail: error.message || "unknown" });
-    return json({ error: error.message || "No pudimos procesar la solicitud." }, 400);
+    if (error instanceof ValidationError) {
+      return json({ error: error.message }, 400);
+    }
+    return json({ error: "No pudimos procesar la solicitud." }, 500);
   }
 }

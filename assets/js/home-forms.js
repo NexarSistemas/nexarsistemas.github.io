@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submit.textContent = "Enviando...";
       setStatus(status, "Enviando tu solicitud...", "loading");
       try {
-        const result = await submitHomeForm({
+        await submitHomeForm({
           tipo: "solicitud_vendedor",
           nombre,
           email,
@@ -110,13 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
           mensaje: mensaje || null
         });
         form.reset();
-        setStatus(
-          status,
-          result.duplicate
-            ? "Ya recibimos una solicitud con este email. Te contactaremos pronto."
-            : "Tu solicitud fue enviada correctamente. Te contactaremos pronto.",
-          "success"
-        );
+        setStatus(status, "Tu solicitud fue recibida. Te contactaremos pronto.", "success");
       } catch (error) {
         console.error("Solicitud de vendedor: error al enviar a Supabase.", error);
         setStatus(status, "No pudimos enviar la solicitud. Intentá nuevamente en unos minutos.", "error");
@@ -162,19 +156,13 @@ document.addEventListener("DOMContentLoaded", () => {
       submit.textContent = "Suscribiendo...";
       setStatus(status, "Registrando tu suscripción...", "loading");
       try {
-        const result = await submitHomeForm({
+        await submitHomeForm({
           tipo: "suscripcion_novedades",
           email,
           consentimiento: true
         });
         form.reset();
-        setStatus(
-          status,
-          result.duplicate
-            ? "Este email ya está suscripto a las novedades de Nexar."
-            : "¡Listo! Tu suscripción fue registrada.",
-          "success"
-        );
+        setStatus(status, "¡Listo! Procesamos tu suscripción.", "success");
       } catch (error) {
         console.error("Suscripción a novedades: error al enviar a Supabase.", error);
         setStatus(status, "No pudimos registrar la suscripción. Intentá nuevamente en unos minutos.", "error");
