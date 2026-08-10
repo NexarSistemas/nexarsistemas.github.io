@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.hostname === "nexarsistemas.github.io") {
+    const target = new URL(window.location.href);
+    target.host = "nexarsistemas.com.ar";
+    target.protocol = "https:";
+    window.location.replace(target.toString());
+    return;
+  }
+
   const HOME_FORMS_ENDPOINT = "/.netlify/functions/home-form-submissions";
 
   function isValidEmail(email) {
