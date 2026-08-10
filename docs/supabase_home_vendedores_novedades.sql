@@ -38,6 +38,37 @@ create table if not exists public.suscripciones_novedades (
 create unique index if not exists suscripciones_novedades_email_unico_idx
   on public.suscripciones_novedades (lower(email));
 
+-- Lookup exacto y case-insensitive para la Function server-side. Evita los
+-- operadores de patrón de PostgREST y aprovecha los índices lower(email).
+create or replace function public.find_home_submission_by_email(p_table text, p_email text)
+returns table (id bigint, email text)
+language plpgsql
+stable
+security invoker
+set search_path = ''
+as $$
+begin
+  if p_table = 'solicitudes_vendedores' then
+    return query
+      select s.id, s.email
+      from public.solicitudes_vendedores as s
+      where lower(s.email) = lower(p_email)
+      limit 1;
+  elsif p_table = 'suscripciones_novedades' then
+    return query
+      select s.id, s.email
+      from public.suscripciones_novedades as s
+      where lower(s.email) = lower(p_email)
+      limit 1;
+  end if;
+
+  raise exception 'Tabla no permitida para búsqueda de email.';
+end;
+$$;
+
+revoke all on function public.find_home_submission_by_email(text, text) from public, anon, authenticated;
+grant execute on function public.find_home_submission_by_email(text, text) to service_role;
+
 alter table public.suscripciones_novedades enable row level security;
 revoke insert on public.suscripciones_novedades from anon;
 revoke usage, select on sequence public.suscripciones_novedades_id_seq from anon;

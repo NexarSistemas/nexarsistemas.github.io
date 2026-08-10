@@ -25,10 +25,6 @@ function normalizeEmail(value) {
   return normalizeText(value).toLowerCase();
 }
 
-function escapeLikePattern(value) {
-  return value.replaceAll("\\", "\\\\").replaceAll("%", "\\%").replaceAll("_", "\\_").replaceAll("*", "\\*");
-}
-
 function validateLength(value, label, minimum, maximum) {
   if (value.length < minimum || value.length > maximum) {
     return `${label} debe tener entre ${minimum} y ${maximum} caracteres.`;
@@ -72,10 +68,14 @@ async function supabaseRequest(config, path, options = {}) {
 }
 
 async function findExistingByEmail(config, tableName, email) {
-  const escapedEmail = escapeLikePattern(email);
   const rows = await supabaseRequest(
     config,
-    `/rest/v1/${tableName}?select=id,email&email=ilike.${encodeURIComponent(escapedEmail)}&limit=1`
+    "/rest/v1/rpc/find_home_submission_by_email",
+    {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ p_table: tableName, p_email: email })
+    }
   );
   return Array.isArray(rows)
     ? rows.find((row) => normalizeEmail(row?.email) === email) || null
