@@ -21,7 +21,7 @@ test("la Function delega el rate limiting distribuido a Netlify", () => {
       action: "rate_limit",
       aggregateBy: ["ip"],
       windowLimit: 5,
-      windowSize: 600
+      windowSize: 180
     }
   });
 });

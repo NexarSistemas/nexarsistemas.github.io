@@ -6,7 +6,7 @@ export const config = {
     action: "rate_limit",
     aggregateBy: ["ip"],
     windowLimit: 5,
-    windowSize: 600
+    windowSize: 180
   }
 };
 
