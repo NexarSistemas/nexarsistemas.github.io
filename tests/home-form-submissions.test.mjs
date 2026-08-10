@@ -100,7 +100,7 @@ test("un email ya activo renueva el consentimiento por ID sin crear otra fila", 
   assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /\/rest\/v1\/suscripciones_novedades\?id=eq\.1$/);
-  assert.deepEqual(JSON.parse(update.options.body), { email: "ana@example.com", consentimiento: true, origen: "web" });
+  assert.deepEqual(JSON.parse(update.options.body), { consentimiento: true, origen: "web" });
 });
 
 test("una re-suscripción tras una baja vuelve a disparar la sincronización", async () => {
@@ -127,25 +127,36 @@ test("una re-suscripción tras una baja vuelve a disparar la sincronización", a
   assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
 });
 
-test("un email con guion bajo escapa comodines en la búsqueda case-insensitive", async () => {
-  const requests = [];
-  globalThis.fetch = async (url, options = {}) => {
-    requests.push({ url: String(url), options });
-    if (options.method === "GET" || options.method === undefined) return new Response("[]", { status: 200 });
-    return new Response("", { status: 201 });
-  };
+for (const [email, escapedEmail] of [
+  ["a_ice@example.com", "a%5C_ice%40example.com"],
+  ["a%ice@example.com", "a%5C%25ice%40example.com"],
+  ["a*ice@example.com", "a%5C*ice%40example.com"]
+]) {
+  test(`un email ${email} no confunde a alice@example.com`, async () => {
+    const requests = [];
+    globalThis.fetch = async (url, options = {}) => {
+      requests.push({ url: String(url), options });
+      if (options.method === "GET" || options.method === undefined) {
+        return new Response('[{"id":21,"email":"alice@example.com"}]', { status: 200 });
+      }
+      return new Response("", { status: 201 });
+    };
 
-  await handler(
-    new Request("https://example.test/.netlify/functions/home-form-submissions", {
-      method: "POST",
-      body: JSON.stringify({ tipo: "suscripcion_novedades", email: "a_ice@example.com", consentimiento: true })
-    }),
-    { ip: "198.51.100.8" }
-  );
+    const response = await handler(
+      new Request("https://example.test/.netlify/functions/home-form-submissions", {
+        method: "POST",
+        body: JSON.stringify({ tipo: "suscripcion_novedades", email, consentimiento: true })
+      }),
+      { ip: "198.51.100.8" }
+    );
 
-  const lookup = requests.find((request) => request.options.method === undefined || request.options.method === "GET");
-  assert.match(lookup.url, /email=ilike\.a%5C_ice%40example\.com/);
-});
+    assert.deepEqual(await response.json(), { success: true, duplicate: false });
+    const lookup = requests.find((request) => request.options.method === undefined || request.options.method === "GET");
+    assert.ok(lookup.url.includes(`email=ilike.${escapedEmail}`));
+    assert.equal(requests.filter((request) => request.options.method === "PATCH").length, 0);
+    assert.equal(requests.filter((request) => request.options.method === "POST").length, 1);
+  });
+}
 
 test("una fila existente con mayúsculas se localiza y renueva por su ID", async () => {
   const requests = [];
@@ -170,6 +181,7 @@ test("una fila existente con mayúsculas se localiza y renueva por su ID", async
   assert.match(lookup.url, /email=ilike\.ana%40example\.com/);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /id=eq\.9$/);
+  assert.deepEqual(JSON.parse(update.options.body), { consentimiento: true, origen: "web" });
 });
 
 test("tras un 23505 vuelve a buscar la fila y la actualiza por ID", async () => {
@@ -202,6 +214,37 @@ test("tras un 23505 vuelve a buscar la fila y la actualiza por ID", async () => 
   assert.equal(lookups, 2);
   const update = requests.find((request) => request.options.method === "PATCH");
   assert.match(update.url, /id=eq\.11$/);
+});
+
+test("un vendedor con comodín válido no queda como duplicado de otro email", async () => {
+  const requests = [];
+  globalThis.fetch = async (url, options = {}) => {
+    requests.push({ url: String(url), options });
+    if (options.method === "GET" || options.method === undefined) {
+      return new Response('[{"id":30,"email":"alice@example.com"}]', { status: 200 });
+    }
+    return new Response("", { status: 201 });
+  };
+
+  const response = await handler(
+    new Request("https://example.test/.netlify/functions/home-form-submissions", {
+      method: "POST",
+      body: JSON.stringify({
+        tipo: "solicitud_vendedor",
+        nombre: "Alicia Pérez",
+        email: "a*ice@example.com",
+        whatsapp: "264 555 1234",
+        localidad_provincia: "San Juan"
+      })
+    }),
+    { ip: "198.51.100.11" }
+  );
+
+  assert.deepEqual(await response.json(), { success: true, duplicate: false });
+  const lookup = requests.find((request) => request.options.method === undefined || request.options.method === "GET");
+  assert.match(lookup.url, /email=ilike\.a%5C\*ice%40example\.com/);
+  const insert = requests.find((request) => request.options.method === "POST");
+  assert.match(insert.url, /\/rest\/v1\/solicitudes_vendedores$/);
 });
 
 test("la Function rechaza métodos y límites inválidos", async () => {

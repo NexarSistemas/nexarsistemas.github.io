@@ -26,7 +26,7 @@ function normalizeEmail(value) {
 }
 
 function escapeLikePattern(value) {
-  return value.replaceAll("\\", "\\\\").replaceAll("%", "\\%").replaceAll("_", "\\_");
+  return value.replaceAll("\\", "\\\\").replaceAll("%", "\\%").replaceAll("_", "\\_").replaceAll("*", "\\*");
 }
 
 function validateLength(value, label, minimum, maximum) {
@@ -77,7 +77,9 @@ async function findExistingByEmail(config, tableName, email) {
     config,
     `/rest/v1/${tableName}?select=id,email&email=ilike.${encodeURIComponent(escapedEmail)}&limit=1`
   );
-  return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  return Array.isArray(rows)
+    ? rows.find((row) => normalizeEmail(row?.email) === email) || null
+    : null;
 }
 
 async function insertIdempotently(config, tableName, email, payload) {
@@ -111,7 +113,7 @@ async function patchNewsletterById(config, id, payload) {
 async function renewNewsletterSubscription(config, subscription) {
   const existing = await findExistingByEmail(config, "suscripciones_novedades", subscription.email);
   if (existing) {
-    await patchNewsletterById(config, existing.id, subscription.payload);
+    await patchNewsletterById(config, existing.id, { consentimiento: true, origen: "web" });
     return { duplicate: true };
   }
 
@@ -131,7 +133,7 @@ async function renewNewsletterSubscription(config, subscription) {
     if (!racedExisting) {
       throw new Error("No se pudo localizar la suscripción existente.");
     }
-    await patchNewsletterById(config, racedExisting.id, subscription.payload);
+    await patchNewsletterById(config, racedExisting.id, { consentimiento: true, origen: "web" });
     return { duplicate: true };
   }
 }
