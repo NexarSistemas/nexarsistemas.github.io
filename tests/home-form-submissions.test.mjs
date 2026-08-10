@@ -12,7 +12,19 @@ globalThis.Netlify = {
   }
 };
 
-const { default: handler } = await import("../netlify/functions/home-form-submissions.mjs");
+const { config, default: handler } = await import("../netlify/functions/home-form-submissions.mjs");
+
+test("la Function delega el rate limiting distribuido a Netlify", () => {
+  assert.deepEqual(config, {
+    path: "/.netlify/functions/home-form-submissions",
+    rateLimit: {
+      action: "rate_limit",
+      aggregateBy: ["ip"],
+      windowLimit: 5,
+      windowSize: 600
+    }
+  });
+});
 
 test("la solicitud de vendedor se valida e inserta desde la Function", async () => {
   const requests = [];
@@ -111,7 +123,7 @@ test("una re-suscripción tras una baja vuelve a disparar la sincronización", a
   assert.equal(requests.filter((request) => request.options.method === "POST").length, 0);
 });
 
-test("la Function rechaza metodos, límites inválidos y exceso de intentos", async () => {
+test("la Function rechaza métodos y límites inválidos", async () => {
   const methodResponse = await handler(new Request("https://example.test", { method: "GET" }), { ip: "198.51.100.3" });
   assert.equal(methodResponse.status, 405);
 
@@ -131,15 +143,4 @@ test("la Function rechaza metodos, límites inválidos y exceso de intentos", as
   assert.equal(invalidResponse.status, 400);
   assert.match((await invalidResponse.json()).error, /Nombre y apellido debe tener entre 2 y 200/);
 
-  for (let index = 0; index < 5; index += 1) {
-    await handler(
-      new Request("https://example.test", { method: "POST", body: JSON.stringify({ tipo: "invalido" }) }),
-      { ip: "198.51.100.5" }
-    );
-  }
-  const limitedResponse = await handler(
-    new Request("https://example.test", { method: "POST", body: JSON.stringify({ tipo: "invalido" }) }),
-    { ip: "198.51.100.5" }
-  );
-  assert.equal(limitedResponse.status, 429);
 });

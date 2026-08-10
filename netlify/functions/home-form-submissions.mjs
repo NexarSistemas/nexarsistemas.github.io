@@ -1,6 +1,14 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 5;
+
+export const config = {
+  path: "/.netlify/functions/home-form-submissions",
+  rateLimit: {
+    action: "rate_limit",
+    aggregateBy: ["ip"],
+    windowLimit: 5,
+    windowSize: 600
+  }
+};
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -23,36 +31,6 @@ function validateLength(value, label, minimum, maximum) {
   }
 
   return "";
-}
-
-function getRateLimitStore() {
-  if (!getRateLimitStore.store) {
-    getRateLimitStore.store = new Map();
-  }
-
-  return getRateLimitStore.store;
-}
-
-function isRateLimited(clientIp) {
-  const now = Date.now();
-  const store = getRateLimitStore();
-  const timestamps = (store.get(clientIp) || []).filter(
-    (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
-  );
-
-  if (timestamps.length >= RATE_LIMIT_MAX_REQUESTS) {
-    store.set(clientIp, timestamps);
-    return true;
-  }
-
-  timestamps.push(now);
-  store.set(clientIp, timestamps);
-  return false;
-}
-
-function getClientIp(request, context) {
-  const forwarded = request.headers.get("x-nf-client-connection-ip") || request.headers.get("x-forwarded-for") || "";
-  return context.ip || forwarded.split(",")[0].trim() || "unknown";
 }
 
 function getSupabaseConfig() {
@@ -201,10 +179,6 @@ function parseNewsletterSubscription(body) {
 export default async function handler(request, context) {
   if (request.method !== "POST") {
     return json({ error: "Metodo no permitido." }, 405);
-  }
-
-  if (isRateLimited(getClientIp(request, context))) {
-    return json({ error: "Recibimos muchos intentos. Esperá unos minutos antes de volver a intentar." }, 429);
   }
 
   let body;
