@@ -305,7 +305,7 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
   };
 
   const token = "valid_base64url-token";
-  const preview = (payload) => async () => ({ ok: true, json: async () => payload });
+  const preview = (payload, ok = true) => async () => ({ ok, json: async () => payload });
   const firstLoad = await runPage({
     search: `?token=${token}`,
     fetchImpl: preview({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" })
@@ -335,10 +335,27 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
   assert.equal(refresh.elements.get("confirm-token").value, token);
   assert.equal(refresh.fetchCalls.length, 1);
 
-  for (const status of ["confirmed", "expired", "invalid", "error"]) {
-    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl: preview({ ok: true, status }) });
+  for (const [status, title] of [
+    ["confirmed", "Solicitud ya confirmada"],
+    ["expired", "Enlace vencido"],
+    ["invalid", "Enlace inválido"],
+    ["error", "No se pudo verificar la solicitud"]
+  ]) {
+    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl: preview({ ok: false, status }, false) });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, title, status);
     assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true, status);
   }
+
+  const replacedInvalidToken = await runPage({
+    search: "?token=no válido",
+    state: { newsletterConfirmationToken: "old_valid_token", unrelated: "preserved" },
+    fetchImpl: preview({})
+  });
+  assert.equal(Object.hasOwn(replacedInvalidToken.replacedState, "newsletterConfirmationToken"), false);
+  assert.equal(replacedInvalidToken.replacedState.unrelated, "preserved");
+  const invalidRefresh = await runPage({ state: replacedInvalidToken.replacedState, fetchImpl: preview({}) });
+  assert.equal(invalidRefresh.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.equal(invalidRefresh.fetchCalls.length, 0);
 
   for (const fetchImpl of [
     async () => { throw new Error("network"); },

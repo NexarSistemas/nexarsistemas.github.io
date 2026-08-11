@@ -12,9 +12,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         params.delete("token");
         const query = params.toString();
         const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
-        const state = tokenIsValid
-            ? { ...(window.history.state || {}), newsletterConfirmationToken: token }
-            : window.history.state;
+        const state = { ...(window.history.state || {}) };
+        if (tokenIsValid) {
+            state.newsletterConfirmationToken = token;
+        } else {
+            delete state.newsletterConfirmationToken;
+        }
         window.history.replaceState(state, "", cleanUrl);
     }
 
@@ -69,16 +72,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
         const response = await fetch(`${previewEndpoint}?token=${encodeURIComponent(token)}`, { method: "GET" });
-        if (!response.ok) {
-            throw new Error("No se pudo verificar la solicitud.");
-        }
-
         const preview = await response.json();
-        if (!preview || preview.ok !== true) {
-            throw new Error("Respuesta de vista previa inválida.");
-        }
 
-        if (preview.status === "pending" && (preview.action === "opt_in" || preview.action === "opt_out") && typeof preview.email_masked === "string" && preview.email_masked) {
+        if (preview && preview.ok === true && preview.status === "pending" && (preview.action === "opt_in" || preview.action === "opt_out") && typeof preview.email_masked === "string" && preview.email_masked) {
             const isOptIn = preview.action === "opt_in";
             setVisualState("");
             showResult({
@@ -122,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 message: "Intentá nuevamente más tarde."
             }
         };
-        showError(results[preview.status] || results.error);
+        showError(preview && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
     } catch {
         showError({
             badge: "No pudimos verificar la solicitud",
