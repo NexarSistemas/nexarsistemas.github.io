@@ -231,23 +231,28 @@ test("la confirmación de novedades requiere una acción explícita y no expone 
   assert.match(html, /<link rel="stylesheet" href="\.\/css\/site\.css">/);
   assert.match(html, /<form[^>]+method="post"[^>]+action="https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference"/);
   assert.match(html, /<input type="hidden" name="confirm_token" id="confirm-token">/);
+  assert.match(html, /id="newsletter-email" hidden/);
   assert.match(html, />Confirmar</);
   assert.match(html, /src="\.\/js\/confirmar-novedades\.js"/);
   assert.match(script, /\^\[A-Za-z0-9_-\]\{1,100\}\$/);
   assert.match(script, /window\.history\.replaceState/);
-  assert.doesNotMatch(script, /fetch\s*\(|XMLHttpRequest|\.submit\s*\(/);
+  assert.match(script, /const previewEndpoint = "https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference-preview"/);
+  assert.match(script, /fetch\(`\$\{previewEndpoint\}\?token=\$\{encodeURIComponent\(token\)\}`/);
+  assert.match(script, /method: "GET"/);
+  assert.doesNotMatch(script, /XMLHttpRequest|\.submit\s*\(/);
   assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
 });
 
-test("la confirmación de novedades conserva el token fuera de la URL y muestra errores visuales", () => {
+test("la confirmación de novedades verifica la solicitud antes de habilitar el formulario", async () => {
   const script = read("js/confirmar-novedades.js");
-  const runPage = ({ search = "", state = null } = {}) => {
+  const runPage = async ({ search = "", state = null, fetchImpl } = {}) => {
     const elements = new Map();
     for (const id of [
       "newsletter-badge",
       "newsletter-icon",
       "newsletter-title",
       "newsletter-message",
+      "newsletter-email",
       "newsletter-confirmation-form",
       "confirm-token"
     ]) {
@@ -262,9 +267,14 @@ test("la confirmación de novedades conserva el token fuera de la URL y muestra 
     let onDOMContentLoaded;
     let replacedState;
     let replacedUrl;
+    const fetchCalls = [];
     const body = { dataset: {} };
     vm.runInNewContext(script, {
       URLSearchParams,
+      fetch: async (...args) => {
+        fetchCalls.push(args);
+        return fetchImpl(...args);
+      },
       document: {
         body,
         addEventListener(event, callback) {
@@ -290,33 +300,68 @@ test("la confirmación de novedades conserva el token fuera de la URL y muestra 
         }
       }
     });
-    onDOMContentLoaded();
-    return { body, elements, replacedState, replacedUrl };
+    await onDOMContentLoaded();
+    return { body, elements, fetchCalls, replacedState, replacedUrl };
   };
 
   const token = "valid_base64url-token";
-  const firstLoad = runPage({ search: `?token=${token}` });
+  const preview = (payload) => async () => ({ ok: true, json: async () => payload });
+  const firstLoad = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" })
+  });
   assert.equal(firstLoad.replacedState.newsletterConfirmationToken, token);
   assert.equal(firstLoad.replacedUrl, "/confirmar-novedades.html");
   assert.equal(firstLoad.elements.get("newsletter-confirmation-form").hidden, false);
   assert.equal(firstLoad.elements.get("confirm-token").value, token);
+  assert.equal(firstLoad.elements.get("newsletter-title").textContent, "Confirmar suscripción");
+  assert.equal(firstLoad.elements.get("newsletter-email").textContent, "m***@ejemplo.com");
+  assert.equal(firstLoad.fetchCalls[0][0], "https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference-preview?token=valid_base64url-token");
+  assert.equal(firstLoad.fetchCalls[0][1].method, "GET");
 
-  const refresh = runPage({ state: firstLoad.replacedState });
+  const optOut = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_out", email_masked: "m***@ejemplo.com" })
+  });
+  assert.equal(optOut.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(optOut.elements.get("newsletter-title").textContent, "Confirmar baja");
+  assert.equal(optOut.elements.get("newsletter-email").textContent, "m***@ejemplo.com");
+
+  const refresh = await runPage({
+    state: firstLoad.replacedState,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" })
+  });
   assert.equal(refresh.elements.get("newsletter-confirmation-form").hidden, false);
   assert.equal(refresh.elements.get("confirm-token").value, token);
+  assert.equal(refresh.fetchCalls.length, 1);
+
+  for (const status of ["confirmed", "expired", "invalid", "error"]) {
+    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl: preview({ ok: true, status }) });
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true, status);
+  }
+
+  for (const fetchImpl of [
+    async () => { throw new Error("network"); },
+    async () => ({ ok: true, json: async () => { throw new Error("invalid json"); } })
+  ]) {
+    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, "No se pudo verificar la solicitud");
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected");
+  }
 
   for (const search of ["", "?token=no válido"]) {
-    const invalidLoad = runPage({ search });
+    const invalidLoad = await runPage({ search, fetchImpl: preview({}) });
     assert.equal(invalidLoad.elements.get("newsletter-title").textContent, "Enlace inválido");
     assert.equal(invalidLoad.elements.get("newsletter-message").textContent, "El enlace no es válido.");
     assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true);
     assert.equal(invalidLoad.body.dataset.statusDefault, "rejected");
   }
 
-  const craftedStatus = runPage({ search: "?status=confirmed&action=opt_out" });
+  const craftedStatus = await runPage({ search: "?status=confirmed&action=opt_out", fetchImpl: preview({}) });
   assert.equal(craftedStatus.elements.get("newsletter-title").textContent, "Enlace inválido");
   assert.equal(craftedStatus.body.dataset.statusDefault, "rejected");
-  assert.doesNotMatch(script, /Suscripción confirmada|Baja confirmada|Solicitud ya confirmada/);
+  assert.equal(craftedStatus.fetchCalls.length, 0);
   assert.doesNotMatch(script, /params\.get\("status"\)|params\.get\("action"\)/);
 });
 
