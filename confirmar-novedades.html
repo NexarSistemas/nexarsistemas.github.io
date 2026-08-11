@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar preferencia | Nexar Sistemas</title>
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Confirmación segura de preferencias de Novedades Nexar.">
+    <link rel="canonical" href="https://nexarsistemas.com.ar/confirmar-novedades.html">
+    <link rel="icon" type="image/png" href="./assets/logon.png">
+    <link rel="stylesheet" href="./css/site.css">
+</head>
+<body class="payment-page">
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="./index.html" aria-label="Nexar Sistemas, inicio"><img class="brand-logo" src="./assets/nexar_sistemas.png" alt="Nexar Sistemas"></a>
+        <nav class="header-nav" aria-label="Navegación principal"><a href="./index.html">Inicio</a><a href="./index.html#contacto">Contacto</a></nav>
+        <div class="header-actions"><a class="button button-small" href="./index.html">Volver a Nexar Sistemas</a></div>
+    </div>
+</header>
+<main class="payment-main" id="contenido">
+    <div class="container">
+        <section class="payment-layout" aria-labelledby="newsletter-title">
+            <article class="payment-panel">
+                <span class="payment-badge" id="newsletter-badge">Novedades Nexar</span>
+                <div class="payment-status-icon" id="newsletter-icon" role="img" aria-label="Confirmación de preferencia">✓</div>
+                <h1 id="newsletter-title">Confirmar preferencia</h1>
+                <p class="payment-lead" id="newsletter-message">Confirmarás un cambio en Novedades Nexar.</p>
+                <form id="newsletter-confirmation-form" method="post" action="https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference" hidden>
+                    <input type="hidden" name="confirm_token" id="confirm-token">
+                    <div class="payment-actions"><button class="button" type="submit">Confirmar</button></div>
+                </form>
+                <div class="payment-actions"><a class="button button-small" href="./index.html">Volver a Nexar Sistemas</a></div>
+            </article>
+            <aside class="payment-aside">
+                <h2>Confirmación segura</h2>
+                <p class="payment-note">La preferencia solo se aplica al presionar Confirmar. No compartas este enlace.</p>
+            </aside>
+        </section>
+    </div>
+</main>
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <a class="brand brand-footer" href="./index.html"><img class="brand-logo" src="./assets/nexar_sistemas.png" alt="Nexar Sistemas"></a>
+        <div class="footer-column"><strong>Enlaces</strong><a href="./index.html">Inicio</a><a href="./index.html#contacto">Contacto</a></div>
+        <div class="footer-column"><strong>Soporte</strong><a href="mailto:soporte@nexarsistemas.com.ar">soporte@nexarsistemas.com.ar</a><a href="tel:+5492646616948">+5492646616948</a></div>
+    </div>
+    <div class="container footer-bottom">© 2026 Nexar Sistemas. Todos los derechos reservados.</div>
+</footer>
+<script src="./js/confirmar-novedades.js"></script>
+</body>
+</html>

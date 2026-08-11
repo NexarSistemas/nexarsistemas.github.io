@@ -14,6 +14,7 @@ const publicPages = [
   "mercadopago-pendiente.html",
   "mercadopago-fallo.html",
   "mercadopago-suscripcion.html",
+  "confirmar-novedades.html",
   "vendedores/login.html",
   "vendedores/recuperar.html",
   "vendedores/dashboard.html",
@@ -219,6 +220,41 @@ test("el retorno de suscripción agradece la adhesión y vuelve al inicio", () =
   assert.doesNotMatch(html, /href="\.\/nexar-comercio\.html/);
   assert.match(script, /let remainingSeconds = 15/);
   assert.match(script, /window\.location\.href = "\.\/index\.html"/);
+});
+
+test("la confirmación de novedades requiere una acción explícita y no expone secretos", () => {
+  const html = read("confirmar-novedades.html");
+  const script = read("js/confirmar-novedades.js");
+
+  assert.match(html, /<meta name="referrer" content="no-referrer">/);
+  assert.match(html, /<link rel="stylesheet" href="\.\/css\/site\.css">/);
+  assert.match(html, /<form[^>]+method="post"[^>]+action="https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference"/);
+  assert.match(html, /<input type="hidden" name="confirm_token" id="confirm-token">/);
+  assert.match(html, />Confirmar</);
+  assert.match(html, /src="\.\/js\/confirmar-novedades\.js"/);
+  assert.match(script, /\^\[A-Za-z0-9_-\]\{1,100\}\$/);
+  assert.match(script, /window\.history\.replaceState/);
+  assert.doesNotMatch(script, /fetch\s*\(|XMLHttpRequest|\.submit\s*\(/);
+  assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
+});
+
+test("la confirmación de novedades presenta solo los resultados devueltos por el backend", () => {
+  const script = read("js/confirmar-novedades.js");
+
+  for (const text of [
+    "Suscripción confirmada",
+    "Ya podés recibir Novedades Nexar.",
+    "Baja confirmada",
+    "Dejaste de recibir Novedades Nexar.",
+    "Solicitud ya confirmada",
+    "Enlace vencido",
+    "Enlace inválido",
+    "No se pudo aplicar la preferencia"
+  ]) {
+    assert.match(script, new RegExp(text.replace(/[.?]/g, "\\$&")), text);
+  }
+  assert.match(script, /status === "confirmed"/);
+  assert.match(script, /results\[`confirmed:\$\{action\}`\]/);
 });
 
 test("los IDs funcionales del portal de vendedores se preservan", () => {
