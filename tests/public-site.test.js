@@ -335,8 +335,16 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
   assert.equal(refresh.elements.get("confirm-token").value, token);
   assert.equal(refresh.fetchCalls.length, 1);
 
+  const confirmedLoad = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "confirmed" })
+  });
+  assert.equal(confirmedLoad.elements.get("newsletter-title").textContent, "Solicitud ya confirmada");
+  assert.equal(confirmedLoad.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.notEqual(confirmedLoad.body.dataset.statusDefault, "rejected");
+  assert.equal(confirmedLoad.elements.get("newsletter-icon").textContent, "✓");
+
   for (const [status, title] of [
-    ["confirmed", "Solicitud ya confirmada"],
     ["expired", "Enlace vencido"],
     ["invalid", "Enlace inválido"],
     ["error", "No se pudo verificar la solicitud"]
@@ -344,6 +352,7 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
     const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl: preview({ ok: false, status }, false) });
     assert.equal(invalidLoad.elements.get("newsletter-title").textContent, title, status);
     assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true, status);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected", status);
   }
 
   const replacedInvalidToken = await runPage({

@@ -118,6 +118,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 message: "Intentá nuevamente más tarde."
             }
         };
+        if (preview && preview.status === "confirmed") {
+            setVisualState("");
+            showResult(results.confirmed);
+            return;
+        }
         showError(preview && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
     } catch {
         showError({
