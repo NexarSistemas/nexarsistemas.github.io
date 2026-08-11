@@ -344,6 +344,14 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
   assert.notEqual(confirmedLoad.body.dataset.statusDefault, "rejected");
   assert.equal(confirmedLoad.elements.get("newsletter-icon").textContent, "✓");
 
+  const unexpectedConfirmed = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: false, status: "confirmed" }, false)
+  });
+  assert.equal(unexpectedConfirmed.elements.get("newsletter-title").textContent, "No se pudo verificar la solicitud");
+  assert.equal(unexpectedConfirmed.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.equal(unexpectedConfirmed.body.dataset.statusDefault, "rejected");
+
   for (const [status, title] of [
     ["expired", "Enlace vencido"],
     ["invalid", "Enlace inválido"],

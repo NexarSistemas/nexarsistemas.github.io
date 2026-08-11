@@ -118,12 +118,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 message: "Intentá nuevamente más tarde."
             }
         };
-        if (preview && preview.status === "confirmed") {
+        if (preview && preview.ok === true && preview.status === "confirmed") {
             setVisualState("");
             showResult(results.confirmed);
             return;
         }
-        showError(preview && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
+        showError(preview && preview.status !== "confirmed" && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
     } catch {
         showError({
             badge: "No pudimos verificar la solicitud",
