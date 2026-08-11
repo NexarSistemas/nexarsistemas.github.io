@@ -1,13 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("token") || "";
+    const tokenFromUrl = params.get("token");
+    const storedToken = window.history.state && typeof window.history.state.newsletterConfirmationToken === "string"
+        ? window.history.state.newsletterConfirmationToken
+        : "";
+    const token = tokenFromUrl === null ? storedToken : tokenFromUrl;
     const tokenIsValid = /^[A-Za-z0-9_-]{1,100}$/.test(token);
 
     if (params.has("token")) {
         params.delete("token");
         const query = params.toString();
         const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
-        window.history.replaceState(null, "", cleanUrl);
+        const state = tokenIsValid
+            ? { ...(window.history.state || {}), newsletterConfirmationToken: token }
+            : window.history.state;
+        window.history.replaceState(state, "", cleanUrl);
     }
 
     const badge = document.getElementById("newsletter-badge");
@@ -26,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (!tokenIsValid) {
+        document.body.dataset.statusDefault = "rejected";
         showResult({
             badge: "Enlace inválido",
             icon: "!",

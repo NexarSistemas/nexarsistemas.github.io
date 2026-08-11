@@ -239,51 +239,83 @@ test("la confirmación de novedades requiere una acción explícita y no expone 
   assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
 });
 
-test("la confirmación de novedades no presenta resultados definitivos desde el query string", () => {
+test("la confirmación de novedades conserva el token fuera de la URL y muestra errores visuales", () => {
   const script = read("js/confirmar-novedades.js");
-  const elements = new Map();
-  for (const id of [
-    "newsletter-badge",
-    "newsletter-icon",
-    "newsletter-title",
-    "newsletter-message",
-    "newsletter-confirmation-form",
-    "confirm-token"
-  ]) {
-    elements.set(id, {
-      hidden: true,
-      setAttribute() {},
-      textContent: "",
-      value: ""
+  const runPage = ({ search = "", state = null } = {}) => {
+    const elements = new Map();
+    for (const id of [
+      "newsletter-badge",
+      "newsletter-icon",
+      "newsletter-title",
+      "newsletter-message",
+      "newsletter-confirmation-form",
+      "confirm-token"
+    ]) {
+      elements.set(id, {
+        hidden: true,
+        setAttribute() {},
+        textContent: "",
+        value: ""
+      });
+    }
+
+    let onDOMContentLoaded;
+    let replacedState;
+    let replacedUrl;
+    const body = { dataset: {} };
+    vm.runInNewContext(script, {
+      URLSearchParams,
+      document: {
+        body,
+        addEventListener(event, callback) {
+          assert.equal(event, "DOMContentLoaded");
+          onDOMContentLoaded = callback;
+        },
+        getElementById(id) {
+          return elements.get(id);
+        }
+      },
+      window: {
+        history: {
+          state,
+          replaceState(nextState, unused, nextUrl) {
+            replacedState = nextState;
+            replacedUrl = nextUrl;
+          }
+        },
+        location: {
+          search,
+          pathname: "/confirmar-novedades.html",
+          hash: ""
+        }
+      }
     });
+    onDOMContentLoaded();
+    return { body, elements, replacedState, replacedUrl };
+  };
+
+  const token = "valid_base64url-token";
+  const firstLoad = runPage({ search: `?token=${token}` });
+  assert.equal(firstLoad.replacedState.newsletterConfirmationToken, token);
+  assert.equal(firstLoad.replacedUrl, "/confirmar-novedades.html");
+  assert.equal(firstLoad.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(firstLoad.elements.get("confirm-token").value, token);
+
+  const refresh = runPage({ state: firstLoad.replacedState });
+  assert.equal(refresh.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(refresh.elements.get("confirm-token").value, token);
+
+  for (const search of ["", "?token=no válido"]) {
+    const invalidLoad = runPage({ search });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, "Enlace inválido");
+    assert.equal(invalidLoad.elements.get("newsletter-message").textContent, "El enlace no es válido.");
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected");
   }
 
-  let onDOMContentLoaded;
-  vm.runInNewContext(script, {
-    URLSearchParams,
-    document: {
-      addEventListener(event, callback) {
-        assert.equal(event, "DOMContentLoaded");
-        onDOMContentLoaded = callback;
-      },
-      getElementById(id) {
-        return elements.get(id);
-      }
-    },
-    window: {
-      history: { replaceState() {} },
-      location: {
-        search: "?status=confirmed&action=opt_out",
-        pathname: "/confirmar-novedades.html",
-        hash: ""
-      }
-    }
-  });
-  onDOMContentLoaded();
-
-  assert.equal(elements.get("newsletter-title").textContent, "Enlace inválido");
-  assert.equal(elements.get("newsletter-message").textContent, "El enlace no es válido.");
-  assert.equal(elements.get("newsletter-confirmation-form").hidden, true);
+  const craftedStatus = runPage({ search: "?status=confirmed&action=opt_out" });
+  assert.equal(craftedStatus.elements.get("newsletter-title").textContent, "Enlace inválido");
+  assert.equal(craftedStatus.body.dataset.statusDefault, "rejected");
   assert.doesNotMatch(script, /Suscripción confirmada|Baja confirmada|Solicitud ya confirmada/);
   assert.doesNotMatch(script, /params\.get\("status"\)|params\.get\("action"\)/);
 });
