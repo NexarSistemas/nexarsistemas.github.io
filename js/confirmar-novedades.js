@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token") || "";
-    const status = params.get("status") || "";
-    const action = params.get("action") || "";
     const tokenIsValid = /^[A-Za-z0-9_-]{1,100}$/.test(token);
 
     if (params.has("token")) {
@@ -27,53 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
         message.textContent = result.message;
     };
 
-    const results = {
-        "confirmed:opt_in": {
-            badge: "Preferencia confirmada",
-            icon: "✓",
-            title: "Suscripción confirmada",
-            message: "Ya podés recibir Novedades Nexar."
-        },
-        "confirmed:opt_out": {
-            badge: "Preferencia confirmada",
-            icon: "✓",
-            title: "Baja confirmada",
-            message: "Dejaste de recibir Novedades Nexar."
-        },
-        already_confirmed: {
-            badge: "Solicitud confirmada",
-            icon: "✓",
-            title: "Solicitud ya confirmada",
-            message: "Esta solicitud ya fue confirmada anteriormente."
-        },
-        expired: {
-            badge: "Enlace vencido",
-            icon: "!",
-            title: "Enlace vencido",
-            message: "Volvé a solicitar el cambio desde la aplicación."
-        },
-        invalid: {
+    if (!tokenIsValid) {
+        showResult({
             badge: "Enlace inválido",
             icon: "!",
             title: "Enlace inválido",
             message: "El enlace no es válido."
-        },
-        error: {
-            badge: "No pudimos aplicar el cambio",
-            icon: "!",
-            title: "No se pudo aplicar la preferencia",
-            message: "Intentá nuevamente más tarde."
-        }
-    };
-
-    const result = status === "confirmed" ? results[`confirmed:${action}`] : results[status];
-    if (result) {
-        showResult(result);
-        return;
-    }
-
-    if (!tokenIsValid) {
-        showResult(results.invalid);
+        });
         return;
     }
 

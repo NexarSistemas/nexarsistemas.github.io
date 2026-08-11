@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const publicPages = [
@@ -238,23 +239,53 @@ test("la confirmación de novedades requiere una acción explícita y no expone 
   assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
 });
 
-test("la confirmación de novedades presenta solo los resultados devueltos por el backend", () => {
+test("la confirmación de novedades no presenta resultados definitivos desde el query string", () => {
   const script = read("js/confirmar-novedades.js");
-
-  for (const text of [
-    "Suscripción confirmada",
-    "Ya podés recibir Novedades Nexar.",
-    "Baja confirmada",
-    "Dejaste de recibir Novedades Nexar.",
-    "Solicitud ya confirmada",
-    "Enlace vencido",
-    "Enlace inválido",
-    "No se pudo aplicar la preferencia"
+  const elements = new Map();
+  for (const id of [
+    "newsletter-badge",
+    "newsletter-icon",
+    "newsletter-title",
+    "newsletter-message",
+    "newsletter-confirmation-form",
+    "confirm-token"
   ]) {
-    assert.match(script, new RegExp(text.replace(/[.?]/g, "\\$&")), text);
+    elements.set(id, {
+      hidden: true,
+      setAttribute() {},
+      textContent: "",
+      value: ""
+    });
   }
-  assert.match(script, /status === "confirmed"/);
-  assert.match(script, /results\[`confirmed:\$\{action\}`\]/);
+
+  let onDOMContentLoaded;
+  vm.runInNewContext(script, {
+    URLSearchParams,
+    document: {
+      addEventListener(event, callback) {
+        assert.equal(event, "DOMContentLoaded");
+        onDOMContentLoaded = callback;
+      },
+      getElementById(id) {
+        return elements.get(id);
+      }
+    },
+    window: {
+      history: { replaceState() {} },
+      location: {
+        search: "?status=confirmed&action=opt_out",
+        pathname: "/confirmar-novedades.html",
+        hash: ""
+      }
+    }
+  });
+  onDOMContentLoaded();
+
+  assert.equal(elements.get("newsletter-title").textContent, "Enlace inválido");
+  assert.equal(elements.get("newsletter-message").textContent, "El enlace no es válido.");
+  assert.equal(elements.get("newsletter-confirmation-form").hidden, true);
+  assert.doesNotMatch(script, /Suscripción confirmada|Baja confirmada|Solicitud ya confirmada/);
+  assert.doesNotMatch(script, /params\.get\("status"\)|params\.get\("action"\)/);
 });
 
 test("los IDs funcionales del portal de vendedores se preservan", () => {
