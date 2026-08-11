@@ -31,6 +31,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 - `mercadopago-pendiente.html`: retorno pendiente
 - `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
 - `mercadopago-suscripcion.html`: agradecimiento posterior a una adhesión, sin afirmar que el primer cobro esté acreditado
+- `confirmar-novedades.html`: confirmación explícita de altas y bajas de Novedades Nexar mediante un enlace seguro
 - `vendedores/login.html`: acceso al portal
 - `vendedores/recuperar.html`: solicitud de recuperación
 - `vendedores/dashboard.html`: dashboard autenticado

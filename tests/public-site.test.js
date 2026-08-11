@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const publicPages = [
@@ -14,6 +15,7 @@ const publicPages = [
   "mercadopago-pendiente.html",
   "mercadopago-fallo.html",
   "mercadopago-suscripcion.html",
+  "confirmar-novedades.html",
   "vendedores/login.html",
   "vendedores/recuperar.html",
   "vendedores/dashboard.html",
@@ -219,6 +221,182 @@ test("el retorno de suscripción agradece la adhesión y vuelve al inicio", () =
   assert.doesNotMatch(html, /href="\.\/nexar-comercio\.html/);
   assert.match(script, /let remainingSeconds = 15/);
   assert.match(script, /window\.location\.href = "\.\/index\.html"/);
+});
+
+test("la confirmación de novedades requiere una acción explícita y no expone secretos", () => {
+  const html = read("confirmar-novedades.html");
+  const script = read("js/confirmar-novedades.js");
+
+  assert.match(html, /<meta name="referrer" content="no-referrer">/);
+  assert.match(html, /<link rel="stylesheet" href="\.\/css\/site\.css">/);
+  assert.match(html, /<form[^>]+method="post"[^>]+action="https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference"/);
+  assert.match(html, /<input type="hidden" name="confirm_token" id="confirm-token">/);
+  assert.match(html, /id="newsletter-email" hidden/);
+  assert.match(html, />Confirmar</);
+  assert.match(html, /src="\.\/js\/confirmar-novedades\.js"/);
+  assert.match(script, /\^\[A-Za-z0-9_-\]\{1,100\}\$/);
+  assert.match(script, /window\.history\.replaceState/);
+  assert.match(script, /const previewEndpoint = "https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference-preview"/);
+  assert.match(script, /fetch\(`\$\{previewEndpoint\}\?token=\$\{encodeURIComponent\(token\)\}`/);
+  assert.match(script, /method: "GET"/);
+  assert.doesNotMatch(script, /XMLHttpRequest|\.submit\s*\(/);
+  assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
+});
+
+test("la confirmación de novedades verifica la solicitud antes de habilitar el formulario", async () => {
+  const script = read("js/confirmar-novedades.js");
+  const runPage = async ({ search = "", state = null, fetchImpl } = {}) => {
+    const elements = new Map();
+    for (const id of [
+      "newsletter-badge",
+      "newsletter-icon",
+      "newsletter-title",
+      "newsletter-message",
+      "newsletter-email",
+      "newsletter-confirmation-form",
+      "confirm-token"
+    ]) {
+      elements.set(id, {
+        hidden: true,
+        setAttribute() {},
+        textContent: "",
+        value: ""
+      });
+    }
+
+    let onDOMContentLoaded;
+    let replacedState;
+    let replacedUrl;
+    const fetchCalls = [];
+    const body = { dataset: {} };
+    vm.runInNewContext(script, {
+      URLSearchParams,
+      fetch: async (...args) => {
+        fetchCalls.push(args);
+        return fetchImpl(...args);
+      },
+      document: {
+        body,
+        addEventListener(event, callback) {
+          assert.equal(event, "DOMContentLoaded");
+          onDOMContentLoaded = callback;
+        },
+        getElementById(id) {
+          return elements.get(id);
+        }
+      },
+      window: {
+        history: {
+          state,
+          replaceState(nextState, unused, nextUrl) {
+            replacedState = nextState;
+            replacedUrl = nextUrl;
+          }
+        },
+        location: {
+          search,
+          pathname: "/confirmar-novedades.html",
+          hash: ""
+        }
+      }
+    });
+    await onDOMContentLoaded();
+    return { body, elements, fetchCalls, replacedState, replacedUrl };
+  };
+
+  const token = "valid_base64url-token";
+  const preview = (payload, ok = true) => async () => ({ ok, json: async () => payload });
+  const firstLoad = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" })
+  });
+  assert.equal(firstLoad.replacedState.newsletterConfirmationToken, token);
+  assert.equal(firstLoad.replacedUrl, "/confirmar-novedades.html");
+  assert.equal(firstLoad.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(firstLoad.elements.get("confirm-token").value, token);
+  assert.equal(firstLoad.elements.get("newsletter-title").textContent, "Confirmar suscripción");
+  assert.equal(firstLoad.elements.get("newsletter-email").textContent, "m***@ejemplo.com");
+  assert.equal(firstLoad.fetchCalls[0][0], "https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference-preview?token=valid_base64url-token");
+  assert.equal(firstLoad.fetchCalls[0][1].method, "GET");
+
+  const optOut = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_out", email_masked: "m***@ejemplo.com" })
+  });
+  assert.equal(optOut.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(optOut.elements.get("newsletter-title").textContent, "Confirmar baja");
+  assert.equal(optOut.elements.get("newsletter-email").textContent, "m***@ejemplo.com");
+
+  const refresh = await runPage({
+    state: firstLoad.replacedState,
+    fetchImpl: preview({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" })
+  });
+  assert.equal(refresh.elements.get("newsletter-confirmation-form").hidden, false);
+  assert.equal(refresh.elements.get("confirm-token").value, token);
+  assert.equal(refresh.fetchCalls.length, 1);
+
+  const confirmedLoad = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: true, status: "confirmed" })
+  });
+  assert.equal(confirmedLoad.elements.get("newsletter-title").textContent, "Solicitud ya confirmada");
+  assert.equal(confirmedLoad.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.notEqual(confirmedLoad.body.dataset.statusDefault, "rejected");
+  assert.equal(confirmedLoad.elements.get("newsletter-icon").textContent, "✓");
+
+  const unexpectedConfirmed = await runPage({
+    search: `?token=${token}`,
+    fetchImpl: preview({ ok: false, status: "confirmed" }, false)
+  });
+  assert.equal(unexpectedConfirmed.elements.get("newsletter-title").textContent, "No se pudo verificar la solicitud");
+  assert.equal(unexpectedConfirmed.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.equal(unexpectedConfirmed.body.dataset.statusDefault, "rejected");
+
+  for (const [status, title] of [
+    ["expired", "Enlace vencido"],
+    ["invalid", "Enlace inválido"],
+    ["error", "No se pudo verificar la solicitud"]
+  ]) {
+    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl: preview({ ok: false, status }, false) });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, title, status);
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true, status);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected", status);
+  }
+
+  const replacedInvalidToken = await runPage({
+    search: "?token=no válido",
+    state: { newsletterConfirmationToken: "old_valid_token", unrelated: "preserved" },
+    fetchImpl: preview({})
+  });
+  assert.equal(Object.hasOwn(replacedInvalidToken.replacedState, "newsletterConfirmationToken"), false);
+  assert.equal(replacedInvalidToken.replacedState.unrelated, "preserved");
+  const invalidRefresh = await runPage({ state: replacedInvalidToken.replacedState, fetchImpl: preview({}) });
+  assert.equal(invalidRefresh.elements.get("newsletter-confirmation-form").hidden, true);
+  assert.equal(invalidRefresh.fetchCalls.length, 0);
+
+  for (const fetchImpl of [
+    async () => { throw new Error("network"); },
+    async () => ({ ok: true, json: async () => { throw new Error("invalid json"); } })
+  ]) {
+    const invalidLoad = await runPage({ search: `?token=${token}`, fetchImpl });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, "No se pudo verificar la solicitud");
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected");
+  }
+
+  for (const search of ["", "?token=no válido"]) {
+    const invalidLoad = await runPage({ search, fetchImpl: preview({}) });
+    assert.equal(invalidLoad.elements.get("newsletter-title").textContent, "Enlace inválido");
+    assert.equal(invalidLoad.elements.get("newsletter-message").textContent, "El enlace no es válido.");
+    assert.equal(invalidLoad.elements.get("newsletter-confirmation-form").hidden, true);
+    assert.equal(invalidLoad.body.dataset.statusDefault, "rejected");
+  }
+
+  const craftedStatus = await runPage({ search: "?status=confirmed&action=opt_out", fetchImpl: preview({}) });
+  assert.equal(craftedStatus.elements.get("newsletter-title").textContent, "Enlace inválido");
+  assert.equal(craftedStatus.body.dataset.statusDefault, "rejected");
+  assert.equal(craftedStatus.fetchCalls.length, 0);
+  assert.doesNotMatch(script, /params\.get\("status"\)|params\.get\("action"\)/);
 });
 
 test("los IDs funcionales del portal de vendedores se preservan", () => {
