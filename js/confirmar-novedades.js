@@ -184,13 +184,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     message: "Esta solicitud ya fue confirmada anteriormente."
                 }
             };
-            const normalizedText = typeof result.text === "string" ? result.text.trim().toLowerCase() : "";
+            const normalizedText = typeof result.text === "string"
+                ? result.text.normalize("NFC").trim().replace(/\s+/gu, " ")
+                : "";
             const successKey = result.status === "confirmed"
                 ? "confirmed"
                 : result.action || ({
-                    "subscription confirmed": "opt_in",
-                    "unsubscription confirmed": "opt_out",
-                    "already confirmed": "confirmed"
+                    "Suscripción confirmada. Ya podés recibir Novedades Nexar.": "opt_in",
+                    "Baja confirmada. Dejaste de recibir Novedades Nexar.": "opt_out",
+                    "Esta solicitud ya fue confirmada.": "confirmed"
                 })[normalizedText];
             if (!Object.prototype.hasOwnProperty.call(successResults, successKey)) {
                 throw new Error("unexpected newsletter confirmation response");

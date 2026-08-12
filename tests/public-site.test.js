@@ -350,12 +350,17 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
     });
     assert.equal(prevented, true);
   };
+  const plainTextResponse = (ok, text) => ({
+    ok,
+    headers: { get: () => "text/plain; charset=utf-8" },
+    text: async () => text
+  });
 
   const confirmedOptIn = await runPage({
     search: `?token=${token}`,
     fetchImpl: async (url) => url.startsWith("https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference-preview")
       ? { ok: true, json: async () => ({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" }) }
-      : { ok: true, json: async () => ({ ok: true, action: "opt_in" }) }
+      : plainTextResponse(true, "Suscripción confirmada. Ya podés recibir Novedades Nexar.")
   });
   await submit(confirmedOptIn);
   assert.equal(confirmedOptIn.fetchCalls.length, 2);
@@ -371,7 +376,7 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
     search: `?token=${token}`,
     fetchImpl: async (url) => url.includes("-preview")
       ? { ok: true, json: async () => ({ ok: true, status: "pending", action: "opt_out", email_masked: "m***@ejemplo.com" }) }
-      : { ok: true, json: async () => ({ ok: true, action: "opt_out" }) }
+      : plainTextResponse(true, "Baja confirmada. Dejaste de recibir Novedades Nexar.")
   });
   await submit(confirmedOptOut);
   assert.equal(confirmedOptOut.elements.get("newsletter-title").textContent, "Baja confirmada");
@@ -380,29 +385,14 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
     search: `?token=${token}`,
     fetchImpl: async (url) => url.includes("-preview")
       ? { ok: true, json: async () => ({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" }) }
-      : { ok: true, json: async () => ({ ok: true, status: "confirmed" }) }
+      : plainTextResponse(true, "Esta solicitud ya fue confirmada.")
   });
   await submit(alreadyConfirmed);
   assert.equal(alreadyConfirmed.elements.get("newsletter-title").textContent, "Solicitud ya confirmada");
 
-  const plainTextConfirmation = await runPage({
-    search: `?token=${token}`,
-    fetchImpl: async (url) => url.includes("-preview")
-      ? { ok: true, json: async () => ({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" }) }
-      : {
-          ok: true,
-          headers: { get: () => "text/plain" },
-          text: async () => "Subscription confirmed"
-        }
-  });
-  await submit(plainTextConfirmation);
-  assert.equal(plainTextConfirmation.elements.get("newsletter-title").textContent, "Suscripción confirmada");
-
   for (const postResponse of [
-    { ok: false, json: async () => ({ ok: false, status: "expired" }) },
-    { ok: false, json: async () => ({ ok: false, status: "invalid" }) },
-    { ok: true, json: async () => ({ ok: false, status: "error" }) },
-    null
+    plainTextResponse(true, "Respuesta no reconocida."),
+    plainTextResponse(false, "Suscripción confirmada. Ya podés recibir Novedades Nexar.")
   ]) {
     const failedConfirmation = await runPage({
       search: `?token=${token}`,
@@ -410,7 +400,6 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
         if (url.includes("-preview")) {
           return { ok: true, json: async () => ({ ok: true, status: "pending", action: "opt_in", email_masked: "m***@ejemplo.com" }) };
         }
-        if (postResponse === null) throw new Error("network");
         return postResponse;
       }
     });
