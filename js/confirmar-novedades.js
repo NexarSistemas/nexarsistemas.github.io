@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const previewEndpoint = "https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference-preview";
+    const confirmationEndpoint = "https://qwlngclrhpezelqddlsp.supabase.co/functions/v1/newsletter-preference";
     const params = new URLSearchParams(window.location.search);
     const tokenFromUrl = params.get("token");
     const storedToken = window.history.state && typeof window.history.state.newsletterConfirmationToken === "string"
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = document.getElementById("newsletter-email");
     const form = document.getElementById("newsletter-confirmation-form");
     const confirmToken = document.getElementById("confirm-token");
+    const closeNote = document.getElementById("newsletter-close-note");
 
     const setVisualState = (status) => {
         if (status) {
@@ -37,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     };
 
-    const showResult = (result) => {
+    const showResult = (result, { completed = false } = {}) => {
         badge.textContent = result.badge;
         icon.textContent = result.icon;
         icon.setAttribute("aria-label", result.title);
@@ -45,6 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         message.textContent = result.message;
         email.hidden = true;
         form.hidden = true;
+        closeNote.hidden = !completed;
+        form.closest(".payment-panel").classList.toggle("newsletter-confirmation-complete", completed);
     };
 
     const showError = (result) => {
@@ -89,10 +93,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             email.hidden = false;
             confirmToken.value = token;
             form.hidden = false;
-            return;
-        }
-
-        const results = {
+        } else {
+            const results = {
             confirmed: {
                 badge: "Solicitud confirmada",
                 icon: "✓",
@@ -118,12 +120,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 message: "Intentá nuevamente más tarde."
             }
         };
-        if (preview && preview.ok === true && preview.status === "confirmed") {
-            setVisualState("");
-            showResult(results.confirmed);
-            return;
+            if (preview && preview.ok === true && preview.status === "confirmed") {
+                setVisualState("");
+                showResult(results.confirmed);
+                return;
+            }
+            showError(preview && preview.status !== "confirmed" && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
         }
-        showError(preview && preview.status !== "confirmed" && Object.prototype.hasOwnProperty.call(results, preview.status) ? results[preview.status] : results.error);
     } catch {
         showError({
             badge: "No pudimos verificar la solicitud",
@@ -132,4 +135,78 @@ document.addEventListener("DOMContentLoaded", async () => {
             message: "Intentá nuevamente más tarde."
         });
     }
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        form.hidden = true;
+        setVisualState("pending");
+        showResult({
+            badge: "Confirmando solicitud",
+            icon: "…",
+            title: "Confirmando solicitud",
+            message: "Estamos aplicando tu preferencia."
+        });
+
+        try {
+            const response = await fetch(confirmationEndpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ confirm_token: confirmToken.value }).toString()
+            });
+            const contentType = response.headers && response.headers.get("content-type");
+            const result = contentType && !contentType.includes("application/json")
+                ? { text: await response.text() }
+                : await response.json();
+
+            if (!response.ok || !result || (Object.prototype.hasOwnProperty.call(result, "ok") && result.ok !== true)) {
+                throw new Error("newsletter confirmation failed");
+            }
+
+            const successResults = {
+                opt_in: {
+                    badge: "Suscripción confirmada",
+                    icon: "✓",
+                    title: "Suscripción confirmada",
+                    message: "Tu suscripción a Novedades Nexar ya está activa."
+                },
+                opt_out: {
+                    badge: "Baja confirmada",
+                    icon: "✓",
+                    title: "Baja confirmada",
+                    message: "Ya no recibirás Novedades Nexar."
+                },
+                confirmed: {
+                    badge: "Solicitud confirmada",
+                    icon: "✓",
+                    title: "Solicitud ya confirmada",
+                    message: "Esta solicitud ya fue confirmada anteriormente."
+                }
+            };
+            const normalizedText = typeof result.text === "string"
+                ? result.text.normalize("NFC").trim().replace(/\s+/gu, " ")
+                : "";
+            const successKey = result.status === "confirmed"
+                ? "confirmed"
+                : result.action || ({
+                    "Suscripción confirmada. Ya podés recibir Novedades Nexar.": "opt_in",
+                    "Baja confirmada. Dejaste de recibir Novedades Nexar.": "opt_out",
+                    "Esta solicitud ya fue confirmada.": "confirmed"
+                })[normalizedText];
+            if (!Object.prototype.hasOwnProperty.call(successResults, successKey)) {
+                throw new Error("unexpected newsletter confirmation response");
+            }
+
+            setVisualState("");
+            showResult(successResults[successKey], { completed: true });
+        } catch {
+            showError({
+                badge: "No pudimos confirmar la solicitud",
+                icon: "!",
+                title: "No se pudo confirmar la solicitud",
+                message: "Intentá nuevamente más tarde."
+            });
+        }
+    });
 });

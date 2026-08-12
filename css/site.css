@@ -1392,6 +1392,25 @@ a {
     margin-top: 28px;
 }
 
+.newsletter-confirmation-complete {
+    text-align: center;
+}
+
+.newsletter-confirmation-complete .payment-status-icon {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.newsletter-confirmation-complete .payment-actions {
+    justify-content: center;
+}
+
+.newsletter-close-note {
+    margin: 18px 0 -10px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
 .payment-note,
 .payment-param-warning {
     margin: 24px 0 0;
