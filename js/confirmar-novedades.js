@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ? { text: await response.text() }
                 : await response.json();
 
-            if (!response.ok || !result || (Object.hasOwn(result, "ok") && result.ok !== true)) {
+            if (!response.ok || !result || (Object.prototype.hasOwnProperty.call(result, "ok") && result.ok !== true)) {
                 throw new Error("newsletter confirmation failed");
             }
 

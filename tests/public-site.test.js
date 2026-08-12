@@ -229,6 +229,7 @@ test("la confirmación de novedades requiere una acción explícita y no expone 
 
   assert.match(html, /<meta name="referrer" content="no-referrer">/);
   assert.match(html, /<link rel="stylesheet" href="\.\/css\/site\.css">/);
+  assert.match(html, /<article class="payment-panel" aria-live="polite" aria-atomic="true">/);
   assert.match(html, /<form[^>]+method="post"[^>]+action="https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference"/);
   assert.match(html, /<input type="hidden" name="confirm_token" id="confirm-token">/);
   assert.match(html, /id="newsletter-close-note" hidden>Ya podés cerrar esta pestaña o ventana\.<\/p>/);
@@ -243,7 +244,8 @@ test("la confirmación de novedades requiere una acción explícita y no expone 
   assert.match(script, /const confirmationEndpoint = "https:\/\/qwlngclrhpezelqddlsp\.supabase\.co\/functions\/v1\/newsletter-preference"/);
   assert.match(script, /method: "POST"/);
   assert.match(script, /confirm_token: confirmToken\.value/);
-  assert.match(script, /!response\.ok \|\| !result \|\| \(Object\.hasOwn\(result, "ok"\) && result\.ok !== true\)/);
+  assert.match(script, /!response\.ok \|\| !result \|\| \(Object\.prototype\.hasOwnProperty\.call\(result, "ok"\) && result\.ok !== true\)/);
+  assert.doesNotMatch(script, /Object\.hasOwn\(/);
   assert.doesNotMatch(script, /params\.get\("status"\)|params\.get\("action"\)/);
   assert.doesNotMatch(script, /XMLHttpRequest|\.submit\s*\(/);
   assert.doesNotMatch(html + script, /service_role|SUPABASE_ANON_KEY|RESEND_API_KEY|api[_-]?key/i);
@@ -459,7 +461,7 @@ test("la confirmación de novedades verifica la solicitud antes de habilitar el 
     state: { newsletterConfirmationToken: "old_valid_token", unrelated: "preserved" },
     fetchImpl: preview({})
   });
-  assert.equal(Object.hasOwn(replacedInvalidToken.replacedState, "newsletterConfirmationToken"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(replacedInvalidToken.replacedState, "newsletterConfirmationToken"), false);
   assert.equal(replacedInvalidToken.replacedState.unrelated, "preserved");
   const invalidRefresh = await runPage({ state: replacedInvalidToken.replacedState, fetchImpl: preview({}) });
   assert.equal(invalidRefresh.elements.get("newsletter-confirmation-form").hidden, true);
