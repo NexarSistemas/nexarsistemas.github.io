@@ -21,9 +21,22 @@ Los formatos comunicados en esta primera etapa son:
 
 ## Precios y contacto
 
-No se publican precios fijos. Cada proyecto requiere un presupuesto personalizado según alcance, secciones, contenido y funcionalidades.
+La tarjeta principal de servicios web dirige a `#servicios-web`, donde se publican estos valores desde:
 
-La tarjeta de la página principal dirige al formulario existente mediante `#contacto`. El formulario incorpora:
+- Presencia Web — desde $250.000;
+- Web Profesional — desde $450.000;
+- Web Empresa — desde $590.000;
+- Sistemas web a medida — solicitar presupuesto.
+
+El mantenimiento web se ofrece en tres niveles:
+
+- Básico — desde $20.000/mes;
+- Profesional — desde $35.000/mes;
+- Empresarial — desde $60.000/mes.
+
+Los valores son desde: el precio final depende del alcance, funcionalidades, integraciones y servicios externos. Los sistemas web a medida se presupuestan individualmente.
+
+Cada nivel dirige al formulario existente mediante `#contacto`. El formulario incorpora:
 
 - producto o servicio: `Diseño y desarrollo web`;
 - tipo de consulta: `Solicitar presupuesto web`.
@@ -35,9 +48,12 @@ No se crea una página independiente en este MVP. Esta decisión evita publicar 
 `tests/web-services.test.js` verifica:
 
 - que la tarjeta y su contenido principal estén presentes;
-- que el enlace de presupuesto apunte a un fragmento existente;
+- que los precios y niveles de mantenimiento publicados coincidan con la oferta actual;
+- que la tarjeta principal enlace a `#servicios-web` y los presupuestos al contacto existente;
 - que el formulario ofrezca las opciones específicas del servicio;
 - que la hoja de estilos adicional exista y esté enlazada;
 - que no se introduzca una ruta HTML inexistente para el servicio.
+
+La misma prueba también cubre Nexar Play y sus accesos a Tetris Deluxe y Crucigrama Nexar.
 
 La prueba general `tests/public-site.test.js` continúa comprobando que los enlaces internos a archivos públicos existentes no estén rotos.
