@@ -36,7 +36,7 @@ El mantenimiento web se ofrece en tres niveles:
 
 Los valores son desde: el precio final depende del alcance, funcionalidades, integraciones y servicios externos. Los sistemas web a medida se presupuestan individualmente.
 
-Cada nivel dirige al formulario existente mediante `#contacto`. El formulario incorpora:
+Los paquetes de desarrollo web dirigen al formulario existente mediante `#contacto`. Los niveles de mantenimiento se muestran como información comercial y precios, sin CTA propio. El formulario incorpora:
 
 - producto o servicio: `Diseño y desarrollo web`;
 - tipo de consulta: `Solicitar presupuesto web`.
