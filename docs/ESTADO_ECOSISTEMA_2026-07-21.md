@@ -23,8 +23,11 @@ Sitio público de Nexar Sistemas, landing comercial, formularios de contacto/dem
 
 ## Límites y pendientes
 
-- Los Issues abiertos del área Tetris son independientes del flujo comercial principal.
-- Antes de destacar el juego públicamente deben resolverse licencia/atribución y usabilidad móvil.
+- Tetris Deluxe es una implementación independiente desarrollada por Nexar Sistemas; no es un fork técnico ni código derivado de otro repositorio.
+- La identidad legal fue normalizada en `NexarSistemas/Tetris` mediante la PR #7, ya mergeada, y la licencia se publica correctamente como `LICENSE`.
+- README y EULA distinguen los elementos propios de Nexar de marcas o derechos de terceros.
+- La versión actual incorpora controles táctiles, interfaz responsive y compatibilidad con áreas seguras móviles; los gates anteriores de atribución/licencia y usabilidad móvil están cerrados.
+- Tetris puede destacarse públicamente desde Nexar Play.
 - Este repositorio no contiene lógica de licencias ni debe emitir permisos de planes.
 
 ## Integraciones
