@@ -17,7 +17,27 @@ test("la página principal publica la oferta de servicios web", () => {
   assert.match(html, /profesionales, comercios y emprendimientos/);
   assert.match(html, /Landing pages para promocionar servicios/);
   assert.match(html, /Webs profesionales e institucionales/);
-  assert.match(html, /Precio a consultar · Presupuesto personalizado/);
+  assert.match(html, /Planes desde \$250\.000/);
+  assert.match(html, /id="servicios-web"/);
+  assert.match(html, /Presencia Web[\s\S]*?Desde \$250\.000/);
+  assert.match(html, /Web Profesional[\s\S]*?Desde \$450\.000/);
+  assert.match(html, /Web Empresa[\s\S]*?Desde \$590\.000/);
+  assert.match(html, /Sistemas web a medida[\s\S]*?Solicitar presupuesto/);
+  assert.match(html, /Básico[\s\S]*?Desde \$20\.000\/mes/);
+  assert.match(html, /Profesional[\s\S]*?Desde \$35\.000\/mes/);
+  assert.match(html, /Empresarial[\s\S]*?Desde \$60\.000\/mes/);
+  assert.match(html, /El precio final depende del alcance, las funcionalidades, las integraciones y los servicios externos\./);
+});
+
+test("la home publica Nexar Play con sus accesos independientes", () => {
+  const html = read("index.html");
+
+  assert.match(html, /id="nexar-play"/);
+  assert.match(html, /Tetris Deluxe/);
+  assert.match(html, /href="\/tetris"/);
+  assert.match(html, /Crucigrama Nexar/);
+  assert.match(html, /href="https:\/\/crucigrama\.nexarsistemas\.com\.ar"/);
+  assert.match(html, /target="_blank" rel="noopener">Jugar Crucigrama Nexar/);
 });
 
 test("la solicitud de presupuesto usa el formulario existente", () => {
