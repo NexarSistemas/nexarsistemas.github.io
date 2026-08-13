@@ -34,7 +34,7 @@ test("la home publica Nexar Play con sus accesos independientes", () => {
 
   assert.match(html, /id="nexar-play"/);
   assert.match(html, /Tetris Deluxe/);
-  assert.match(html, /href="\/tetris"/);
+  assert.match(html, /href="\.\/Tetris\/"/);
   assert.match(html, /Crucigrama Nexar/);
   assert.match(html, /href="https:\/\/crucigrama\.nexarsistemas\.com\.ar"/);
   assert.match(html, /target="_blank" rel="noopener">Jugar Crucigrama Nexar/);
