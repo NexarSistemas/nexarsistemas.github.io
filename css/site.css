@@ -949,6 +949,34 @@ a {
     background: var(--white);
 }
 
+.founder-section {
+    background: var(--cream);
+}
+
+.founder-section-inner {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 72px;
+}
+
+.founder-section-copy h2 {
+    margin: 0 0 12px;
+    color: var(--navy);
+}
+
+.founder-section-copy p {
+    max-width: 620px;
+    margin: 0;
+    color: var(--muted);
+}
+
+.founder-badge {
+    display: grid;
+    min-width: 0;
+    place-items: center;
+}
+
 .newsletter-inner {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -1561,6 +1589,7 @@ a {
     .faq-wrap,
     .contact-grid,
     .newsletter-inner,
+    .founder-section-inner,
     .seller-cta-inner {
         grid-template-columns: 1fr;
         gap: 55px;
