@@ -977,6 +977,48 @@ a {
     place-items: center;
 }
 
+.founder-linkedin-badge {
+    display: none;
+    max-width: 100%;
+}
+
+.founder-badge.has-linkedin-badge .founder-linkedin-badge {
+    display: block;
+}
+
+.founder-profile-fallback {
+    width: min(100%, 300px);
+    padding: 26px 28px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+}
+
+.founder-profile-fallback strong {
+    display: block;
+    color: var(--navy);
+    font-size: 18px;
+}
+
+.founder-profile-fallback p {
+    margin: 4px 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.founder-profile-fallback a {
+    color: var(--green-dark);
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.founder-badge.has-linkedin-badge .founder-profile-fallback {
+    display: none;
+}
+
 .newsletter-inner {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -1794,6 +1836,17 @@ a {
 
     .payment-summary {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 359px) {
+    .founder-linkedin-badge,
+    .founder-badge.has-linkedin-badge .founder-linkedin-badge {
+        display: none;
+    }
+
+    .founder-badge.has-linkedin-badge .founder-profile-fallback {
+        display: block;
     }
 }
 

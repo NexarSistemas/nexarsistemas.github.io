@@ -471,19 +471,26 @@
                 <h2 id="founder-title">Quién está detrás de Nexar</h2>
                 <p>Nexar Sistemas es un proyecto independiente creado y desarrollado por Rolando Navarta, enfocado en software de gestión y soluciones web simples, prácticas y adaptadas a necesidades reales.</p>
             </div>
-            <div class="founder-badge" aria-label="Perfil de LinkedIn de Rolando Navarta">
-                <div class="badge-base LI-profile-badge"
-                     data-locale="es_ES"
-                     data-size="medium"
-                     data-theme="light"
-                     data-type="VERTICAL"
-                     data-vanity="rolando-navarta-b033b3428"
-                     data-version="v1">
-                    <a class="badge-base__link LI-simple-link"
-                       href="https://ar.linkedin.com/in/rolando-navarta-b033b3428?trk=profile-badge">
-                        Rolando Navarta
-                    </a>
+            <div class="founder-badge">
+                <div class="founder-linkedin-badge">
+                    <div class="badge-base LI-profile-badge"
+                         data-locale="es_ES"
+                         data-size="medium"
+                         data-theme="light"
+                         data-type="VERTICAL"
+                         data-vanity="rolando-navarta-b033b3428"
+                         data-version="v1">
+                        <a class="badge-base__link LI-simple-link"
+                           href="https://ar.linkedin.com/in/rolando-navarta-b033b3428?trk=profile-badge">
+                            Rolando Navarta
+                        </a>
+                    </div>
                 </div>
+                <article class="founder-profile-fallback" aria-label="Perfil de Rolando Navarta">
+                    <strong>Rolando Navarta</strong>
+                    <p>Fundador y desarrollador de Nexar Sistemas</p>
+                    <a href="https://ar.linkedin.com/in/rolando-navarta-b033b3428?trk=profile-badge" target="_blank" rel="noopener">Ver perfil en LinkedIn</a>
+                </article>
             </div>
         </div>
     </section>
@@ -515,5 +522,23 @@
         async
         defer
         type="text/javascript"></script>
+<script>
+    (() => {
+        const container = document.querySelector(".founder-badge");
+        const badge = container?.querySelector(".LI-profile-badge");
+        if (!container || !badge) return;
+
+        const revealLinkedInBadge = () => {
+            if (badge.querySelector("iframe") || !badge.querySelector(".badge-base__link")) {
+                container.classList.add("has-linkedin-badge");
+                observer.disconnect();
+            }
+        };
+
+        const observer = new MutationObserver(revealLinkedInBadge);
+        observer.observe(badge, { childList: true, subtree: true });
+        revealLinkedInBadge();
+    })();
+</script>
 </body>
 </html>

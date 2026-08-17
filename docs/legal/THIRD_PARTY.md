@@ -50,7 +50,14 @@ No implica que todos los elementos listados esten presentes en todos los product
 - Uso posible: componentes visuales sobre Tailwind para interfaces administrativas o comerciales.
 - Revision pendiente por producto: version exacta, alcance real de uso y dependencia respecto del frontend final.
 
-## 9. Otros por completar
+## 9. LinkedIn
+
+- Uso: insignia pública del perfil del fundador en la home de Nexar Sistemas.
+- Recurso cargado en el navegador: `https://platform.linkedin.com/badges/js/profile.js`.
+- Finalidad: renderizar el badge enlazado al perfil público de LinkedIn.
+- Dependencia externa opcional: si el recurso falla o es bloqueado, la web conserva un fallback local y funcional con enlace al perfil.
+
+## 10. Otros por completar
 
 Este repositorio puede incorporar nuevos terceros a medida que se auditen productos Nexar especificos. Algunos ejemplos posibles:
 
@@ -62,6 +69,6 @@ Este repositorio puede incorporar nuevos terceros a medida que se auditen produc
 - Librerias frontend y backend.
 - Servicios de mensajeria o notificaciones.
 
-## 10. Nota de distribucion
+## 11. Nota de distribucion
 
 Antes de distribuir, vender, publicar o sincronizar documentacion en un producto Nexar, debe revisarse este inventario y completarse la declaracion real de terceros aplicable a ese producto especifico.
