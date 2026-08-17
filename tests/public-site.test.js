@@ -530,3 +530,20 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
   assert.match(sql, /private\.notify_admin_email\(\)/);
 });
+
+test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez", () => {
+  const html = read("index.html");
+  const thirdParty = read("docs/legal/THIRD_PARTY.md");
+  const profileUrl = "https://ar.linkedin.com/in/rolando-navarta-b033b3428?trk=profile-badge";
+  const badgeScript = "https://platform.linkedin.com/badges/js/profile.js";
+
+  assert.match(html, /data-vanity="rolando-navarta-b033b3428"/);
+  assert.match(html, new RegExp(profileUrl.replace(/[.?]/g, "\\$&")));
+  assert.equal((html.match(new RegExp(badgeScript.replace(/[.?]/g, "\\$&"), "g")) || []).length, 1);
+  assert.match(html, /class="founder-profile-fallback"/);
+  assert.match(html, /Fundador y desarrollador de Nexar Sistemas/);
+  assert.match(html, /has-linkedin-badge/);
+  assert.match(thirdParty, /## 9\. LinkedIn/);
+  assert.match(thirdParty, new RegExp(badgeScript.replace(/[.?]/g, "\\$&")));
+  assert.match(thirdParty, /fallback local y funcional/);
+});
