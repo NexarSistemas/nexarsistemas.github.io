@@ -16,6 +16,7 @@ const publicPages = [
   "mercadopago-fallo.html",
   "mercadopago-suscripcion.html",
   "confirmar-novedades.html",
+  "vendedores/index.html",
   "vendedores/login.html",
   "vendedores/recuperar.html",
   "vendedores/dashboard.html",
@@ -115,8 +116,6 @@ test("el material comercial del portal no se publica ni se indexa", () => {
   assert.doesNotMatch(portalScript, /page === "material"/);
   assert.doesNotMatch(portalScript, /function initMaterialPage\(\)/);
   assert.match(portalScript, /document\.addEventListener\("DOMContentLoaded", \(\) => \{\s*bindLogout\(\);/);
-  assert.doesNotMatch(portalScript, /function isLocalHost\(\)/);
-  assert.doesNotMatch(portalScript, /\["localhost", "127\.0\.0\.1", "0\.0\.0\.0"\]/);
   assert.match(material, /id="commercial-sheet-comercio"/);
   assert.match(material, /id="commercial-sheet-finanzas"/);
   assert.match(material, /data-print-sheet="commercial-sheet-comercio"/);
@@ -508,6 +507,7 @@ test("los IDs funcionales del portal de vendedores se preservan", () => {
 test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const html = read("index.html");
   const frontendScript = read("assets/js/home-forms.js");
+  const runtimeConfig = read("assets/js/runtime-config.js");
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
   assert.match(html, />Hablar por WhatsApp</);
@@ -517,14 +517,17 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(html, /id="newsletterForm"/);
   assert.match(html, /id="newsletter-consent"/);
   assert.match(html, /Podés darte de baja cuando quieras\./);
+  assert.match(html, /src="\.\/assets\/js\/runtime-config\.js"/);
   assert.match(html, /src="\.\/assets\/js\/home-forms\.js"/);
-  assert.match(frontendScript, /const HOME_FORMS_ENDPOINT = "\/.netlify\/functions\/home-form-submissions";/);
-  assert.doesNotMatch(frontendScript, /\/\.netlify\/functions\/(?!home-form-submissions\b)/);
+  assert.match(frontendScript, /runtimeConfig\.getFunctionUrl\("home-form-submissions"\)/);
   assert.doesNotMatch(frontendScript, /\/rest\/v1\//);
   assert.doesNotMatch(frontendScript, /anonKey|service_role|RESEND_API_KEY/i);
   assert.doesNotMatch(frontendScript, /result\.duplicate/);
   assert.match(frontendScript, /Tu solicitud fue recibida\. Te contactaremos pronto\./);
   assert.match(frontendScript, /¡Listo! Procesamos tu suscripción\./);
+  assert.match(runtimeConfig, /backendOrigin/);
+  assert.match(runtimeConfig, /functionBasePath: "\/\.netlify\/functions"/);
+  assert.match(runtimeConfig, /hostname === "nexarsistemas\.github\.io"/);
   assert.match(sql, /enable row level security/);
   assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
@@ -546,4 +549,17 @@ test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez"
   assert.match(thirdParty, /## 9\. LinkedIn/);
   assert.match(thirdParty, new RegExp(badgeScript.replace(/[.?]/g, "\\$&")));
   assert.match(thirdParty, /fallback local y funcional/);
+});
+
+test("las rutas equivalentes a _redirects existen para GitHub Pages", () => {
+  const tetrisRedirect = read("tetris/index.html");
+  const crucigramaRedirect = read("nexar-crucigrama/index.html");
+  const portalIndex = read("vendedores/index.html");
+
+  assert.match(tetrisRedirect, /http-equiv="refresh" content="0; url=\.\.\/Tetris\/"/);
+  assert.match(tetrisRedirect, /href="\.\.\/Tetris\/"/);
+  assert.match(crucigramaRedirect, /http-equiv="refresh" content="0; url=https:\/\/crucigrama\.nexarsistemas\.com\.ar\/"/);
+  assert.match(crucigramaRedirect, /href="https:\/\/crucigrama\.nexarsistemas\.com\.ar\/"/);
+  assert.match(portalIndex, /http-equiv="refresh" content="0; url=\.\/login\.html"/);
+  assert.match(portalIndex, /href="\.\/login\.html"/);
 });

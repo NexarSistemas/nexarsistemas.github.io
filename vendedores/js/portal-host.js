@@ -1,10 +1,11 @@
 (function () {
-  if (window.location.hostname !== "nexarsistemas.github.io") {
-    return;
+  if (!window.NEXAR_RUNTIME_CONFIG) {
+    window.NEXAR_RUNTIME_CONFIG = {
+      backendOrigin: "https://nexarsistemas.com.ar",
+      functionBasePath: "/.netlify/functions",
+      getFunctionUrl(functionName) {
+        return `${this.backendOrigin}${this.functionBasePath}/${functionName}`;
+      }
+    };
   }
-
-  const canonicalUrl = new URL(window.location.href);
-  canonicalUrl.protocol = "https:";
-  canonicalUrl.host = "nexarsistemas.com.ar";
-  window.location.replace(canonicalUrl.toString());
 })();

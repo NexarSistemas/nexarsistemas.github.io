@@ -1,4 +1,10 @@
 const { supabaseFetch, parseJson } = require("./portal-login-vendedor");
+const {
+  getRequestOrigin,
+  handleOptions,
+  rejectDisallowedOrigin,
+  withCorsHeaders
+} = require("./_cors.cjs");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_MESSAGE_LENGTH = 500;
@@ -13,9 +19,22 @@ function normalizeEmail(value) {
 }
 
 exports.handler = async function handler(event) {
+  const allowedMethods = ["POST", "OPTIONS"];
+  const origin = getRequestOrigin(event);
+
+  if (event.httpMethod === "OPTIONS") {
+    return handleOptions(event, allowedMethods);
+  }
+
+  const corsRejection = rejectDisallowedOrigin(event, allowedMethods);
+  if (corsRejection) {
+    return corsRejection;
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "Metodo no permitido." })
     };
   }
@@ -31,6 +50,7 @@ exports.handler = async function handler(event) {
     if (!codigoVendedor) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Ingresá tu código vendedor para continuar." })
       };
     }
@@ -38,6 +58,7 @@ exports.handler = async function handler(event) {
     if (!email && !telefono) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Ingresá email o teléfono para continuar." })
       };
     }
@@ -45,6 +66,7 @@ exports.handler = async function handler(event) {
     if (email && !EMAIL_RE.test(email)) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Si informás email, debe tener un formato válido." })
       };
     }
@@ -52,6 +74,7 @@ exports.handler = async function handler(event) {
     if (mensaje.length > MAX_MESSAGE_LENGTH) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "El mensaje es demasiado largo." })
       };
     }
@@ -96,7 +119,7 @@ exports.handler = async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
       },
       body: JSON.stringify({
         success: true,
@@ -108,7 +131,7 @@ exports.handler = async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
       },
       body: JSON.stringify({
         success: true,

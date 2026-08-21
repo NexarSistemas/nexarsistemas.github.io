@@ -1,4 +1,10 @@
 const crypto = require("crypto");
+const {
+  getRequestOrigin,
+  handleOptions,
+  rejectDisallowedOrigin,
+  withCorsHeaders
+} = require("./_cors.cjs");
 
 const SESSION_DURATION_HOURS = 12;
 const TEMP_SESSION_DURATION_MINUTES = 60;
@@ -236,9 +242,22 @@ async function supabaseFetch(path, options = {}) {
 }
 
 exports.handler = async function handler(event) {
+  const allowedMethods = ["POST", "OPTIONS"];
+  const origin = getRequestOrigin(event);
+
+  if (event.httpMethod === "OPTIONS") {
+    return handleOptions(event, allowedMethods);
+  }
+
+  const corsRejection = rejectDisallowedOrigin(event, allowedMethods);
+  if (corsRejection) {
+    return corsRejection;
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "Metodo no permitido." })
     };
   }
@@ -253,6 +272,7 @@ exports.handler = async function handler(event) {
     if (!codigo || !password) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Datos incompletos." })
       };
     }
@@ -265,6 +285,7 @@ exports.handler = async function handler(event) {
     if (!vendor || !vendor.activo || !verifyWerkzeugPassword(password, vendor.password_hash)) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Credenciales invalidas." })
       };
     }
@@ -318,7 +339,7 @@ exports.handler = async function handler(event) {
       return {
         statusCode: 500,
         headers: {
-          "Content-Type": "application/json"
+          ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
         },
         body: JSON.stringify({ error: "No pudimos crear la sesion del portal." })
       };
@@ -345,7 +366,7 @@ exports.handler = async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
       },
       body: JSON.stringify({
         session_token: sessionToken,
@@ -364,6 +385,7 @@ exports.handler = async function handler(event) {
     console.error("Portal vendedor login error:", error);
     return {
       statusCode: 500,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "No pudimos iniciar sesion." })
     };
   }

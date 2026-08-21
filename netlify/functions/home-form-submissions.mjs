@@ -1,4 +1,11 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import corsModule from "./_cors.cjs";
+
+const {
+  getRequestOrigin,
+  isAllowedOrigin,
+  withCorsHeaders
+} = corsModule;
 
 class ValidationError extends Error {}
 
@@ -180,15 +187,45 @@ function parseNewsletterSubscription(body) {
 }
 
 export default async function handler(request, context) {
+  const allowedMethods = ["POST", "OPTIONS"];
+  const origin = getRequestOrigin(request);
+
+  if (request.method === "OPTIONS") {
+    if (!isAllowedOrigin(origin)) {
+      return new Response(JSON.stringify({ error: "Origin no permitido." }), {
+        status: 403,
+        headers: { "Content-Type": "application/json; charset=utf-8" }
+      });
+    }
+
+    return new Response(null, {
+      status: 204,
+      headers: withCorsHeaders({}, origin, allowedMethods)
+    });
+  }
+
+  if (!isAllowedOrigin(origin)) {
+    return new Response(JSON.stringify({ error: "Origin no permitido." }), {
+      status: 403,
+      headers: { "Content-Type": "application/json; charset=utf-8" }
+    });
+  }
+
   if (request.method !== "POST") {
-    return json({ error: "Metodo no permitido." }, 405);
+    return new Response(JSON.stringify({ error: "Metodo no permitido." }), {
+      status: 405,
+      headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+    });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return json({ error: "La solicitud no tiene un formato válido." }, 400);
+    return new Response(JSON.stringify({ error: "La solicitud no tiene un formato válido." }), {
+      status: 400,
+      headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+    });
   }
 
   try {
@@ -196,19 +233,34 @@ export default async function handler(request, context) {
     if (body?.tipo === "solicitud_vendedor") {
       const application = parseSellerApplication(body);
       await insertIdempotently(config, "solicitudes_vendedores", application.email, application.payload);
-      return json({ success: true });
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+      });
     }
     if (body?.tipo === "suscripcion_novedades") {
       const subscription = parseNewsletterSubscription(body);
       await renewNewsletterSubscription(config, subscription);
-      return json({ success: true });
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+      });
     }
-    return json({ error: "Tipo de formulario no válido." }, 400);
+    return new Response(JSON.stringify({ error: "Tipo de formulario no válido." }), {
+      status: 400,
+      headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+    });
   } catch (error) {
     console.error("Home forms submission failed:", { detail: error.message || "unknown" });
     if (error instanceof ValidationError) {
-      return json({ error: error.message }, 400);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+      });
     }
-    return json({ error: "No pudimos procesar la solicitud." }, 500);
+    return new Response(JSON.stringify({ error: "No pudimos procesar la solicitud." }), {
+      status: 500,
+      headers: withCorsHeaders({ "Content-Type": "application/json; charset=utf-8" }, origin, allowedMethods)
+    });
   }
 }
