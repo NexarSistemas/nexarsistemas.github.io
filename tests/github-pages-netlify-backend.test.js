@@ -43,6 +43,14 @@ test("runtime-config resuelve el backend según el host", () => {
     runForLocation({ hostname: "localhost", origin: "http://localhost:8000" }).backendOrigin,
     "http://localhost:8000"
   );
+  assert.equal(
+    runForLocation({ hostname: "127.0.0.1", origin: "http://127.0.0.1:8000" }).backendOrigin,
+    "http://127.0.0.1:8000"
+  );
+  assert.equal(
+    runForLocation({ hostname: "[::1]", origin: "http://[::1]:8000" }).backendOrigin,
+    "http://[::1]:8000"
+  );
 });
 
 test("portal vendedor y home usan la URL centralizada del backend", () => {
@@ -66,6 +74,8 @@ test("el helper CORS permite los orígenes esperados y rechaza el resto", () => 
   assert.equal(cors.isAllowedOrigin("https://www.nexarsistemas.com.ar"), true);
   assert.equal(cors.isAllowedOrigin("https://nexarsistemas.github.io"), true);
   assert.equal(cors.isAllowedOrigin("http://localhost:8000"), true);
+  assert.equal(cors.isAllowedOrigin("http://127.0.0.1:8000"), true);
+  assert.equal(cors.isAllowedOrigin("http://[::1]:8000"), true);
   assert.equal(cors.isAllowedOrigin("https://evil.example.com"), false);
 });
 

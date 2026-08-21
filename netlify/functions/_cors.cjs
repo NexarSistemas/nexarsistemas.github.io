@@ -13,7 +13,7 @@ function isAllowedOrigin(origin) {
     return true;
   }
 
-  return /^http:\/\/localhost(?::\d+)?$/i.test(origin);
+  return /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(origin);
 }
 
 function buildCorsHeaders(origin, methods) {
