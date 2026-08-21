@@ -7,7 +7,7 @@
       exit 1
     fi
 
-    if git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- netlify/functions netlify.toml; then
+    if git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- netlify/functions netlify/lib netlify.toml; then
       exit 0
     fi
 
