@@ -4,7 +4,7 @@ const {
   handleOptions,
   rejectDisallowedOrigin,
   withCorsHeaders
-} = require("./_cors.cjs");
+} = require("../lib/cors.cjs");
 
 const ALLOWED_UPDATE_FIELDS = new Set(["session_token", "email", "telefono", "alias_cbu"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

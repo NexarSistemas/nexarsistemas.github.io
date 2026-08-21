@@ -68,7 +68,7 @@ test("portal vendedor y home usan la URL centralizada del backend", () => {
 });
 
 test("el helper CORS permite los orígenes esperados y rechaza el resto", () => {
-  const cors = require("../netlify/functions/_cors.cjs");
+  const cors = require("../netlify/lib/cors.cjs");
 
   assert.equal(cors.isAllowedOrigin("https://nexarsistemas.com.ar"), true);
   assert.equal(cors.isAllowedOrigin("https://www.nexarsistemas.com.ar"), true);
@@ -76,6 +76,11 @@ test("el helper CORS permite los orígenes esperados y rechaza el resto", () => 
   assert.equal(cors.isAllowedOrigin("http://localhost:8000"), true);
   assert.equal(cors.isAllowedOrigin("http://127.0.0.1:8000"), true);
   assert.equal(cors.isAllowedOrigin("http://[::1]:8000"), true);
+  assert.equal(cors.isAllowedOrigin("https://deploy-preview-48--nexarsistemas.netlify.app"), true);
+  assert.equal(cors.isAllowedOrigin("https://fix-pre-dns-github-pages--nexarsistemas.netlify.app"), true);
+  assert.equal(cors.isAllowedOrigin("https://nexarsistemas.netlify.app"), false);
+  assert.equal(cors.isAllowedOrigin("https://deploy-preview-48--otroproyecto.netlify.app"), false);
+  assert.equal(cors.isAllowedOrigin("https://feature_branch--nexarsistemas.netlify.app"), false);
   assert.equal(cors.isAllowedOrigin("https://evil.example.com"), false);
 });
 
@@ -103,6 +108,13 @@ test("las functions del portal responden OPTIONS y CORS estricto", async () => {
     body: JSON.stringify({ codigo_vendedor: "VEN001", password: "secret" })
   });
   assert.equal(rejectedRequest.statusCode, 403);
+
+  const previewOptions = await login.handler({
+    httpMethod: "OPTIONS",
+    headers: { origin: "https://deploy-preview-48--nexarsistemas.netlify.app" }
+  });
+  assert.equal(previewOptions.statusCode, 204);
+  assert.equal(previewOptions.headers["Access-Control-Allow-Origin"], "https://deploy-preview-48--nexarsistemas.netlify.app");
 });
 
 test("home-form-submissions maneja OPTIONS y rechaza origins no permitidos", async () => {
@@ -135,4 +147,20 @@ test("home-form-submissions maneja OPTIONS y rechaza origins no permitidos", asy
     body: JSON.stringify({ tipo: "suscripcion_novedades", email: "ana@example.com", consentimiento: true })
   }));
   assert.equal(rejectedResponse.status, 403);
+});
+
+test("solo se publican las cinco Functions reales", () => {
+  const functionsDir = path.join(root, "netlify/functions");
+  const publicFunctions = fs.readdirSync(functionsDir)
+    .filter((entry) => entry.endsWith(".js") || entry.endsWith(".mjs"))
+    .map((entry) => entry.replace(/\.(?:js|mjs)$/u, ""))
+    .sort();
+
+  assert.deepEqual(publicFunctions, [
+    "home-form-submissions",
+    "portal-change-password",
+    "portal-login-vendedor",
+    "portal-password-recovery",
+    "portal-update-profile"
+  ]);
 });

@@ -1,5 +1,5 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-import corsModule from "./_cors.cjs";
+import corsModule from "../lib/cors.cjs";
 
 const {
   getRequestOrigin,

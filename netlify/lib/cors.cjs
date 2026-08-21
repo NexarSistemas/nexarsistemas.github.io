@@ -4,6 +4,10 @@ const ALLOWED_EXACT_ORIGINS = new Set([
   "https://nexarsistemas.github.io"
 ]);
 
+const NETLIFY_DEPLOY_PREVIEW_RE = /^https:\/\/deploy-preview-\d+--nexarsistemas\.netlify\.app$/i;
+const NETLIFY_BRANCH_DEPLOY_RE = /^https:\/\/(?!deploy-preview-\d+--)[a-z0-9][a-z0-9-]*--nexarsistemas\.netlify\.app$/i;
+const LOOPBACK_HTTP_RE = /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i;
+
 function isAllowedOrigin(origin) {
   if (!origin) {
     return true;
@@ -13,7 +17,11 @@ function isAllowedOrigin(origin) {
     return true;
   }
 
-  return /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(origin);
+  return (
+    LOOPBACK_HTTP_RE.test(origin) ||
+    NETLIFY_DEPLOY_PREVIEW_RE.test(origin) ||
+    NETLIFY_BRANCH_DEPLOY_RE.test(origin)
+  );
 }
 
 function buildCorsHeaders(origin, methods) {
