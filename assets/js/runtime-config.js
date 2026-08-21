@@ -1,5 +1,5 @@
 window.NEXAR_RUNTIME_CONFIG = (() => {
-  const FALLBACK_BACKEND_ORIGIN = "https://nexarsistemas.com.ar";
+  const FALLBACK_BACKEND_ORIGIN = "https://api.nexarsistemas.com.ar";
   const location = window.location;
   const hostname = String(location.hostname || "").toLowerCase();
 
