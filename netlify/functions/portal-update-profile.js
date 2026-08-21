@@ -1,4 +1,10 @@
 const { supabaseFetch, parseJson, maskToken } = require("./portal-login-vendedor");
+const {
+  getRequestOrigin,
+  handleOptions,
+  rejectDisallowedOrigin,
+  withCorsHeaders
+} = require("./_cors.cjs");
 
 const ALLOWED_UPDATE_FIELDS = new Set(["session_token", "email", "telefono", "alias_cbu"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,6 +94,18 @@ async function resolveVendorFromSession(sessionToken) {
 }
 
 exports.handler = async function handler(event) {
+  const allowedMethods = ["GET", "POST", "OPTIONS"];
+  const origin = getRequestOrigin(event);
+
+  if (event.httpMethod === "OPTIONS") {
+    return handleOptions(event, allowedMethods);
+  }
+
+  const corsRejection = rejectDisallowedOrigin(event, allowedMethods);
+  if (corsRejection) {
+    return corsRejection;
+  }
+
   try {
     const body = event.httpMethod === "POST" ? parseJson(event.body) : {};
     if (event.httpMethod === "POST") {
@@ -95,6 +113,7 @@ exports.handler = async function handler(event) {
       if (unexpectedKeys.length) {
         return {
           statusCode: 400,
+          headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
           body: JSON.stringify({ error: "Se recibieron campos no permitidos." })
         };
       }
@@ -105,6 +124,7 @@ exports.handler = async function handler(event) {
     if (!sessionToken) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
@@ -113,6 +133,7 @@ exports.handler = async function handler(event) {
     if (!vendor) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
@@ -121,7 +142,7 @@ exports.handler = async function handler(event) {
       return {
         statusCode: 200,
         headers: {
-          "Content-Type": "application/json"
+          ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
         },
         body: JSON.stringify({
           vendedor: buildVendorPayload(vendor)
@@ -132,6 +153,7 @@ exports.handler = async function handler(event) {
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Metodo no permitido." })
       };
     }
@@ -143,6 +165,7 @@ exports.handler = async function handler(event) {
     if (email && !EMAIL_RE.test(email)) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Si informas email, debe tener un formato valido." })
       };
     }
@@ -162,7 +185,7 @@ exports.handler = async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
       },
       body: JSON.stringify({
         success: true,
@@ -178,6 +201,7 @@ exports.handler = async function handler(event) {
     console.error("Portal vendedor update profile error:", error);
     return {
       statusCode: 500,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "No pudimos actualizar el perfil." })
     };
   }

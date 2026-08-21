@@ -5,6 +5,12 @@ const {
   parseJson,
   maskToken
 } = require("./portal-login-vendedor");
+const {
+  getRequestOrigin,
+  handleOptions,
+  rejectDisallowedOrigin,
+  withCorsHeaders
+} = require("./_cors.cjs");
 
 function getSessionExpiryStatus(session, nowMs = Date.now()) {
   if (!session) {
@@ -37,9 +43,22 @@ function logSessionValidation(session, status, sessionToken) {
 }
 
 exports.handler = async function handler(event) {
+  const allowedMethods = ["POST", "OPTIONS"];
+  const origin = getRequestOrigin(event);
+
+  if (event.httpMethod === "OPTIONS") {
+    return handleOptions(event, allowedMethods);
+  }
+
+  const corsRejection = rejectDisallowedOrigin(event, allowedMethods);
+  if (corsRejection) {
+    return corsRejection;
+  }
+
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "Metodo no permitido." })
     };
   }
@@ -54,6 +73,7 @@ exports.handler = async function handler(event) {
     if (!sessionToken || !currentPassword || !newPassword || !confirmPassword) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "Completa todos los campos para continuar." })
       };
     }
@@ -61,6 +81,7 @@ exports.handler = async function handler(event) {
     if (newPassword !== confirmPassword) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La nueva contrasena y su confirmacion deben coincidir." })
       };
     }
@@ -68,6 +89,7 @@ exports.handler = async function handler(event) {
     if (newPassword === currentPassword) {
       return {
         statusCode: 400,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La nueva contrasena debe ser distinta de la actual." })
       };
     }
@@ -84,6 +106,7 @@ exports.handler = async function handler(event) {
     if (expiryStatus.expired) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
@@ -96,6 +119,7 @@ exports.handler = async function handler(event) {
     if (!vendor || !vendor.activo) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La sesion no es valida o ya vencio." })
       };
     }
@@ -110,6 +134,7 @@ exports.handler = async function handler(event) {
     if (!verifyWerkzeugPassword(currentPassword, vendor.password_hash)) {
       return {
         statusCode: 401,
+        headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
         body: JSON.stringify({ error: "La contrasena actual no es valida." })
       };
     }
@@ -135,7 +160,7 @@ exports.handler = async function handler(event) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/json"
+        ...withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods)
       },
       body: JSON.stringify({
         success: true,
@@ -153,6 +178,7 @@ exports.handler = async function handler(event) {
     console.error("Portal vendedor change password error:", error);
     return {
       statusCode: 500,
+      headers: withCorsHeaders({ "Content-Type": "application/json" }, origin, allowedMethods),
       body: JSON.stringify({ error: "No pudimos actualizar la contrasena." })
     };
   }

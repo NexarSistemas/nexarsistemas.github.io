@@ -1,0 +1,36 @@
+window.NEXAR_RUNTIME_CONFIG = (() => {
+  const FALLBACK_BACKEND_ORIGIN = "https://nexarsistemas.com.ar";
+  const location = window.location;
+  const hostname = String(location.hostname || "").toLowerCase();
+
+  function isLocalHost(host) {
+    return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
+  }
+
+  function getBackendOrigin() {
+    if (isLocalHost(hostname)) {
+      return location.origin;
+    }
+
+    if (
+      hostname === "nexarsistemas.com.ar" ||
+      hostname === "www.nexarsistemas.com.ar"
+    ) {
+      return location.origin;
+    }
+
+    if (hostname === "nexarsistemas.github.io") {
+      return FALLBACK_BACKEND_ORIGIN;
+    }
+
+    return FALLBACK_BACKEND_ORIGIN;
+  }
+
+  return {
+    backendOrigin: getBackendOrigin(),
+    functionBasePath: "/.netlify/functions",
+    getFunctionUrl(functionName) {
+      return `${this.backendOrigin}${this.functionBasePath}/${functionName}`;
+    }
+  };
+})();

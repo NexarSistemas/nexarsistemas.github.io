@@ -1,12 +1,17 @@
 (function () {
   const STORAGE_KEY = "nexar.portal.vendedor.session";
-  const LOGIN_ENDPOINT = "/.netlify/functions/portal-login-vendedor";
-  const CHANGE_PASSWORD_ENDPOINT = "/.netlify/functions/portal-change-password";
-  const UPDATE_PROFILE_ENDPOINT = "/.netlify/functions/portal-update-profile";
-  const PASSWORD_RECOVERY_ENDPOINT = "/.netlify/functions/portal-password-recovery";
   const DASHBOARD_RPC = "portal_dashboard_vendedor";
 
   const page = document.body ? document.body.dataset.portalPage : "";
+
+  function getFunctionEndpoint(functionName) {
+    const runtimeConfig = window.NEXAR_RUNTIME_CONFIG || {};
+    if (typeof runtimeConfig.getFunctionUrl === "function") {
+      return runtimeConfig.getFunctionUrl(functionName);
+    }
+
+    return `https://nexarsistemas.com.ar/.netlify/functions/${functionName}`;
+  }
 
   function getConfig() {
     const config = window.NEXAR_SUPABASE_CONFIG || {};
@@ -226,7 +231,7 @@
   }
 
   async function fetchProfile(sessionToken) {
-    const response = await fetch(`${UPDATE_PROFILE_ENDPOINT}?session_token=${encodeURIComponent(sessionToken)}`, {
+      const response = await fetch(`${getFunctionEndpoint("portal-update-profile")}?session_token=${encodeURIComponent(sessionToken)}`, {
       method: "GET"
     });
     const payload = await response.json();
@@ -302,7 +307,7 @@
       showStatus("Validando acceso...", "loading");
 
       try {
-        const response = await fetch(LOGIN_ENDPOINT, {
+        const response = await fetch(getFunctionEndpoint("portal-login-vendedor"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -380,7 +385,7 @@
       showStatus("Registrando solicitud...", "loading");
 
       try {
-        const response = await fetch(PASSWORD_RECOVERY_ENDPOINT, {
+        const response = await fetch(getFunctionEndpoint("portal-password-recovery"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -594,7 +599,7 @@
         showStatus("Actualizando datos de contacto...", "loading", "portal-profile-status");
 
         try {
-          const response = await fetch(UPDATE_PROFILE_ENDPOINT, {
+          const response = await fetch(getFunctionEndpoint("portal-update-profile"), {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -658,7 +663,7 @@
       showStatus("Actualizando contraseña...", "loading", "portal-password-status");
 
       try {
-        const response = await fetch(CHANGE_PASSWORD_ENDPOINT, {
+        const response = await fetch(getFunctionEndpoint("portal-change-password"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
