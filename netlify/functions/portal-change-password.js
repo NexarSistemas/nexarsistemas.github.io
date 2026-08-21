@@ -10,7 +10,7 @@ const {
   handleOptions,
   rejectDisallowedOrigin,
   withCorsHeaders
-} = require("./_cors.cjs");
+} = require("../lib/cors.cjs");
 
 function getSessionExpiryStatus(session, nowMs = Date.now()) {
   if (!session) {

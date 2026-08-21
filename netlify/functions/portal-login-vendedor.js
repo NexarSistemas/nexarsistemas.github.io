@@ -4,7 +4,7 @@ const {
   handleOptions,
   rejectDisallowedOrigin,
   withCorsHeaders
-} = require("./_cors.cjs");
+} = require("../lib/cors.cjs");
 
 const SESSION_DURATION_HOURS = 12;
 const TEMP_SESSION_DURATION_MINUTES = 60;

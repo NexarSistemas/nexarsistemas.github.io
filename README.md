@@ -69,18 +69,19 @@ node tests/public-site.test.js
 
 ## GitHub Pages, Netlify y dominio
 
-- `nexarsistemas.com.ar` es el dominio canónico y se sirve desde Netlify; el DNS no apunta a GitHub Pages.
-- El repositorio no debe incluir un archivo `CNAME` para `nexarsistemas.com.ar`, porque GitHub Pages no administra ese dominio.
-- `nexarsistemas.github.io` queda como publicación independiente de GitHub Pages y no sustituye al dominio canónico para los retornos de pagos, el portal ni las Netlify Functions.
-- `_redirects` define las rutas públicas de juegos: `/Tetris/` se sirve localmente desde el deploy de Netlify mediante `Tetris/index.html`, mientras `/nexar-crucigrama/` redirige con `302` a la producción aislada de Vercel para no compartir origen ni sesión con el portal de vendedores.
-- `robots.txt` y `sitemap.xml` usan el dominio canónico.
-- Los enlaces internos son relativos para funcionar en ambos hosts.
-- El portal de vendedores usa Netlify Functions en rutas relativas `/.netlify/functions/...`. La lógica de host de `vendedores/js/portal-host.js` conserva ruta y parámetros y, si se carga desde `nexarsistemas.github.io`, redirige al dominio canónico `https://nexarsistemas.com.ar` para que las Functions queden servidas en la arquitectura correcta.
-- No se modifican DNS, variables remotas ni configuración externa de Netlify desde este repositorio.
+- El objetivo de arquitectura es servir el frontend estático desde GitHub Pages y conservar Netlify exclusivamente como backend de Functions.
+- `nexarsistemas.github.io` ya puede consumir las Functions mediante una URL absoluta de backend centralizada en `assets/js/runtime-config.js`.
+- El portal de vendedores ya no redirige forzosamente desde GitHub Pages al dominio canónico.
+- Las URLs públicas se mantienen, incluyendo `/`, `/Tetris/`, `/tetris`, `/nexar-crucigrama/`, `/vendedores/` y las páginas públicas de Mercado Pago.
+- `nexarsistemas.com.ar` sigue siendo el dominio canónico vigente y `robots.txt` / `sitemap.xml` continúan usando ese host mientras el DNS no cambie.
+- El repositorio no debe incluir un archivo `CNAME` para `nexarsistemas.com.ar` hasta que GitHub Pages pase a administrar ese dominio.
+- `_redirects` queda reservado para el host de Netlify, pero las rutas públicas imprescindibles ya tienen equivalentes estáticos compatibles con GitHub Pages.
+- `netlify.toml` define el directorio de Functions y evita deploys innecesarios de Netlify cuando solo cambia frontend.
+- En esta etapa no se modifican DNS, variables remotas ni configuración externa de Netlify o GitHub Pages.
 
 ## Solicitudes de contacto, vendedores y novedades con Supabase
 
-El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. Los dos formularios nuevos de la home (postulación de vendedores y suscripción a novedades) envían sus datos únicamente a `/.netlify/functions/home-form-submissions`. La Netlify Function valida el payload, aplica rate limiting nativo de Netlify y, con credenciales solo server-side, consulta `public.find_home_submission_by_email` para identificar emails de forma exacta y case-insensitive antes de insertar o renovar consentimiento en `public.solicitudes_vendedores` y `public.suscripciones_novedades`.
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. Los dos formularios nuevos de la home (postulación de vendedores y suscripción a novedades) envían sus datos a la Function `home-form-submissions` de Netlify a través del backend absoluto resuelto por `assets/js/runtime-config.js`. La Netlify Function valida el payload, aplica rate limiting nativo de Netlify y, con credenciales solo server-side, consulta `public.find_home_submission_by_email` para identificar emails de forma exacta y case-insensitive antes de insertar o renovar consentimiento en `public.solicitudes_vendedores` y `public.suscripciones_novedades`.
 
 El frontend usa únicamente:
 
@@ -148,7 +149,7 @@ Se preservan:
 - cambio de contraseña;
 - perfil;
 - dashboard;
-- llamadas a Netlify Functions;
+- llamadas a Netlify Functions mediante backend absoluto centralizado;
 - llamadas Supabase protegidas;
 - mensajes de éxito y error.
 
@@ -173,6 +174,14 @@ Variables server-side requeridas por las Functions:
 - parámetros contractuales y retornos de Mercado Pago;
 - redirección del retorno de suscripción;
 - IDs funcionales del portal.
+
+`tests/github-pages-netlify-backend.test.js` cubre:
+
+- resolución del backend absoluto por host;
+- CORS permitido para producción, GitHub Pages, loopback local y previews estrictos de Netlify;
+- rechazo de orígenes externos no permitidos;
+- manejo de `OPTIONS`;
+- existencia exclusiva de las cinco Functions públicas.
 
 Los formularios nuevos de la home modifican Functions y su contrato server-side documentado. Para validarlos, ejecutar:
 

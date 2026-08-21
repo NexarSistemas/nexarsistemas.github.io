@@ -4,7 +4,7 @@ const {
   handleOptions,
   rejectDisallowedOrigin,
   withCorsHeaders
-} = require("./_cors.cjs");
+} = require("../lib/cors.cjs");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_MESSAGE_LENGTH = 500;
