@@ -29,7 +29,7 @@ test("runtime-config resuelve el backend según el host", () => {
 
   assert.equal(
     runForLocation({ hostname: "nexarsistemas.github.io", origin: "https://nexarsistemas.github.io" }).backendOrigin,
-    "https://nexarsistemas.com.ar"
+    "https://api.nexarsistemas.com.ar"
   );
   assert.equal(
     runForLocation({ hostname: "nexarsistemas.com.ar", origin: "https://nexarsistemas.com.ar" }).backendOrigin,
@@ -70,6 +70,7 @@ test("portal vendedor y home usan la URL centralizada del backend", () => {
 test("el helper CORS permite los orígenes esperados y rechaza el resto", () => {
   const cors = require("../netlify/lib/cors.cjs");
 
+  assert.equal(cors.isAllowedOrigin("https://api.nexarsistemas.com.ar"), true);
   assert.equal(cors.isAllowedOrigin("https://nexarsistemas.com.ar"), true);
   assert.equal(cors.isAllowedOrigin("https://www.nexarsistemas.com.ar"), true);
   assert.equal(cors.isAllowedOrigin("https://nexarsistemas.github.io"), true);

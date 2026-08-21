@@ -1,4 +1,5 @@
 const ALLOWED_EXACT_ORIGINS = new Set([
+  "https://api.nexarsistemas.com.ar",
   "https://nexarsistemas.com.ar",
   "https://www.nexarsistemas.com.ar",
   "https://nexarsistemas.github.io"
