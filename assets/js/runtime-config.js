@@ -12,17 +12,6 @@ window.NEXAR_RUNTIME_CONFIG = (() => {
       return location.origin;
     }
 
-    if (
-      hostname === "nexarsistemas.com.ar" ||
-      hostname === "www.nexarsistemas.com.ar"
-    ) {
-      return location.origin;
-    }
-
-    if (hostname === "nexarsistemas.github.io") {
-      return FALLBACK_BACKEND_ORIGIN;
-    }
-
     return FALLBACK_BACKEND_ORIGIN;
   }
 
