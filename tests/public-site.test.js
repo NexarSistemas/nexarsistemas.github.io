@@ -527,7 +527,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(frontendScript, /¡Listo! Procesamos tu suscripción\./);
   assert.match(runtimeConfig, /backendOrigin/);
   assert.match(runtimeConfig, /functionBasePath: "\/\.netlify\/functions"/);
-  assert.match(runtimeConfig, /hostname === "nexarsistemas\.github\.io"/);
+  assert.match(runtimeConfig, /https:\/\/api\.nexarsistemas\.com\.ar/);
   assert.match(sql, /enable row level security/);
   assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
