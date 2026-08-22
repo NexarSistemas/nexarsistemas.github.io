@@ -33,11 +33,11 @@ test("runtime-config resuelve el backend según el host", () => {
   );
   assert.equal(
     runForLocation({ hostname: "nexarsistemas.com.ar", origin: "https://nexarsistemas.com.ar" }).backendOrigin,
-    "https://nexarsistemas.com.ar"
+    "https://api.nexarsistemas.com.ar"
   );
   assert.equal(
     runForLocation({ hostname: "www.nexarsistemas.com.ar", origin: "https://www.nexarsistemas.com.ar" }).backendOrigin,
-    "https://www.nexarsistemas.com.ar"
+    "https://api.nexarsistemas.com.ar"
   );
   assert.equal(
     runForLocation({ hostname: "localhost", origin: "http://localhost:8000" }).backendOrigin,
