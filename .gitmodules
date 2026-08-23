@@ -1,0 +1,4 @@
+[submodule "sudoku"]
+	path = sudoku
+	url = https://github.com/NexarSistemas/nexar-sudoku.git
+	branch = main
