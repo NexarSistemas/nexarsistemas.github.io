@@ -619,6 +619,12 @@ a {
     gap: 26px;
 }
 
+.nexar-play-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 26px;
+}
+
 .product-card,
 .feature-card,
 .price-card,
@@ -1649,6 +1655,10 @@ a {
         grid-template-columns: 1fr 1fr;
     }
 
+    .nexar-play-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .footer-grid {
         grid-template-columns: 1.4fr 1fr 1fr;
     }
@@ -1756,6 +1766,10 @@ a {
     .product-grid,
     .pricing-grid,
     .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nexar-play-grid {
         grid-template-columns: 1fr;
     }
 
