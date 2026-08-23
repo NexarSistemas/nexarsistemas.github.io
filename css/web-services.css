@@ -129,8 +129,7 @@
 }
 
 .nexar-play-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-width: 760px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .nexar-play-card {
@@ -139,6 +138,10 @@
 
 @media (max-width: 980px) {
     .web-service-package-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nexar-play-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
