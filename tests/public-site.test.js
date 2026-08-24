@@ -552,9 +552,14 @@ test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez"
 });
 
 test("las rutas equivalentes a _redirects existen para GitHub Pages", () => {
+  const notFound = read("404.html");
   const sudokuRedirect = read("sudoku/index.html");
   const crucigramaRedirect = read("nexar-crucigrama/index.html");
   const portalIndex = read("vendedores/index.html");
+
+  assert.match(notFound, /window\.location\.pathname === "\/tetris"/);
+  assert.match(notFound, /window\.location\.pathname === "\/tetris\/"/);
+  assert.match(notFound, /window\.location\.replace\("\/Tetris\/" \+ window\.location\.search \+ window\.location\.hash\)/);
 
   assert.match(sudokuRedirect, /http-equiv="refresh" content="0; url=https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
   assert.match(sudokuRedirect, /href="https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
