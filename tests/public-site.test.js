@@ -557,8 +557,8 @@ test("las rutas equivalentes a _redirects existen para GitHub Pages", () => {
   const crucigramaRedirect = read("nexar-crucigrama/index.html");
   const portalIndex = read("vendedores/index.html");
 
-  assert.match(tetrisRedirect, /http-equiv="refresh" content="0; url=\.\.\/Tetris\/"/);
-  assert.match(tetrisRedirect, /href="\.\.\/Tetris\/"/);
+  assert.match(tetrisRedirect, /http-equiv="refresh" content="0; url=\/Tetris\/"/);
+  assert.match(tetrisRedirect, /href="\/Tetris\/"/);
   assert.match(sudokuRedirect, /http-equiv="refresh" content="0; url=https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
   assert.match(sudokuRedirect, /href="https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
   assert.match(crucigramaRedirect, /http-equiv="refresh" content="0; url=https:\/\/crucigrama\.nexarsistemas\.com\.ar\/"/);
