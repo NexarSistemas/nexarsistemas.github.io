@@ -72,10 +72,10 @@ node tests/public-site.test.js
 - El objetivo de arquitectura es servir el frontend estático desde GitHub Pages y conservar Netlify exclusivamente como backend de Functions.
 - `nexarsistemas.github.io` ya puede consumir las Functions mediante una URL absoluta de backend centralizada en `assets/js/runtime-config.js`.
 - El portal de vendedores ya no redirige forzosamente desde GitHub Pages al dominio canónico.
-- Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/Tetris/`, `/nexar-crucigrama/`, `/vendedores/` y las páginas públicas de Mercado Pago. `/Tetris/` es la ruta canónica de Tetris.
+- Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/vendedores/` y las páginas públicas de Mercado Pago. Los accesos canónicos de Nexar Play son `https://tetris.nexarsistemas.com.ar/`, `https://sudoku.nexarsistemas.com.ar/` y `https://ruta.nexarsistemas.com.ar/`.
 - `nexarsistemas.com.ar` sigue siendo el dominio canónico vigente y `robots.txt` / `sitemap.xml` continúan usando ese host mientras el DNS no cambie.
 - El repositorio no debe incluir un archivo `CNAME` para `nexarsistemas.com.ar` hasta que GitHub Pages pase a administrar ese dominio.
-- `_redirects` queda reservado para el host de Netlify; allí `/tetris` se redirige a `/Tetris/`. GitHub Pages garantiza únicamente la ruta canónica estática `/Tetris/`.
+- `_redirects` queda reservado para el host de Netlify. Nexar Play no mantiene rutas históricas de juegos en este repositorio.
 - `netlify.toml` define el directorio de Functions y evita deploys innecesarios de Netlify cuando solo cambia frontend.
 - En esta etapa no se modifican DNS, variables remotas ni configuración externa de Netlify o GitHub Pages.
 

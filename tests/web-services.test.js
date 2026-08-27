@@ -34,10 +34,11 @@ test("la home publica Nexar Play con sus accesos independientes", () => {
 
   assert.match(html, /id="nexar-play"/);
   assert.match(html, /Tetris Deluxe/);
-  assert.match(html, /href="\.\/Tetris\/"/);
-  assert.match(html, /Crucigrama Nexar/);
-  assert.match(html, /href="https:\/\/crucigrama\.nexarsistemas\.com\.ar"/);
-  assert.match(html, /target="_blank" rel="noopener">Jugar Crucigrama Nexar/);
+  assert.match(html, /href="https:\/\/tetris\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Tetris Deluxe/);
+  assert.match(html, /href="https:\/\/sudoku\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Sudoku Nexar/);
+  assert.match(html, /Nexar Ruta/);
+  assert.match(html, /href="https:\/\/ruta\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Nexar Ruta/);
+  assert.doesNotMatch(html, /Crucigrama Nexar|\.\/Tetris\/|nexar-sudoku|nexar-crucigrama|crucigrama\.nexarsistemas\.com\.ar/);
 });
 
 test("la solicitud de presupuesto usa el formulario existente", () => {
