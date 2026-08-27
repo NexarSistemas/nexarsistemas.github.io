@@ -551,21 +551,21 @@ test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez"
   assert.match(thirdParty, /fallback local y funcional/);
 });
 
-test("las rutas estáticas compatibles con GitHub Pages existen", () => {
-  const tetrisCanonical = read("Tetris/index.html");
-  const sudokuRedirect = read("sudoku/index.html");
-  const crucigramaRedirect = read("nexar-crucigrama/index.html");
+test("Nexar Play usa exclusivamente los subdominios vigentes", () => {
+  const home = read("index.html");
   const portalIndex = read("vendedores/index.html");
 
-  assert.match(tetrisCanonical, /https:\/\/raw\.githubusercontent\.com\/NexarSistemas\/Tetris\/main\/index\.html/);
-  assert.equal(fs.readdirSync(root).includes("Tetris"), true);
-  assert.equal(fs.readdirSync(root).includes("tetris"), false);
-  assert.equal(fs.existsSync(path.join(root, "404.html")), false);
-
-  assert.match(sudokuRedirect, /http-equiv="refresh" content="0; url=https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
-  assert.match(sudokuRedirect, /href="https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\/"/);
-  assert.match(crucigramaRedirect, /http-equiv="refresh" content="0; url=https:\/\/crucigrama\.nexarsistemas\.com\.ar\/"/);
-  assert.match(crucigramaRedirect, /href="https:\/\/crucigrama\.nexarsistemas\.com\.ar\/"/);
+  for (const [name, url] of [
+    ["Tetris Deluxe", "https://tetris.nexarsistemas.com.ar/"],
+    ["Sudoku Nexar", "https://sudoku.nexarsistemas.com.ar/"],
+    ["Nexar Ruta", "https://ruta.nexarsistemas.com.ar/"]
+  ]) {
+    assert.match(home, new RegExp(`<h3>${name}<\\/h3>[\\s\\S]*?href="${url.replace(/[./]/g, "\\$&")}" target="_blank" rel="noopener"`));
+  }
+  assert.doesNotMatch(home, /Crucigrama|nexar-crucigrama|nexar-sudoku|\.\/Tetris\/|https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\//);
+  assert.equal(fs.existsSync(path.join(root, "Tetris")), false);
+  assert.equal(fs.existsSync(path.join(root, "sudoku")), false);
+  assert.equal(fs.existsSync(path.join(root, "nexar-crucigrama")), false);
   assert.match(portalIndex, /http-equiv="refresh" content="0; url=\.\/login\.html"/);
   assert.match(portalIndex, /href="\.\/login\.html"/);
 });

@@ -54,6 +54,6 @@ No se crea una página independiente en este MVP. Esta decisión evita publicar 
 - que la hoja de estilos adicional exista y esté enlazada;
 - que no se introduzca una ruta HTML inexistente para el servicio.
 
-La misma prueba también cubre Nexar Play y sus accesos a Tetris Deluxe y Crucigrama Nexar.
+La misma prueba también cubre Nexar Play y sus accesos a Tetris Deluxe, Sudoku Nexar y Nexar Ruta.
 
 La prueba general `tests/public-site.test.js` continúa comprobando que los enlaces internos a archivos públicos existentes no estén rotos.

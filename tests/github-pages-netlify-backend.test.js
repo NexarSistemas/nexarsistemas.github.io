@@ -166,9 +166,9 @@ test("solo se publican las cinco Functions reales", () => {
   ]);
 });
 
-test("netlify.toml vigila functions, lib y la propia configuración", () => {
+test("netlify.toml vigila functions, lib, redirects y la propia configuración", () => {
   const netlifyToml = read("netlify.toml");
 
   assert.match(netlifyToml, /\[functions\][\s\S]*directory = "netlify\/functions"/);
-  assert.match(netlifyToml, /git diff --quiet "\$CACHED_COMMIT_REF" "\$COMMIT_REF" -- netlify\/functions netlify\/lib netlify\.toml/);
+  assert.match(netlifyToml, /git diff --quiet "\$CACHED_COMMIT_REF" "\$COMMIT_REF" -- netlify\/functions netlify\/lib netlify\.toml _redirects/);
 });

@@ -1,11 +1,1 @@
-# Juegos Nexar: el dominio principal lo sirve Netlify.
-
-# Tetris se sirve localmente desde este mismo deploy para evitar bucles
-# entre Netlify y el dominio personalizado histórico de GitHub Pages.
-/Tetris               /Tetris/                                                   301
-/tetris               /Tetris/                                                   301
-/tetris/*             /Tetris/:splat                                             301
-
-# Crucigrama se mantiene aislado del portal en un subdominio propio servido por Vercel.
-/nexar-crucigrama     https://crucigrama.nexarsistemas.com.ar/                   302
-/nexar-crucigrama/*   https://crucigrama.nexarsistemas.com.ar/:splat             302
+# Las rutas históricas de juegos no se mantienen en este deploy.
