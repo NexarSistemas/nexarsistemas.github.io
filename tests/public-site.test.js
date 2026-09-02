@@ -536,6 +536,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
 
 test("la home presenta clientes con enlaces y estados públicos correctos", () => {
   const html = read("index.html");
+  const siteCss = read("css/site.css");
   const ineditaCard = html.match(/<article class="product-card client-card" id="cliente-inedita">([\s\S]*?)<\/article>/);
   const tecmaCard = html.match(/<article class="product-card client-card" id="cliente-tecma">([\s\S]*?)<\/article>/);
 
@@ -552,6 +553,7 @@ test("la home presenta clientes con enlaces y estados públicos correctos", () =
   assert.match(tecmaCard[1], /TeCMA SAN JUAN/);
   assert.doesNotMatch(tecmaCard[1], /<a\b/);
   assert.doesNotMatch(html, /Proyecto confirmado|En conversación|Próximamente/);
+  assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.clients-grid\s*\{\s*grid-template-columns: 1fr;/);
 });
 
 test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez", () => {
