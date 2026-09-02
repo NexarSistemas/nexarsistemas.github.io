@@ -534,6 +534,26 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(sql, /private\.notify_admin_email\(\)/);
 });
 
+test("la home presenta clientes con enlaces y estados públicos correctos", () => {
+  const html = read("index.html");
+  const ineditaCard = html.match(/<article class="product-card client-card" id="cliente-inedita">([\s\S]*?)<\/article>/);
+  const tecmaCard = html.match(/<article class="product-card client-card" id="cliente-tecma">([\s\S]*?)<\/article>/);
+
+  assert.match(html, /<section class="section" id="clientes">/);
+  assert.match(html, /<h2>Quiénes confían en nosotros<\/h2>/);
+  assert.match(html, /href="#clientes">Clientes<\/a>/);
+  assert.equal(fs.existsSync(path.join(root, "assets/clientes/inedita_san_juan.png")), true);
+  assert.equal(fs.existsSync(path.join(root, "assets/clientes/iso_corporeo_interior.png")), true);
+  assert.equal(fs.existsSync(path.join(root, "assets/clientes/tecma-logo.png")), true);
+  assert.ok(ineditaCard);
+  assert.match(ineditaCard[1], /INÉDITA SAN JUAN/);
+  assert.match(ineditaCard[1], /href="https:\/\/www\.instagram\.com\/ineditasanjuan\/" target="_blank" rel="noopener noreferrer"/);
+  assert.ok(tecmaCard);
+  assert.match(tecmaCard[1], /TeCMA SAN JUAN/);
+  assert.doesNotMatch(tecmaCard[1], /<a\b/);
+  assert.doesNotMatch(html, /Proyecto confirmado|En conversación|Próximamente/);
+});
+
 test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez", () => {
   const html = read("index.html");
   const thirdParty = read("docs/legal/THIRD_PARTY.md");

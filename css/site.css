@@ -619,6 +619,12 @@ a {
     gap: 26px;
 }
 
+.clients-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+}
+
 .nexar-play-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -638,6 +644,78 @@ a {
 
 .product-card {
     padding: 38px 40px 35px;
+}
+
+.client-card {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.client-brand {
+    width: 132px;
+    min-width: 132px;
+    display: grid;
+    place-items: center;
+    gap: 8px;
+}
+
+.client-brand-inedita {
+    grid-template-columns: 1fr;
+    width: 150px;
+    min-width: 150px;
+}
+
+.client-brand-logo,
+.client-brand-isotype {
+    display: block;
+    object-fit: contain;
+}
+
+.client-brand-logo {
+    width: 100%;
+    max-height: 78px;
+}
+
+.client-brand-isotype {
+    width: 66px;
+    height: 66px;
+}
+
+.client-brand-logo-tecma {
+    max-height: 62px;
+}
+
+.client-brand-inedita .client-brand-logo {
+    width: 150px;
+    height: 112px;
+    max-height: none;
+}
+
+.client-brand-inedita .client-brand-isotype {
+    width: 92px;
+    height: 92px;
+}
+
+.client-copy {
+    min-width: 0;
+    flex: 1;
+}
+
+.client-copy h3 {
+    margin: 4px 0 12px;
+    color: var(--navy);
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.client-copy p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.client-copy .text-link {
+    margin-top: 22px;
 }
 
 .product-logo {
@@ -1764,6 +1842,7 @@ a {
     }
 
     .product-grid,
+    .clients-grid,
     .pricing-grid,
     .feature-grid {
         grid-template-columns: 1fr;
@@ -1777,6 +1856,17 @@ a {
     .content-card,
     .page-hero-panel {
         padding: 28px 24px;
+    }
+
+    .client-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .client-brand {
+        width: 150px;
+        min-width: 0;
     }
 
     .price-card p {
