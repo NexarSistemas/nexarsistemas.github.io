@@ -6,6 +6,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const publicPages = [
+  "404.html",
   "index.html",
   "nexar-comercio.html",
   "nexar-finanzas.html",
@@ -91,6 +92,22 @@ test("los logos oficiales usan rutas existentes y mayúsculas exactas", () => {
       assert.equal(fs.existsSync(target), true, `${page} -> ${match[1]}`);
     }
   }
+});
+
+test("la página 404 es una superficie de error sin redirecciones automáticas", () => {
+  const errorPage = read("404.html");
+
+  assert.match(errorPage, /<title>Página no encontrada \| Nexar Sistemas<\/title>/);
+  assert.match(errorPage, /src="\.\/assets\/nexar_sistemas\.png" alt="Nexar Sistemas"/);
+  assert.match(errorPage, /href="\.\/index\.html">Volver al inicio<\/a>/);
+  assert.match(errorPage, /href="\.\/nexar-comercio\.html">Ver soluciones<\/a>/);
+  assert.match(errorPage, /href="\.\/index\.html#contacto">Contactar a Nexar/);
+  assert.match(errorPage, /href="https:\/\/tetris\.nexarsistemas\.com\.ar\/"[^>]*>Nexar Play<\/a>/);
+  assert.doesNotMatch(errorPage, /<meta[^>]+http-equiv=["']refresh/i);
+  assert.doesNotMatch(errorPage, /<script\b|window\.location|location\.replace|location\.assign/i);
+  assert.doesNotMatch(errorPage, /(?:\.\/|https?:\/\/)[^"']*(?:Tetris|tetris\/|sudoku\/|ruta\/)/);
+  assert.equal(fs.existsSync(path.join(root, "assets/nexar_sistemas.png")), true);
+  assert.equal(fs.existsSync(path.join(root, "css/site.css")), true);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
