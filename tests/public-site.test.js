@@ -6,6 +6,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const publicPages = [
+  "404.html",
   "index.html",
   "nexar-comercio.html",
   "nexar-finanzas.html",
@@ -36,7 +37,19 @@ test("las superficies públicas principales existen y usan el sistema visual com
 });
 
 test("los enlaces internos esenciales apuntan a archivos existentes", () => {
-  const pagesToCheck = publicPages.slice(0, 10);
+  const pagesToCheck = [
+    "404.html",
+    "index.html",
+    "nexar-comercio.html",
+    "nexar-finanzas.html",
+    "nexar-tienda.html",
+    "nexar-almacen.html",
+    "mercadopago-exito.html",
+    "mercadopago-pendiente.html",
+    "mercadopago-fallo.html",
+    "mercadopago-suscripcion.html",
+    "confirmar-novedades.html"
+  ];
   for (const page of pagesToCheck) {
     const html = read(page);
     const linkPattern = /href="([^"#?]+(?:\.html|\.css|\.png))[^"]*"/g;
@@ -44,7 +57,9 @@ test("los enlaces internos esenciales apuntan a archivos existentes", () => {
       if (/^(?:https?:|mailto:|tel:)/.test(match[1])) {
         continue;
       }
-      const target = path.resolve(path.dirname(path.join(root, page)), match[1]);
+      const target = match[1].startsWith("/")
+        ? path.join(root, match[1].slice(1))
+        : path.resolve(path.dirname(path.join(root, page)), match[1]);
       assert.equal(fs.existsSync(target), true, `${page} -> ${match[1]}`);
     }
   }
@@ -87,10 +102,30 @@ test("los logos oficiales usan rutas existentes y mayúsculas exactas", () => {
   for (const page of publicPages) {
     const html = read(page);
     for (const match of html.matchAll(/<img[^>]+src="([^"]+)"/g)) {
-      const target = path.resolve(path.dirname(path.join(root, page)), match[1]);
+      const target = match[1].startsWith("/")
+        ? path.join(root, match[1].slice(1))
+        : path.resolve(path.dirname(path.join(root, page)), match[1]);
       assert.equal(fs.existsSync(target), true, `${page} -> ${match[1]}`);
     }
   }
+});
+
+test("la página 404 es una superficie de error sin redirecciones automáticas", () => {
+  const errorPage = read("404.html");
+
+  assert.match(errorPage, /<title>Página no encontrada \| Nexar Sistemas<\/title>/);
+  assert.match(errorPage, /src="\/assets\/nexar_sistemas\.png" alt="Nexar Sistemas"/);
+  assert.match(errorPage, /href="\/">Volver al inicio<\/a>/);
+  assert.match(errorPage, /href="\/nexar-comercio\.html">Ver soluciones<\/a>/);
+  assert.match(errorPage, /href="\/#contacto">Contactar a Nexar/);
+  assert.match(errorPage, /href="\/#nexar-play">Nexar Play<\/a>/);
+  assert.match(errorPage, /<details class="mobile-nav">[\s\S]*?href="\/#productos">Productos[\s\S]*?href="\/#servicios-web">Servicios web[\s\S]*?href="\/#planes">Planes[\s\S]*?href="\/#contacto">Contacto[\s\S]*?href="\/vendedores\/login\.html">Acceso vendedores/);
+  assert.doesNotMatch(errorPage, /(?:href|src)="\.\/(?:assets|css|index\.html|vendedores\/|nexar-)/);
+  assert.doesNotMatch(errorPage, /<meta[^>]+http-equiv=["']refresh/i);
+  assert.doesNotMatch(errorPage, /<script\b|window\.location|location\.replace|location\.assign/i);
+  assert.doesNotMatch(errorPage, /(?:\.\/|https?:\/\/)[^"']*(?:Tetris|tetris\/|sudoku\/|ruta\/)/);
+  assert.equal(fs.existsSync(path.join(root, "assets/nexar_sistemas.png")), true);
+  assert.equal(fs.existsSync(path.join(root, "css/site.css")), true);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
