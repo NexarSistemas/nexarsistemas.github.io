@@ -37,7 +37,19 @@ test("las superficies públicas principales existen y usan el sistema visual com
 });
 
 test("los enlaces internos esenciales apuntan a archivos existentes", () => {
-  const pagesToCheck = publicPages.slice(0, 10);
+  const pagesToCheck = [
+    "404.html",
+    "index.html",
+    "nexar-comercio.html",
+    "nexar-finanzas.html",
+    "nexar-tienda.html",
+    "nexar-almacen.html",
+    "mercadopago-exito.html",
+    "mercadopago-pendiente.html",
+    "mercadopago-fallo.html",
+    "mercadopago-suscripcion.html",
+    "confirmar-novedades.html"
+  ];
   for (const page of pagesToCheck) {
     const html = read(page);
     const linkPattern = /href="([^"#?]+(?:\.html|\.css|\.png))[^"]*"/g;
@@ -107,6 +119,7 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.match(errorPage, /href="\/nexar-comercio\.html">Ver soluciones<\/a>/);
   assert.match(errorPage, /href="\/#contacto">Contactar a Nexar/);
   assert.match(errorPage, /href="\/#nexar-play">Nexar Play<\/a>/);
+  assert.match(errorPage, /<details class="mobile-nav">[\s\S]*?href="\/#productos">Productos[\s\S]*?href="\/#servicios-web">Servicios web[\s\S]*?href="\/#planes">Planes[\s\S]*?href="\/#contacto">Contacto[\s\S]*?href="\/vendedores\/login\.html">Acceso vendedores/);
   assert.doesNotMatch(errorPage, /(?:href|src)="\.\/(?:assets|css|index\.html|vendedores\/|nexar-)/);
   assert.doesNotMatch(errorPage, /<meta[^>]+http-equiv=["']refresh/i);
   assert.doesNotMatch(errorPage, /<script\b|window\.location|location\.replace|location\.assign/i);
