@@ -119,6 +119,7 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.match(errorPage, /href="\/nexar-comercio\.html">Ver soluciones<\/a>/);
   assert.match(errorPage, /href="\/#contacto">Contactar a Nexar/);
   assert.match(errorPage, /href="\/#nexar-play">Nexar Play<\/a>/);
+  assert.match(errorPage, /© 2026 Nexar Sistemas\. Todos los derechos reservados\./);
   assert.match(errorPage, /<details class="mobile-nav">[\s\S]*?href="\/#productos">Productos[\s\S]*?href="\/#servicios-web">Servicios web[\s\S]*?href="\/#planes">Planes[\s\S]*?href="\/#contacto">Contacto[\s\S]*?href="\/vendedores\/login\.html">Acceso vendedores/);
   assert.doesNotMatch(errorPage, /(?:href|src)="\.\/(?:assets|css|index\.html|vendedores\/|nexar-)/);
   assert.doesNotMatch(errorPage, /<meta[^>]+http-equiv=["']refresh/i);
@@ -126,6 +127,13 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.doesNotMatch(errorPage, /(?:\.\/|https?:\/\/)[^"']*(?:Tetris|tetris\/|sudoku\/|ruta\/)/);
   assert.equal(fs.existsSync(path.join(root, "assets/nexar_sistemas.png")), true);
   assert.equal(fs.existsSync(path.join(root, "css/site.css")), true);
+});
+
+test("los footers conservan los accesos de Nexar Play e Instagram", () => {
+  const home = read("index.html");
+  assert.match(home, /<div class="footer-column"><strong>Enlaces<\/strong>[\s\S]*?href="#nexar-play">Nexar Play<\/a>/);
+  assert.match(home, /class="social-action social-action-instagram" href="https:\/\/www\.instagram\.com\/nexarsistemas\//);
+  assert.match(read("404.html"), /href="\/#nexar-play">Nexar Play<\/a>/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
