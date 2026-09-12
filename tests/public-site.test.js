@@ -602,14 +602,23 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   const html = read("index.html");
   const desktopNav = html.match(/<nav class="header-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
   const mobileNav = html.match(/<nav class="mobile-nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
-  const primaryLabels = ["Productos", "Soluciones", "Clientes", "Nexar", "Contacto"];
+  const primaryNavigation = [
+    { label: "Productos", href: "#productos" },
+    { label: "Soluciones", href: "./soluciones.html" },
+    { label: "Clientes", href: "#clientes" },
+    { label: "Nexar", href: "#fundador" },
+    { label: "Contacto", href: "#contacto" }
+  ];
 
   for (const nav of [desktopNav, mobileNav]) {
-    const labels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)]
-      .map((match) => match[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim())
-      .filter((label) => primaryLabels.includes(label));
+    const links = [...nav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+      .map((match) => ({
+        label: match[2].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(),
+        href: match[1]
+      }))
+      .filter(({ label }) => primaryNavigation.some((item) => item.label === label));
 
-    assert.deepEqual(labels, primaryLabels);
+    assert.deepEqual(links, primaryNavigation);
     assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
     assert.doesNotMatch(nav, />Casos<\/a>/);
   }
