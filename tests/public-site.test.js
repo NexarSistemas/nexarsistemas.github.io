@@ -584,7 +584,7 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   const productsSection = html.match(/<section class="section" id="productos">([\s\S]*?)<\/section>/)?.[1] || "";
   const solutionsSection = html.match(/<section class="section section-soft" id="soluciones">([\s\S]*?)<\/section>/)?.[1] || "";
 
-  assert.match(html, /<a href="#soluciones">Soluciones<\/a>/);
+  assert.match(html, /<a href="\.\/soluciones\.html">Soluciones<\/a>/);
   assert.match(html, /<a class="button" href="#soluciones">Conocer soluciones<\/a>/);
   assert.match(productsSection, /Productos propios/);
   assert.match(productsSection, /Nexar Comercio/);
@@ -596,6 +596,28 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   assert.match(solutionsSection, /Digitalización de procesos/);
   assert.match(solutionsSection, /Automatización/);
   assert.doesNotMatch(solutionsSection, /Nexar Hosting/);
+});
+
+test("la navegación principal prioriza el recorrido comercial", () => {
+  const html = read("index.html");
+  const desktopNav = html.match(/<nav class="header-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+  const mobileNav = html.match(/<nav class="mobile-nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+
+  for (const nav of [desktopNav, mobileNav]) {
+    assert.match(nav, /href="#productos">Productos<\/a>/);
+    assert.match(nav, /href="\.\/soluciones\.html">Soluciones<\/a>/);
+    assert.match(nav, /href="#clientes">Clientes<\/a>/);
+    assert.match(nav, /href="#fundador">Nexar<\/a>/);
+    assert.match(nav, /href="#contacto">Contacto<\/a>/);
+    assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
+    assert.doesNotMatch(nav, />Casos<\/a>/);
+  }
+
+  assert.match(html, /<section class="section founder-section" id="fundador"/);
+  assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
+  assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
+  assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
+  assert.match(html, /href="\.\/vendedores\/login\.html">Portal de vendedores<\/a>/);
 });
 
 test("la página de soluciones presenta una propuesta orientada a problemas reales", () => {
