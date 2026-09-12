@@ -118,9 +118,7 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.match(errorPage, /<title>Página no encontrada \| Nexar Sistemas<\/title>/);
   assert.match(errorPage, /src="\/assets\/nexar_sistemas\.png" alt="Nexar Sistemas"/);
   assert.match(errorPage, /href="\/">Volver al inicio<\/a>/);
-  assert.match(errorPage, /href="\/nexar-comercio\.html">Ver soluciones<\/a>/);
   assert.match(errorPage, /href="\/#contacto">Contactar a Nexar/);
-  assert.match(errorPage, /href="\/#nexar-play">Nexar Play<\/a>/);
   assert.match(errorPage, /© 2026 Nexar Sistemas\. Todos los derechos reservados\./);
   assert.match(errorPage, /<details class="mobile-nav">[\s\S]*?href="\/#productos">Productos[\s\S]*?href="\/#servicios-web">Servicios web[\s\S]*?href="\/#planes">Planes[\s\S]*?href="\/#contacto">Contacto[\s\S]*?href="\/vendedores\/login\.html">Acceso vendedores/);
   assert.doesNotMatch(errorPage, /(?:href|src)="\.\/(?:assets|css|index\.html|vendedores\/|nexar-)/);
@@ -131,11 +129,32 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.equal(fs.existsSync(path.join(root, "css/site.css")), true);
 });
 
-test("los footers conservan los accesos de Nexar Play e Instagram", () => {
-  const home = read("index.html");
-  assert.match(home, /<div class="footer-column"><strong>Enlaces<\/strong>[\s\S]*?href="#nexar-play">Nexar Play<\/a>/);
-  assert.match(home, /class="social-action social-action-instagram" href="https:\/\/www\.instagram\.com\/nexarsistemas\//);
-  assert.match(read("404.html"), /href="\/#nexar-play">Nexar Play<\/a>/);
+test("las páginas comerciales comparten footer y accesos flotantes oficiales", () => {
+  const commercialPages = [
+    ["index.html", "./"],
+    ["soluciones.html", "./"],
+    ["nexar-comercio.html", "./"],
+    ["nexar-finanzas.html", "./"],
+    ["vendedores/index.html", "../"]
+  ];
+
+  for (const [page, rootPath] of commercialPages) {
+    const html = read(page);
+    assert.equal((html.match(/class="social-actions-float"/g) || []).length, 1, page);
+    assert.match(html, /class="social-action social-action-whatsapp" href="https:\/\/wa\.me\/5492646616948\?text=Hola%20/);
+    assert.match(html, /class="social-action social-action-instagram" href="https:\/\/www\.instagram\.com\/nexarsistemas\//);
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html"[^>]*>Inicio<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}nexar-comercio\\.html"[^>]*>Nexar Comercio<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}nexar-finanzas\\.html"[^>]*>Nexar Finanzas<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}soluciones\\.html"[^>]*>Soluciones<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html#casos"|href="#casos"`), page);
+    assert.match(html, new RegExp(`href="${page === "vendedores/index.html" ? "\\./" : rootPath + "vendedores/"}"[^>]*>Vendedores<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html#nexar-play"|href="#nexar-play"`), page);
+  }
+
+  assert.doesNotMatch(read("404.html"), /class="social-actions-float"/);
+  assert.doesNotMatch(read("mercadopago-exito.html"), /class="social-actions-float"/);
+  assert.match(read("404.html"), /<footer class="site-footer error-footer">[\s\S]*?href="\/">Inicio<\/a>/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {

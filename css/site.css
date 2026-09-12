@@ -1431,7 +1431,7 @@ a {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    grid-template-columns: 1.35fr repeat(4, 1fr);
     gap: 50px;
 }
 
@@ -1841,11 +1841,11 @@ a {
     }
 
     .footer-grid {
-        grid-template-columns: 1.4fr 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
     }
 
-    .footer-column:last-child {
-        grid-column: 2;
+    .footer-grid > .footer-column:first-child {
+        grid-column: 1 / -1;
     }
 
     .payment-layout {
@@ -2022,10 +2022,6 @@ a {
 
     .brand-footer {
         grid-column: 1 / -1;
-    }
-
-    .footer-column:last-child {
-        grid-column: auto;
     }
 
     .section-heading h2,
