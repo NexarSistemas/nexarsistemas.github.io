@@ -551,14 +551,27 @@ test("los IDs funcionales del portal de vendedores se preservan", () => {
 
 test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const html = read("index.html");
+  const vendorLanding = read("vendedores/index.html");
   const frontendScript = read("assets/js/home-forms.js");
   const runtimeConfig = read("assets/js/runtime-config.js");
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
   assert.match(html, />Hablar por WhatsApp</);
-  assert.match(html, /href="\.\/vendedores\/login\.html">Acceso vendedores/);
-  assert.match(html, /id="sellerApplicationForm"/);
-  assert.match(html, /name="localidad_provincia"/);
+  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
+  assert.doesNotMatch(html, /id="vendedores"|id="sellerApplicationForm"/);
+  assert.match(vendorLanding, /<title>Vendedores \| Nexar Sistemas<\/title>/);
+  assert.doesNotMatch(vendorLanding, /http-equiv="refresh"|noindex,nofollow/);
+  assert.match(vendorLanding, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/vendedores\/">/);
+  assert.match(vendorLanding, /href="\.\/login\.html">Ingresar al portal/);
+  assert.match(vendorLanding, /id="sellerApplicationForm"/);
+  assert.match(vendorLanding, /name="nombre"/);
+  assert.match(vendorLanding, /name="email"/);
+  assert.match(vendorLanding, /name="whatsapp"/);
+  assert.match(vendorLanding, /name="localidad_provincia"/);
+  assert.match(vendorLanding, /name="mensaje"/);
+  assert.match(vendorLanding, /src="\.\.\/assets\/js\/home-forms\.js"/);
+  assert.doesNotMatch(html, /href="\.\/vendedores\/login\.html">Acceso vendedores/);
+  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
   assert.match(html, /id="newsletterForm"/);
   assert.match(html, /id="newsletter-consent"/);
   assert.match(html, /Podés darte de baja cuando quieras\./);
@@ -577,6 +590,14 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(sql, /create unique index if not exists solicitudes_vendedores_email_unico_idx/);
   assert.match(sql, /create unique index if not exists suscripciones_novedades_email_unico_idx/);
   assert.match(sql, /private\.notify_admin_email\(\)/);
+});
+
+test("la landing de vendedores no inventa un destino de referidos", () => {
+  const vendorLanding = read("vendedores/index.html");
+  assert.doesNotMatch(vendorLanding, /Referidos/);
+  assert.match(vendorLanding, /Ya soy vendedor/);
+  assert.match(vendorLanding, /Quiero ser vendedor/);
+  assert.match(vendorLanding, /href="\.\/login\.html">Ingresar al portal/);
 });
 
 test("la home separa productos propios de soluciones Nexar Sistemas", () => {
@@ -626,7 +647,9 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
-  assert.match(html, /href="\.\/vendedores\/login\.html">Portal de vendedores<\/a>/);
+  assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/">Vendedores<\/a>/);
+  assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
+  assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
   assert.match(html, /<section class="section section-soft" id="casos">/);
   const tecmaCase = html.match(/<article class="case-card" data-case="tecma">([\s\S]*?)<\/article>/)?.[1] || "";
   const ineditaCase = html.match(/<article class="case-card" data-case="inedita">([\s\S]*?)<\/article>/)?.[1] || "";
@@ -737,6 +760,8 @@ test("Nexar Play usa exclusivamente los subdominios vigentes", () => {
   assert.equal(fs.existsSync(path.join(root, "Tetris")), false);
   assert.equal(fs.existsSync(path.join(root, "sudoku")), false);
   assert.equal(fs.existsSync(path.join(root, "nexar-crucigrama")), false);
-  assert.match(portalIndex, /http-equiv="refresh" content="0; url=\.\/login\.html"/);
-  assert.match(portalIndex, /href="\.\/login\.html"/);
+  assert.doesNotMatch(portalIndex, /http-equiv="refresh"|noindex,nofollow/);
+  assert.match(portalIndex, /<title>Vendedores \| Nexar Sistemas<\/title>/);
+  assert.match(portalIndex, /href="\.\/login\.html">Ingresar al portal/);
+  assert.match(portalIndex, /id="sellerApplicationForm"/);
 });

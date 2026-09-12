@@ -3,21 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirigiendo al portal | Nexar Sistemas</title>
-    <meta name="robots" content="noindex,nofollow">
-    <meta http-equiv="refresh" content="0; url=./login.html">
-    <link rel="canonical" href="https://nexarsistemas.com.ar/vendedores/login.html">
+    <title>Vendedores | Nexar Sistemas</title>
+    <meta name="description" content="Conocé la propuesta para vendedores de Nexar Sistemas, ingresá al portal o enviá tu solicitud de incorporación.">
+    <link rel="canonical" href="https://nexarsistemas.com.ar/vendedores/">
     <link rel="icon" type="image/png" href="../assets/logon.png">
     <link rel="stylesheet" href="../css/site.css">
 </head>
-<body class="portal-page">
-<main class="portal-main">
-    <div class="container portal-shell">
-        <section class="portal-card">
-            <p>Redirigiendo al acceso de vendedores…</p>
-            <p><a class="button" href="./login.html">Ir al acceso</a></p>
-        </section>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="../index.html" aria-label="Nexar Sistemas, inicio"><img class="brand-logo" src="../assets/nexar_sistemas.png" alt="Nexar Sistemas"></a>
+        <nav class="header-nav" aria-label="Navegación de vendedores">
+            <a href="../index.html">Nexar Sistemas</a>
+            <a href="#incorporacion">Quiero ser vendedor</a>
+            <a href="#contacto">Contacto</a>
+        </nav>
+        <div class="header-actions">
+            <a class="header-vendor-link" href="./login.html">Ingresar al portal</a>
+            <details class="mobile-nav">
+                <summary>Menú</summary>
+                <nav class="mobile-nav-links" aria-label="Navegación móvil">
+                    <a href="../index.html">Nexar Sistemas</a>
+                    <a href="#incorporacion">Quiero ser vendedor</a>
+                    <a href="#contacto">Contacto</a>
+                    <a href="./login.html">Ingresar al portal</a>
+                </nav>
+            </details>
+        </div>
     </div>
+</header>
+
+<main id="contenido">
+    <section class="page-hero">
+        <div class="container page-hero-grid">
+            <div class="page-hero-copy">
+                <span class="eyebrow">Vendedores y distribuidores</span>
+                <h1>Comercializá Nexar con acompañamiento.</h1>
+                <p>Sumate a una propuesta de productos digitales, sin manejar stock y con herramientas para acompañar tu gestión comercial.</p>
+                <div class="action-row">
+                    <a class="button" href="#incorporacion">Quiero ser vendedor</a>
+                    <a class="button button-outline" href="./login.html">Ingresar al portal</a>
+                </div>
+            </div>
+            <aside class="page-hero-panel">
+                <span class="eyebrow">Ya soy vendedor</span>
+                <h2>Accedé a tus herramientas</h2>
+                <p>Ingresá al portal para consultar la información disponible para vendedores.</p>
+                <a class="text-link" href="./login.html">Ingresar al portal <span aria-hidden="true">→</span></a>
+            </aside>
+        </div>
+    </section>
+
+    <section class="section" id="incorporacion">
+        <div class="container seller-cta-inner">
+            <div>
+                <span class="eyebrow">Quiero ser vendedor</span>
+                <h2>Una propuesta para comercializar productos digitales.</h2>
+                <p>Podés incorporarte al circuito comercial de Nexar Sistemas y contar con acompañamiento para presentar nuestros productos.</p>
+                <ul class="seller-benefits seller-benefits-light">
+                    <li>Comercialización de productos digitales, sin manejar stock.</li>
+                    <li>Posibilidad de ingresos vinculados a clientes recurrentes.</li>
+                    <li>Acceso a herramientas y portal propio para vendedores.</li>
+                    <li>Acompañamiento comercial de Nexar Sistemas.</li>
+                </ul>
+            </div>
+            <form class="contact-form seller-form" id="sellerApplicationForm" novalidate>
+                <div id="seller-application-status" aria-live="polite"></div>
+                <div class="form-group">
+                    <label for="seller-nombre">Nombre y apellido <span class="required-mark">*</span></label>
+                    <input type="text" id="seller-nombre" name="nombre" autocomplete="name" minlength="2" maxlength="200" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="seller-email">Email <span class="required-mark">*</span></label>
+                        <input type="email" id="seller-email" name="email" autocomplete="email" minlength="4" maxlength="254" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seller-whatsapp">WhatsApp <span class="required-mark">*</span></label>
+                        <input type="tel" id="seller-whatsapp" name="whatsapp" autocomplete="tel" minlength="5" maxlength="60" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="seller-localidad">Localidad / provincia <span class="required-mark">*</span></label>
+                    <input type="text" id="seller-localidad" name="localidad_provincia" autocomplete="address-level1" minlength="2" maxlength="200" required>
+                </div>
+                <div class="form-group">
+                    <label for="seller-mensaje">Mensaje (opcional)</label>
+                    <textarea id="seller-mensaje" name="mensaje" maxlength="1000"></textarea>
+                </div>
+                <button type="submit" class="button">Enviar solicitud</button>
+            </form>
+        </div>
+    </section>
 </main>
+
+<footer class="site-footer" id="contacto">
+    <div class="container footer-grid">
+        <a class="brand brand-footer" href="../index.html"><img class="brand-logo" src="../assets/nexar_sistemas.png" alt="Nexar Sistemas"></a>
+        <div class="footer-column"><strong>Vendedores</strong><a href="./login.html">Ingresar al portal</a><a href="./recuperar.html">Recuperar acceso</a></div>
+        <div class="footer-column"><strong>Nexar Sistemas</strong><a href="../index.html">Volver al sitio</a><a href="mailto:vendedores@nexarsistemas.com.ar">Contacto</a></div>
+    </div>
+    <div class="container footer-bottom">© 2026 Nexar Sistemas. Todos los derechos reservados.</div>
+</footer>
+
+<script src="../assets/js/runtime-config.js"></script>
+<script src="../assets/js/home-forms.js"></script>
 </body>
 </html>

@@ -131,6 +131,16 @@ a {
     gap: 10px;
 }
 
+.header-vendor-link {
+    color: var(--green-dark);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.header-vendor-link:hover {
+    color: var(--navy);
+}
+
 .social-actions-float {
     position: fixed;
     right: 24px;
@@ -1038,6 +1048,14 @@ a {
     content: "✓";
     color: #7ee0aa;
     font-weight: 800;
+}
+
+.seller-benefits-light {
+    color: var(--muted);
+}
+
+.seller-benefits-light li::before {
+    color: var(--green);
 }
 
 .seller-form {
