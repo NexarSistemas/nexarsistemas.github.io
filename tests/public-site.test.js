@@ -560,6 +560,8 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(html, /href="\.\/vendedores\/">Vendedores/);
   assert.doesNotMatch(html, /id="vendedores"|id="sellerApplicationForm"/);
   assert.match(vendorLanding, /<title>Vendedores \| Nexar Sistemas<\/title>/);
+  assert.match(vendorLanding, /<a class="skip-link" href="#contenido">Saltar al contenido<\/a>/);
+  assert.match(vendorLanding, /<main id="contenido">/);
   assert.doesNotMatch(vendorLanding, /http-equiv="refresh"|noindex,nofollow/);
   assert.match(vendorLanding, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/vendedores\/">/);
   assert.match(vendorLanding, /href="\.\/login\.html">Ingresar al portal/);

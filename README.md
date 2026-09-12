@@ -24,7 +24,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 
 ## Páginas públicas vigentes
 
-- `index.html`: marca, productos, comparación, contacto y acceso vendedores
+- `index.html`: marca, productos, comparación, contacto y acceso secundario a Vendedores
 - `soluciones.html`: soluciones digitales para empresas, comercios y profesionales
 - `nexar-comercio.html`: producto, funciones, rubros y planes confirmados
 - `nexar-finanzas.html`: producto, funciones y planes confirmados
@@ -33,6 +33,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 - `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
 - `mercadopago-suscripcion.html`: agradecimiento posterior a una adhesión, sin afirmar que el primer cobro esté acreditado
 - `confirmar-novedades.html`: confirmación explícita de altas y bajas de Novedades Nexar mediante un enlace seguro
+- `vendedores/index.html`: punto de entrada público para vendedores, con acceso al portal y solicitud de incorporación
 - `vendedores/login.html`: acceso al portal
 - `vendedores/recuperar.html`: solicitud de recuperación
 - `vendedores/dashboard.html`: dashboard autenticado
@@ -82,7 +83,7 @@ node tests/public-site.test.js
 
 ## Solicitudes de contacto, vendedores y novedades con Supabase
 
-El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. Los dos formularios nuevos de la home (postulación de vendedores y suscripción a novedades) envían sus datos a la Function `home-form-submissions` de Netlify a través del backend absoluto resuelto por `assets/js/runtime-config.js`. La Netlify Function valida el payload, aplica rate limiting nativo de Netlify y, con credenciales solo server-side, consulta `public.find_home_submission_by_email` para identificar emails de forma exacta y case-insensitive antes de insertar o renovar consentimiento en `public.solicitudes_vendedores` y `public.suscripciones_novedades`.
+El formulario público registra solicitudes en `public.solicitudes_demo` o `public.solicitudes_soporte`, según el tipo de consulta, mediante `assets/js/solicitud-demo.js`. La home comercial ya no contiene el formulario grande de alta de vendedores: mantiene únicamente el acceso secundario a `Vendedores`. El formulario fue reubicado, no eliminado: desde `vendedores/index.html` se puede ingresar al portal existente o enviar una solicitud para convertirse en vendedor. La postulación se realiza desde `vendedores/index.html`, mientras la suscripción a novedades continúa en la home; ambos envían sus datos a la Function `home-form-submissions` de Netlify a través del backend absoluto resuelto por `assets/js/runtime-config.js`. La Netlify Function valida el payload, aplica rate limiting nativo de Netlify y, con credenciales solo server-side, consulta `public.find_home_submission_by_email` para identificar emails de forma exacta y case-insensitive antes de insertar o renovar consentimiento en `public.solicitudes_vendedores` y `public.suscripciones_novedades`.
 
 El frontend usa únicamente:
 
@@ -142,6 +143,8 @@ No se modifican webhooks ni contratos server-side con `nexar-pagos`.
 
 ## Portal de vendedores
 
+`vendedores/index.html` es el punto de entrada público del circuito de vendedores. Ofrece el ingreso al portal autenticado mediante `vendedores/login.html` y el formulario para enviar una solicitud de incorporación. La home conserva únicamente el acceso secundario a Vendedores.
+
 Se preservan:
 
 - login y contraseña temporal;
@@ -184,7 +187,7 @@ Variables server-side requeridas por las Functions:
 - manejo de `OPTIONS`;
 - existencia exclusiva de las cinco Functions públicas.
 
-Los formularios nuevos de la home modifican Functions y su contrato server-side documentado. Para validarlos, ejecutar:
+El formulario de alta de vendedores y la suscripción de novedades usan Functions y su contrato server-side documentado. Para validarlos, ejecutar:
 
 ```bash
 node --check assets/js/home-forms.js
