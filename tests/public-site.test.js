@@ -628,6 +628,11 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
   assert.match(html, /href="\.\/vendedores\/login\.html">Portal de vendedores<\/a>/);
+
+  const sectionOrder = ["productos", "soluciones", "clientes", "fundador", "contacto"];
+  const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
+  assert.ok(sectionOffsets.every((offset) => offset >= 0));
+  assert.deepEqual([...sectionOffsets].sort((a, b) => a - b), sectionOffsets);
 });
 
 test("la página de soluciones presenta una propuesta orientada a problemas reales", () => {
