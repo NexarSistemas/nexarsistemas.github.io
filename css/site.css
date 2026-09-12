@@ -1848,6 +1848,10 @@ a {
         grid-column: 1 / -1;
     }
 
+    .footer-grid > .brand-footer {
+        grid-column: 1 / -1;
+    }
+
     .payment-layout {
         grid-template-columns: 1fr;
     }
@@ -2021,6 +2025,10 @@ a {
     }
 
     .footer-grid > .footer-column:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .footer-grid > .brand-footer {
         grid-column: 1 / -1;
     }
 

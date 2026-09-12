@@ -182,6 +182,28 @@ test("el footer comercial distribuye sus secciones en dos columnas en tablet", (
   assert.match(tabletMedia, /\.footer-grid > \.footer-column:first-child\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
 });
 
+test("los footers compactos mantienen la marca a ancho completo", () => {
+  const siteCss = read("css/site.css");
+  const compactPages = [
+    "404.html",
+    "confirmar-novedades.html",
+    "mercadopago-exito.html",
+    "mercadopago-pendiente.html",
+    "mercadopago-fallo.html",
+    "mercadopago-suscripcion.html"
+  ];
+
+  for (const page of compactPages) {
+    const html = read(page);
+    assert.match(html, /<div class="container footer-grid">\s*<a class="brand brand-footer"/, page);
+  }
+
+  for (const breakpoint of ["960px", "700px"]) {
+    const media = siteCss.match(new RegExp(`@media \\(max-width: ${breakpoint}\\) \\{([\\s\\S]*?)(?=\\n@media )`))?.[1] || "";
+    assert.match(media, /\.footer-grid > \.brand-footer\s*\{[\s\S]*?grid-column: 1 \/ -1;/, breakpoint);
+  }
+});
+
 test("el material comercial del portal no se publica ni se indexa", () => {
   const material = read("vendedores/material-comercial.html");
   const portalScript = read("vendedores/js/portal-vendedor.js");
