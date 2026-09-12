@@ -584,7 +584,7 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   const productsSection = html.match(/<section class="section" id="productos">([\s\S]*?)<\/section>/)?.[1] || "";
   const solutionsSection = html.match(/<section class="section section-soft" id="soluciones">([\s\S]*?)<\/section>/)?.[1] || "";
 
-  assert.match(html, /<a href="#soluciones">Soluciones<\/a>/);
+  assert.match(html, /<a href="\.\/soluciones\.html">Soluciones<\/a>/);
   assert.match(html, /<a class="button" href="#soluciones">Conocer soluciones<\/a>/);
   assert.match(productsSection, /Productos propios/);
   assert.match(productsSection, /Nexar Comercio/);
@@ -596,6 +596,43 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   assert.match(solutionsSection, /Digitalización de procesos/);
   assert.match(solutionsSection, /Automatización/);
   assert.doesNotMatch(solutionsSection, /Nexar Hosting/);
+});
+
+test("la navegación principal prioriza el recorrido comercial", () => {
+  const html = read("index.html");
+  const desktopNav = html.match(/<nav class="header-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+  const mobileNav = html.match(/<nav class="mobile-nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+  const primaryNavigation = [
+    { label: "Productos", href: "#productos" },
+    { label: "Soluciones", href: "./soluciones.html" },
+    { label: "Clientes", href: "#clientes" },
+    { label: "Nexar", href: "#fundador" },
+    { label: "Contacto", href: "#contacto" }
+  ];
+
+  for (const nav of [desktopNav, mobileNav]) {
+    const links = [...nav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)]
+      .map((match) => ({
+        label: match[2].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(),
+        href: match[1]
+      }))
+      .filter(({ label }) => primaryNavigation.some((item) => item.label === label));
+
+    assert.deepEqual(links, primaryNavigation);
+    assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
+    assert.doesNotMatch(nav, />Casos<\/a>/);
+  }
+
+  assert.match(html, /<section class="section founder-section" id="fundador"/);
+  assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
+  assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
+  assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
+  assert.match(html, /href="\.\/vendedores\/login\.html">Portal de vendedores<\/a>/);
+
+  const sectionOrder = ["productos", "soluciones", "clientes", "fundador", "contacto"];
+  const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
+  assert.ok(sectionOffsets.every((offset) => offset >= 0));
+  assert.deepEqual([...sectionOffsets].sort((a, b) => a - b), sectionOffsets);
 });
 
 test("la página de soluciones presenta una propuesta orientada a problemas reales", () => {
