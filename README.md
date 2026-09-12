@@ -25,6 +25,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 ## Páginas públicas vigentes
 
 - `index.html`: marca, productos, comparación, contacto y acceso vendedores
+- `soluciones.html`: soluciones digitales para empresas, comercios y profesionales
 - `nexar-comercio.html`: producto, funciones, rubros y planes confirmados
 - `nexar-finanzas.html`: producto, funciones y planes confirmados
 - `mercadopago-exito.html`: retorno aprobado
