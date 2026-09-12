@@ -614,6 +614,7 @@ test("la página de soluciones presenta una propuesta orientada a problemas real
   assert.match(html, /Automatización/);
   assert.match(html, /Servicio de Nexar Sistemas/);
   assert.doesNotMatch(html, /Nexar Hosting|planes de Hosting|precio.*Hosting/i);
+  assert.match(html, /<a href="\.\/soluciones\.html" aria-current="page">Soluciones<\/a>/);
   assert.match(read("index.html"), /href="\.\/soluciones\.html">Ver todas las soluciones/);
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/soluciones\.html/);
 });
