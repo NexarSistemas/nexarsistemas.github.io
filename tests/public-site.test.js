@@ -605,7 +605,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   const primaryNavigation = [
     { label: "Productos", href: "#productos" },
     { label: "Soluciones", href: "./soluciones.html" },
-    { label: "Clientes", href: "#clientes" },
+    { label: "Casos", href: "#casos" },
     { label: "Nexar", href: "#fundador" },
     { label: "Contacto", href: "#contacto" }
   ];
@@ -620,7 +620,6 @@ test("la navegación principal prioriza el recorrido comercial", () => {
 
     assert.deepEqual(links, primaryNavigation);
     assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
-    assert.doesNotMatch(nav, />Casos<\/a>/);
   }
 
   assert.match(html, /<section class="section founder-section" id="fundador"/);
@@ -628,6 +627,19 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
   assert.match(html, /href="\.\/vendedores\/login\.html">Portal de vendedores<\/a>/);
+  assert.match(html, /<section class="section section-soft" id="casos">/);
+  const tecmaCase = html.match(/<article class="case-card" data-case="tecma">([\s\S]*?)<\/article>/)?.[1] || "";
+  const ineditaCase = html.match(/<article class="case-card" data-case="inedita">([\s\S]*?)<\/article>/)?.[1] || "";
+  assert.match(tecmaCase, /TeCMA SAN JUAN/);
+  assert.match(tecmaCase, /Implementado/);
+  assert.match(tecmaCase, /formularios y automatización/);
+  assert.match(tecmaCase, /href="https:\/\/www\.tecmasanjuan\.com\.ar\/" target="_blank" rel="noopener noreferrer"/);
+  assert.doesNotMatch(tecmaCase, /En desarrollo/);
+  assert.match(ineditaCase, /INÉDITA SAN JUAN/);
+  assert.match(ineditaCase, /En desarrollo/);
+  assert.match(ineditaCase, /app de fidelización/);
+  assert.doesNotMatch(html, /Contarnos (tu|la) necesidad/);
+  assert.match(html, /Contanos tu necesidad/);
 
   const sectionOrder = ["productos", "soluciones", "clientes", "fundador", "contacto"];
   const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
@@ -664,7 +676,7 @@ test("la home presenta clientes con enlaces y estados públicos correctos", () =
 
   assert.match(html, /<section class="section" id="clientes">/);
   assert.match(html, /<h2>Quiénes confían en nosotros<\/h2>/);
-  assert.match(html, /href="#clientes">Clientes<\/a>/);
+  assert.match(html, /href="#casos">Casos<\/a>/);
   assert.equal(fs.existsSync(path.join(root, "assets/clientes/inedita_san_juan.png")), true);
   assert.equal(fs.existsSync(path.join(root, "assets/clientes/iso_corporeo_interior.png")), true);
   assert.equal(fs.existsSync(path.join(root, "assets/clientes/tecma-logo.png")), true);
@@ -676,6 +688,12 @@ test("la home presenta clientes con enlaces y estados públicos correctos", () =
   assert.doesNotMatch(tecmaCard[1], /<a\b/);
   assert.doesNotMatch(html, /Proyecto confirmado|En conversación|Próximamente/);
   assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.clients-grid\s*\{\s*grid-template-columns: 1fr;/);
+});
+
+test("las páginas públicas usan el CTA argentino aprobado", () => {
+  assert.doesNotMatch(read("index.html"), /Contarnos (tu|la) necesidad/);
+  assert.doesNotMatch(read("soluciones.html"), /Contarnos (tu|la) necesidad/);
+  assert.match(read("soluciones.html"), /Contanos (tu|la) necesidad/);
 });
 
 test("la presentación institucional refleja la definición actual de Nexar", () => {
