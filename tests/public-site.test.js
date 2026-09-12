@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, "..");
 const publicPages = [
   "404.html",
   "index.html",
+  "soluciones.html",
   "nexar-comercio.html",
   "nexar-finanzas.html",
   "nexar-tienda.html",
@@ -40,6 +41,7 @@ test("los enlaces internos esenciales apuntan a archivos existentes", () => {
   const pagesToCheck = [
     "404.html",
     "index.html",
+    "soluciones.html",
     "nexar-comercio.html",
     "nexar-finanzas.html",
     "nexar-tienda.html",
@@ -594,6 +596,27 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   assert.match(solutionsSection, /Digitalización de procesos/);
   assert.match(solutionsSection, /Automatización/);
   assert.doesNotMatch(solutionsSection, /Nexar Hosting/);
+});
+
+test("la página de soluciones presenta una propuesta orientada a problemas reales", () => {
+  const html = read("soluciones.html");
+
+  assert.match(html, /<title>Soluciones digitales \| Nexar Sistemas<\/title>/);
+  assert.match(html, /<meta name="description" content="[^"]+">/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/soluciones\.html">/);
+  assert.match(html, /<meta property="og:title" content="Soluciones digitales \| Nexar Sistemas">/);
+  assert.match(html, /<meta property="og:url" content="https:\/\/nexarsistemas\.com\.ar\/soluciones\.html">/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/nexarsistemas\.com\.ar\/assets\/nexar_sistemas\.png">/);
+  assert.match(html, /Contanos cómo trabajás hoy/);
+  assert.match(html, /Desarrollo web/);
+  assert.match(html, /Sistemas a medida/);
+  assert.match(html, /Digitalización de procesos/);
+  assert.match(html, /Automatización/);
+  assert.match(html, /Servicio de Nexar Sistemas/);
+  assert.doesNotMatch(html, /Nexar Hosting|planes de Hosting|precio.*Hosting/i);
+  assert.match(html, /<a href="\.\/soluciones\.html" aria-current="page">Soluciones<\/a>/);
+  assert.match(read("index.html"), /href="\.\/soluciones\.html">Ver todas las soluciones/);
+  assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/soluciones\.html/);
 });
 
 test("la home presenta clientes con enlaces y estados públicos correctos", () => {
