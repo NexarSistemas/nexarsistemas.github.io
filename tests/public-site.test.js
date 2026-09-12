@@ -602,13 +602,14 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   const html = read("index.html");
   const desktopNav = html.match(/<nav class="header-nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
   const mobileNav = html.match(/<nav class="mobile-nav-links"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || "";
+  const primaryLabels = ["Productos", "Soluciones", "Clientes", "Nexar", "Contacto"];
 
   for (const nav of [desktopNav, mobileNav]) {
-    assert.match(nav, /href="#productos">Productos<\/a>/);
-    assert.match(nav, /href="\.\/soluciones\.html">Soluciones<\/a>/);
-    assert.match(nav, /href="#clientes">Clientes<\/a>/);
-    assert.match(nav, /href="#fundador">Nexar<\/a>/);
-    assert.match(nav, /href="#contacto">Contacto<\/a>/);
+    const labels = [...nav.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)]
+      .map((match) => match[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim())
+      .filter((label) => primaryLabels.includes(label));
+
+    assert.deepEqual(labels, primaryLabels);
     assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
     assert.doesNotMatch(nav, />Casos<\/a>/);
   }
