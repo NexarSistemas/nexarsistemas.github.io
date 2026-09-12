@@ -641,6 +641,15 @@ test("la home presenta clientes con enlaces y estados públicos correctos", () =
   assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.clients-grid\s*\{\s*grid-template-columns: 1fr;/);
 });
 
+test("la presentación institucional refleja la definición actual de Nexar", () => {
+  const html = read("index.html");
+
+  assert.match(html, /Nexar Sistemas desarrolla software y soluciones digitales/);
+  assert.match(html, /Rolando Navarta/);
+  assert.match(html, /dirige el desarrollo y evolución de sus productos y proyectos/);
+  assert.doesNotMatch(html, /Nexar Sistemas es un proyecto independiente/);
+});
+
 test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez", () => {
   const html = read("index.html");
   const thirdParty = read("docs/legal/THIRD_PARTY.md");
