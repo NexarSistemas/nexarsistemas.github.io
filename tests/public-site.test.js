@@ -577,6 +577,25 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(sql, /private\.notify_admin_email\(\)/);
 });
 
+test("la home separa productos propios de soluciones Nexar Sistemas", () => {
+  const html = read("index.html");
+  const productsSection = html.match(/<section class="section" id="productos">([\s\S]*?)<\/section>/)?.[1] || "";
+  const solutionsSection = html.match(/<section class="section section-soft" id="soluciones">([\s\S]*?)<\/section>/)?.[1] || "";
+
+  assert.match(html, /<a href="#soluciones">Soluciones<\/a>/);
+  assert.match(html, /<a class="button" href="#soluciones">Conocer soluciones<\/a>/);
+  assert.match(productsSection, /Productos propios/);
+  assert.match(productsSection, /Nexar Comercio/);
+  assert.match(productsSection, /Nexar Finanzas/);
+  assert.doesNotMatch(productsSection, /Webs para tu proyecto|Desarrollo web|Sistemas a medida/);
+  assert.match(solutionsSection, /Soluciones Nexar Sistemas/);
+  assert.match(solutionsSection, /Desarrollo web/);
+  assert.match(solutionsSection, /Sistemas a medida/);
+  assert.match(solutionsSection, /Digitalización de procesos/);
+  assert.match(solutionsSection, /Automatización/);
+  assert.doesNotMatch(solutionsSection, /Nexar Hosting/);
+});
+
 test("la home presenta clientes con enlaces y estados públicos correctos", () => {
   const html = read("index.html");
   const siteCss = read("css/site.css");
