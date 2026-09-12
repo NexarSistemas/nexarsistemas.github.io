@@ -625,6 +625,12 @@ a {
     gap: 26px;
 }
 
+.case-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+}
+
 .nexar-play-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -715,6 +721,71 @@ a {
 }
 
 .client-copy .text-link {
+    margin-top: 22px;
+}
+
+.case-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.case-card-header {
+    min-height: 142px;
+    padding: 28px 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: var(--cream);
+}
+
+.case-card-logo {
+    display: block;
+    width: 150px;
+    max-height: 82px;
+    object-fit: contain;
+}
+
+.case-card-logo-tecma {
+    max-height: 62px;
+}
+
+.case-status {
+    flex: 0 0 auto;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.case-status-progress {
+    background: var(--info-soft);
+    color: var(--navy);
+}
+
+.case-card-copy {
+    padding: 30px 34px 34px;
+}
+
+.case-card-copy h3 {
+    margin: 7px 0 12px;
+    color: var(--navy);
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.case-card-copy p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.case-card-copy .text-link {
     margin-top: 22px;
 }
 
@@ -1737,6 +1808,10 @@ a {
         grid-template-columns: 1fr;
     }
 
+    .case-grid {
+        grid-template-columns: 1fr;
+    }
+
     .nexar-play-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -1847,6 +1922,7 @@ a {
 
     .product-grid,
     .clients-grid,
+    .case-grid,
     .pricing-grid,
     .feature-grid {
         grid-template-columns: 1fr;
@@ -1866,6 +1942,11 @@ a {
         align-items: flex-start;
         flex-direction: column;
         gap: 22px;
+    }
+
+    .case-card-header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .client-brand {
