@@ -148,7 +148,11 @@ test("las páginas comerciales comparten footer y accesos flotantes oficiales", 
     assert.match(html, new RegExp(`href="${rootPath}nexar-finanzas\\.html"[^>]*>Nexar Finanzas<\\/a>`), page);
     assert.match(html, new RegExp(`href="${rootPath}soluciones\\.html"[^>]*>Soluciones<\\/a>`), page);
     assert.match(html, new RegExp(`href="${rootPath}index\\.html#casos"|href="#casos"`), page);
-    assert.match(html, new RegExp(`href="${page === "vendedores/index.html" ? "\\./" : rootPath + "vendedores/"}"[^>]*>Vendedores<\\/a>`), page);
+    if (page !== "vendedores/index.html") {
+      assert.match(html, new RegExp(`href="${rootPath}vendedores/index\\.html"[^>]*>Vendedores<\\/a>`), page);
+    } else {
+      assert.doesNotMatch(html, /href="\.\/"[^>]*>Vendedores<\/a>/, page);
+    }
     assert.match(html, new RegExp(`href="${rootPath}index\\.html#nexar-play"|href="#nexar-play"`), page);
   }
 
@@ -576,7 +580,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
   assert.match(html, />Hablar por WhatsApp</);
-  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
+  assert.match(html, /href="\.\/vendedores\/index\.html">Vendedores/);
   assert.doesNotMatch(html, /id="vendedores"|id="sellerApplicationForm"/);
   assert.match(vendorLanding, /<title>Vendedores \| Nexar Sistemas<\/title>/);
   assert.match(vendorLanding, /<a class="skip-link" href="#contenido">Saltar al contenido<\/a>/);
@@ -592,7 +596,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(vendorLanding, /name="mensaje"/);
   assert.match(vendorLanding, /src="\.\.\/assets\/js\/home-forms\.js"/);
   assert.doesNotMatch(html, /href="\.\/vendedores\/login\.html">Acceso vendedores/);
-  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
+  assert.match(html, /href="\.\/vendedores\/index\.html">Vendedores/);
   assert.match(html, /id="newsletterForm"/);
   assert.match(html, /id="newsletter-consent"/);
   assert.match(html, /Podés darte de baja cuando quieras\./);
@@ -668,9 +672,9 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
-  assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/">Vendedores<\/a>/);
-  assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
-  assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
+  assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
+  assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
+  assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
   assert.match(html, /<section class="section section-soft" id="casos">/);
   const tecmaCase = html.match(/<article class="case-card" data-case="tecma">([\s\S]*?)<\/article>/)?.[1] || "";
   const ineditaCase = html.match(/<article class="case-card" data-case="inedita">([\s\S]*?)<\/article>/)?.[1] || "";
