@@ -665,12 +665,13 @@ a {
 .client-card {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 20px;
+    padding: 20px 26px 18px;
 }
 
 .client-brand {
-    width: 132px;
-    min-width: 132px;
+    width: 120px;
+    min-width: 120px;
     display: grid;
     place-items: center;
     gap: 8px;
@@ -678,8 +679,8 @@ a {
 
 .client-brand-inedita {
     grid-template-columns: 1fr;
-    width: 150px;
-    min-width: 150px;
+    width: 126px;
+    min-width: 126px;
 }
 
 .client-brand-logo,
@@ -699,18 +700,18 @@ a {
 }
 
 .client-brand-logo-tecma {
-    max-height: 62px;
+    max-height: 52px;
 }
 
 .client-brand-inedita .client-brand-logo {
-    width: 150px;
-    height: 112px;
+    width: 126px;
+    height: 88px;
     max-height: none;
 }
 
 .client-brand-inedita .client-brand-isotype {
-    width: 92px;
-    height: 92px;
+    width: 58px;
+    height: 58px;
 }
 
 .client-copy {
@@ -719,9 +720,9 @@ a {
 }
 
 .client-copy h3 {
-    margin: 4px 0 12px;
+    margin: 3px 0 5px;
     color: var(--navy);
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.2;
 }
 
@@ -731,7 +732,7 @@ a {
 }
 
 .client-copy .text-link {
-    margin-top: 22px;
+    margin-top: 10px;
 }
 
 .case-card {
@@ -762,6 +763,11 @@ a {
 
 .case-card-logo-tecma {
     max-height: 62px;
+}
+
+.case-card[data-case="inedita"] .case-card-logo {
+    width: 180px;
+    max-height: 110px;
 }
 
 .case-status {
