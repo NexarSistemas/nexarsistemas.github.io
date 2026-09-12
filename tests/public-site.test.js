@@ -663,6 +663,8 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(ineditaCase, /INÉDITA SAN JUAN/);
   assert.match(ineditaCase, /En desarrollo/);
   assert.match(ineditaCase, /app de fidelización/);
+  assert.match(ineditaCase, /Nexar Sistemas está desarrollando la aplicación/);
+  assert.doesNotMatch(ineditaCase, /instagram\.com\/ineditasanjuan/);
   assert.doesNotMatch(html, /Contarnos (tu|la) necesidad/);
   assert.match(html, /Contanos tu necesidad/);
 
@@ -707,10 +709,20 @@ test("la home presenta clientes con enlaces y estados públicos correctos", () =
   assert.equal(fs.existsSync(path.join(root, "assets/clientes/tecma-logo.png")), true);
   assert.ok(ineditaCard);
   assert.match(ineditaCard[1], /INÉDITA SAN JUAN/);
-  assert.match(ineditaCard[1], /href="https:\/\/www\.instagram\.com\/ineditasanjuan\/" target="_blank" rel="noopener noreferrer"/);
+  const clientLinks = [
+    { card: ineditaCard, label: "Visitar INÉDITA", href: "https://www.instagram.com/ineditasanjuan/" },
+    { card: tecmaCard, label: "Visitar TeCMA", href: "https://www.tecmasanjuan.com.ar/" }
+  ];
   assert.ok(tecmaCard);
   assert.match(tecmaCard[1], /TeCMA SAN JUAN/);
-  assert.doesNotMatch(tecmaCard[1], /<a\b/);
+  for (const { card, label, href } of clientLinks) {
+    assert.ok(card);
+    const link = card[1].match(/<a class="text-link" href="([^"]+)" target="_blank" rel="noopener noreferrer">([^<]+) <span/);
+    assert.deepEqual(link && { href: link[1], label: link[2] }, { href, label });
+  }
+  assert.doesNotMatch(ineditaCard[1], /App de fidelización para clientes/);
+  assert.doesNotMatch(tecmaCard[1], /Sitio web institucional y presencia digital/);
+  assert.match(siteCss, /\.case-card\[data-case="inedita"\] \.case-card-logo\s*\{[\s\S]*?width: 180px/);
   assert.doesNotMatch(html, /Proyecto confirmado|En conversación|Próximamente/);
   assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.clients-grid\s*\{\s*grid-template-columns: 1fr;/);
 });
