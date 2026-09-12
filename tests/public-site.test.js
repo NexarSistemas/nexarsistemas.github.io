@@ -174,6 +174,14 @@ test("la navegación autenticada del portal permanece visible hasta 960 px", () 
   }
 });
 
+test("el footer comercial distribuye sus secciones en dos columnas en tablet", () => {
+  const siteCss = read("css/site.css");
+  const tabletMedia = siteCss.match(/@media \(max-width: 960px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+
+  assert.match(tabletMedia, /\.footer-grid\s*\{[\s\S]*?grid-template-columns: repeat\(2, 1fr\);/);
+  assert.match(tabletMedia, /\.footer-grid > \.footer-column:first-child\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
+});
+
 test("el material comercial del portal no se publica ni se indexa", () => {
   const material = read("vendedores/material-comercial.html");
   const portalScript = read("vendedores/js/portal-vendedor.js");
