@@ -158,7 +158,7 @@ test("las páginas comerciales comparten footer y accesos flotantes oficiales", 
 
   assert.doesNotMatch(read("404.html"), /class="social-actions-float"/);
   assert.doesNotMatch(read("mercadopago-exito.html"), /class="social-actions-float"/);
-  assert.match(read("404.html"), /<footer class="site-footer error-footer">[\s\S]*?href="\/">Inicio<\/a>/);
+  assert.match(read("404.html"), /<footer class="site-footer site-footer-compact error-footer">[\s\S]*?href="\/">Inicio<\/a>/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
@@ -178,8 +178,8 @@ test("el footer comercial distribuye sus secciones en dos columnas en tablet", (
   const siteCss = read("css/site.css");
   const tabletMedia = siteCss.match(/@media \(max-width: 960px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
 
-  assert.match(tabletMedia, /\.footer-grid\s*\{[\s\S]*?grid-template-columns: repeat\(2, 1fr\);/);
-  assert.match(tabletMedia, /\.footer-grid > \.footer-column:first-child\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
+  assert.match(tabletMedia, /\.site-footer:not\(\.site-footer-compact\) \.footer-grid\s*\{[\s\S]*?grid-template-columns: repeat\(2, 1fr\);/);
+  assert.match(tabletMedia, /\.site-footer:not\(\.site-footer-compact\) \.footer-grid > \.footer-column:first-child\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
 });
 
 test("los footers compactos mantienen la marca a ancho completo", () => {
@@ -195,13 +195,23 @@ test("los footers compactos mantienen la marca a ancho completo", () => {
 
   for (const page of compactPages) {
     const html = read(page);
+    assert.match(html, /<footer class="site-footer site-footer-compact[^"]*">/, page);
     assert.match(html, /<div class="container footer-grid">\s*<a class="brand brand-footer"/, page);
   }
 
-  for (const breakpoint of ["960px", "700px"]) {
-    const media = siteCss.match(new RegExp(`@media \\(max-width: ${breakpoint}\\) \\{([\\s\\S]*?)(?=\\n@media )`))?.[1] || "";
-    assert.match(media, /\.footer-grid > \.brand-footer\s*\{[\s\S]*?grid-column: 1 \/ -1;/, breakpoint);
-  }
+  assert.doesNotMatch(read("index.html"), /<footer class="site-footer site-footer-compact/);
+
+  const desktopGrid = siteCss.match(/\.site-footer-compact \.footer-grid\s*\{([\s\S]*?)\n\}/)?.[1] || "";
+  assert.match(desktopGrid, /grid-template-columns: 1\.5fr 1fr 1fr;/);
+
+  const tabletMedia = siteCss.match(/@media \(max-width: 960px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+  assert.match(tabletMedia, /\.site-footer-compact \.footer-grid\s*\{[\s\S]*?grid-template-columns: 1fr 1fr;/);
+  assert.match(tabletMedia, /\.site-footer-compact \.brand-footer\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
+
+  const mobileMedia = siteCss.match(/@media \(max-width: 700px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+  assert.match(mobileMedia, /\.site-footer-compact \.footer-grid\s*\{[\s\S]*?grid-template-columns: 1fr;/);
+  assert.match(mobileMedia, /\.site-footer-compact \.brand-footer\s*\{[\s\S]*?grid-column: auto;/);
+
 });
 
 test("el material comercial del portal no se publica ni se indexa", () => {
