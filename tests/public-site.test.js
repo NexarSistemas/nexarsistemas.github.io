@@ -118,9 +118,7 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.match(errorPage, /<title>Página no encontrada \| Nexar Sistemas<\/title>/);
   assert.match(errorPage, /src="\/assets\/nexar_sistemas\.png" alt="Nexar Sistemas"/);
   assert.match(errorPage, /href="\/">Volver al inicio<\/a>/);
-  assert.match(errorPage, /href="\/nexar-comercio\.html">Ver soluciones<\/a>/);
   assert.match(errorPage, /href="\/#contacto">Contactar a Nexar/);
-  assert.match(errorPage, /href="\/#nexar-play">Nexar Play<\/a>/);
   assert.match(errorPage, /© 2026 Nexar Sistemas\. Todos los derechos reservados\./);
   assert.match(errorPage, /<details class="mobile-nav">[\s\S]*?href="\/#productos">Productos[\s\S]*?href="\/#servicios-web">Servicios web[\s\S]*?href="\/#planes">Planes[\s\S]*?href="\/#contacto">Contacto[\s\S]*?href="\/vendedores\/login\.html">Acceso vendedores/);
   assert.doesNotMatch(errorPage, /(?:href|src)="\.\/(?:assets|css|index\.html|vendedores\/|nexar-)/);
@@ -131,11 +129,36 @@ test("la página 404 es una superficie de error sin redirecciones automáticas",
   assert.equal(fs.existsSync(path.join(root, "css/site.css")), true);
 });
 
-test("los footers conservan los accesos de Nexar Play e Instagram", () => {
-  const home = read("index.html");
-  assert.match(home, /<div class="footer-column"><strong>Enlaces<\/strong>[\s\S]*?href="#nexar-play">Nexar Play<\/a>/);
-  assert.match(home, /class="social-action social-action-instagram" href="https:\/\/www\.instagram\.com\/nexarsistemas\//);
-  assert.match(read("404.html"), /href="\/#nexar-play">Nexar Play<\/a>/);
+test("las páginas comerciales comparten footer y accesos flotantes oficiales", () => {
+  const commercialPages = [
+    ["index.html", "./"],
+    ["soluciones.html", "./"],
+    ["nexar-comercio.html", "./"],
+    ["nexar-finanzas.html", "./"],
+    ["vendedores/index.html", "../"]
+  ];
+
+  for (const [page, rootPath] of commercialPages) {
+    const html = read(page);
+    assert.equal((html.match(/class="social-actions-float"/g) || []).length, 1, page);
+    assert.match(html, /class="social-action social-action-whatsapp" href="https:\/\/wa\.me\/5492646616948\?text=Hola%20/);
+    assert.match(html, /class="social-action social-action-instagram" href="https:\/\/www\.instagram\.com\/nexarsistemas\//);
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html"[^>]*>Inicio<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}nexar-comercio\\.html"[^>]*>Nexar Comercio<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}nexar-finanzas\\.html"[^>]*>Nexar Finanzas<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}soluciones\\.html"[^>]*>Soluciones<\\/a>`), page);
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html#casos"|href="#casos"`), page);
+    if (page !== "vendedores/index.html") {
+      assert.match(html, new RegExp(`href="${rootPath}vendedores/index\\.html"[^>]*>Vendedores<\\/a>`), page);
+    } else {
+      assert.doesNotMatch(html, /href="\.\/"[^>]*>Vendedores<\/a>/, page);
+    }
+    assert.match(html, new RegExp(`href="${rootPath}index\\.html#nexar-play"|href="#nexar-play"`), page);
+  }
+
+  assert.doesNotMatch(read("404.html"), /class="social-actions-float"/);
+  assert.doesNotMatch(read("mercadopago-exito.html"), /class="social-actions-float"/);
+  assert.match(read("404.html"), /<footer class="site-footer site-footer-compact error-footer">[\s\S]*?href="\/">Inicio<\/a>/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
@@ -149,6 +172,46 @@ test("la navegación autenticada del portal permanece visible hasta 960 px", () 
     assert.match(html, />Perfil</);
     assert.match(html, /id="portal-logout-link">Salir</);
   }
+});
+
+test("el footer comercial distribuye sus secciones en dos columnas en tablet", () => {
+  const siteCss = read("css/site.css");
+  const tabletMedia = siteCss.match(/@media \(max-width: 960px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+
+  assert.match(tabletMedia, /\.site-footer:not\(\.site-footer-compact\) \.footer-grid\s*\{[\s\S]*?grid-template-columns: repeat\(2, 1fr\);/);
+  assert.match(tabletMedia, /\.site-footer:not\(\.site-footer-compact\) \.footer-grid > \.footer-column:first-child\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
+});
+
+test("los footers compactos mantienen la marca a ancho completo", () => {
+  const siteCss = read("css/site.css");
+  const compactPages = [
+    "404.html",
+    "confirmar-novedades.html",
+    "mercadopago-exito.html",
+    "mercadopago-pendiente.html",
+    "mercadopago-fallo.html",
+    "mercadopago-suscripcion.html"
+  ];
+
+  for (const page of compactPages) {
+    const html = read(page);
+    assert.match(html, /<footer class="site-footer site-footer-compact[^"]*">/, page);
+    assert.match(html, /<div class="container footer-grid">\s*<a class="brand brand-footer"/, page);
+  }
+
+  assert.doesNotMatch(read("index.html"), /<footer class="site-footer site-footer-compact/);
+
+  const desktopGrid = siteCss.match(/\.site-footer-compact \.footer-grid\s*\{([\s\S]*?)\n\}/)?.[1] || "";
+  assert.match(desktopGrid, /grid-template-columns: 1\.5fr 1fr 1fr;/);
+
+  const tabletMedia = siteCss.match(/@media \(max-width: 960px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+  assert.match(tabletMedia, /\.site-footer-compact \.footer-grid\s*\{[\s\S]*?grid-template-columns: 1fr 1fr;/);
+  assert.match(tabletMedia, /\.site-footer-compact \.brand-footer\s*\{[\s\S]*?grid-column: 1 \/ -1;/);
+
+  const mobileMedia = siteCss.match(/@media \(max-width: 700px\) \{([\s\S]*?)(?=\n@media )/)?.[1] || "";
+  assert.match(mobileMedia, /\.site-footer-compact \.footer-grid\s*\{[\s\S]*?grid-template-columns: 1fr;/);
+  assert.match(mobileMedia, /\.site-footer-compact \.brand-footer\s*\{[\s\S]*?grid-column: auto;/);
+
 });
 
 test("el material comercial del portal no se publica ni se indexa", () => {
@@ -557,7 +620,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
   assert.match(html, />Hablar por WhatsApp</);
-  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
+  assert.match(html, /href="\.\/vendedores\/index\.html">Vendedores/);
   assert.doesNotMatch(html, /id="vendedores"|id="sellerApplicationForm"/);
   assert.match(vendorLanding, /<title>Vendedores \| Nexar Sistemas<\/title>/);
   assert.match(vendorLanding, /<a class="skip-link" href="#contenido">Saltar al contenido<\/a>/);
@@ -573,7 +636,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(vendorLanding, /name="mensaje"/);
   assert.match(vendorLanding, /src="\.\.\/assets\/js\/home-forms\.js"/);
   assert.doesNotMatch(html, /href="\.\/vendedores\/login\.html">Acceso vendedores/);
-  assert.match(html, /href="\.\/vendedores\/">Vendedores/);
+  assert.match(html, /href="\.\/vendedores\/index\.html">Vendedores/);
   assert.match(html, /id="newsletterForm"/);
   assert.match(html, /id="newsletter-consent"/);
   assert.match(html, /Podés darte de baja cuando quieras\./);
@@ -649,9 +712,9 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
-  assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/">Vendedores<\/a>/);
-  assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
-  assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/">Vendedores<\/a>/);
+  assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
+  assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
+  assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
   assert.match(html, /<section class="section section-soft" id="casos">/);
   const tecmaCase = html.match(/<article class="case-card" data-case="tecma">([\s\S]*?)<\/article>/)?.[1] || "";
   const ineditaCase = html.match(/<article class="case-card" data-case="inedita">([\s\S]*?)<\/article>/)?.[1] || "";
