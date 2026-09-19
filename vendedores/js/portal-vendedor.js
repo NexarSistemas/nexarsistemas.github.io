@@ -4,6 +4,8 @@
   const PROFILE_FIELDS = "id,codigo_vendedor,email,telefono,alias_cbu";
   const LICENSE_FIELDS = "license_key,producto,usuario,plan,plan_vendido,expira,created_at";
   const COMMISSION_FIELDS = "tipo,producto,license_key,monto,estado,created_at,paid_at";
+  let client;
+  let recoveryAuthEventReceived = false;
 
   function getConfig() {
     const config = window.NEXAR_SUPABASE_CONFIG || {};
@@ -14,11 +16,23 @@
   }
 
   function getClient() {
+    if (client) return client;
     const config = getConfig();
     if (!config.ready || !window.supabase || typeof window.supabase.createClient !== "function") {
       throw new Error("No pudimos preparar el acceso seguro al portal.");
     }
-    return window.supabase.createClient(config.url, config.anonKey);
+    client = window.supabase.createClient(config.url, config.anonKey);
+    client.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") recoveryAuthEventReceived = true;
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") recoveryAuthEventReceived = false;
+      syncRecoveryUi();
+    });
+    return client;
+  }
+
+  function syncRecoveryUi() {
+    const currentPasswordGroup = document.getElementById("current_password_group");
+    if (currentPasswordGroup) currentPasswordGroup.hidden = recoveryAuthEventReceived;
   }
 
   function getStatusElement(statusId = "portal-status") { return document.getElementById(statusId); }
@@ -221,23 +235,32 @@
     });
     const passwordForm = document.getElementById("portal-change-password-form");
     const passwordSubmit = document.getElementById("portal-change-password-submit");
-    const recoveryMode = new URLSearchParams(window.location.search).get("recovery") === "1";
-    if (recoveryMode) { document.getElementById("current_password_group").hidden = true; document.getElementById("portal-profile-copy").textContent = "Definí una nueva contraseña para recuperar tu acceso."; }
+    syncRecoveryUi();
     passwordForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
       const currentPassword = document.getElementById("current_password").value;
       const newPassword = document.getElementById("new_password").value;
       const confirmPassword = document.getElementById("confirm_password").value;
-      if (!newPassword || newPassword !== confirmPassword || (!recoveryMode && !currentPassword)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
+      if (!newPassword || newPassword !== confirmPassword || (!recoveryAuthEventReceived && !currentPassword)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
       passwordSubmit.disabled = true;
-      if (!recoveryMode) {
-        const verified = await client.auth.signInWithPassword({ email: identity.session.user.email, password: currentPassword });
-        if (verified.error) { passwordSubmit.disabled = false; showStatus("No pudimos verificar la contraseña actual.", "error", "portal-password-status"); return; }
+      try {
+        const attributes = recoveryAuthEventReceived
+          ? { password: newPassword }
+          : { password: newPassword, currentPassword };
+        const { error } = await client.auth.updateUser(attributes);
+        if (error) showStatus("No pudimos actualizar la contraseña. Verificá los datos e intentá nuevamente.", "error", "portal-password-status");
+        else {
+          passwordForm.reset();
+          recoveryAuthEventReceived = false;
+          syncRecoveryUi();
+          showStatus("Contraseña actualizada correctamente.", "success", "portal-password-status");
+          history.replaceState({}, "", "./perfil.html");
+        }
+      } catch (error) {
+        showStatus("No pudimos actualizar la contraseña. Intentá nuevamente.", "error", "portal-password-status");
+      } finally {
+        passwordSubmit.disabled = false;
       }
-      const { error } = await client.auth.updateUser({ password: newPassword });
-      passwordSubmit.disabled = false;
-      if (error) showStatus("No pudimos actualizar la contraseña. Intentá nuevamente.", "error", "portal-password-status");
-      else { passwordForm.reset(); showStatus("Contraseña actualizada correctamente.", "success", "portal-password-status"); history.replaceState({}, "", "./perfil.html"); }
     });
   }
 

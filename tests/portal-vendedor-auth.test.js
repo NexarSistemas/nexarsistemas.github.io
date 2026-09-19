@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -30,6 +31,101 @@ test("el frontend del portal no llama autenticación, sesión ni RPC legacy", ()
     assert.equal(script.includes(forbidden), false, forbidden);
   }
   assert.doesNotMatch(script, /getFunctionEndpoint\("portal-(update-profile|change-password|password-recovery)"\)/);
+});
+
+function makeElement(id, value = "") {
+  const listeners = {};
+  return {
+    id,
+    value,
+    hidden: false,
+    disabled: false,
+    textContent: "",
+    className: "",
+    dataset: {},
+    listeners,
+    addEventListener(type, listener) { listeners[type] = listener; },
+    reset() {},
+  };
+}
+
+async function runPasswordChange({ search, authEvent, currentPassword }) {
+  const ids = [
+    "portal-logout-button", "portal-logout-link", "portal-profile-status", "portal-password-status",
+    "profile_codigo_vendedor", "profile_nombre", "profile_login_email", "profile_email", "profile_telefono",
+    "profile_alias_cbu", "portal-update-profile-form", "portal-update-profile-submit", "portal-change-password-form",
+    "portal-change-password-submit", "current_password_group", "current_password", "new_password", "confirm_password",
+    "portal-profile-copy",
+  ];
+  const elements = new Map(ids.map((id) => [id, makeElement(id)]));
+  elements.get("current_password").value = currentPassword;
+  elements.get("new_password").value = "ReplacementPass123!";
+  elements.get("confirm_password").value = "ReplacementPass123!";
+  let updateAttributes;
+  let hiddenAtUpdate;
+  let signInCalls = 0;
+  const session = { user: { id: "auth-user", email: "rona@example.com" } };
+  const profile = { user_id: session.user.id, nombre: "Rolando", rol: "vendedor", activo: true, vendedor_id: "seller-id" };
+  const seller = { id: "seller-id", codigo_vendedor: "RONA596", email: "contact@example.com", telefono: "", alias_cbu: "" };
+  let authStateListener;
+  const client = {
+    auth: {
+      onAuthStateChange(listener) { authStateListener = listener; if (authEvent) listener(authEvent, session); return { data: { subscription: { unsubscribe() {} } } }; },
+      async getSession() { return { data: { session } }; },
+      async signOut() { return { error: null }; },
+      async signInWithPassword() { signInCalls += 1; return { error: null }; },
+      async updateUser(attributes) { updateAttributes = attributes; hiddenAtUpdate = elements.get("current_password_group").hidden; return { error: null }; },
+    },
+    from(table) {
+      const query = {
+        select() { return query; },
+        eq() { return query; },
+        maybeSingle() { return Promise.resolve({ data: table === "perfiles" ? profile : seller, error: null }); },
+      };
+      return query;
+    },
+  };
+  const document = {
+    body: { dataset: { portalPage: "profile" }, classList: { add() {}, remove() {} } },
+    getElementById(id) { return elements.get(id) || null; },
+    addEventListener(type, listener) { if (type === "DOMContentLoaded") this.ready = listener; },
+    querySelectorAll() { return []; },
+  };
+  const window = {
+    NEXAR_SUPABASE_CONFIG: { url: "https://example.supabase.co", anonKey: "anon-key" },
+    supabase: { createClient() { return client; } },
+    location: { search, href: "", origin: "https://example.com", pathname: "/vendedores/perfil.html" },
+    addEventListener() {},
+    setTimeout() {},
+  };
+  const context = { window, document, URLSearchParams, history: { replaceState() {} }, console, Intl, Date, Number, String, Promise };
+  vm.runInNewContext(read("vendedores/js/portal-vendedor.js"), context);
+  document.ready();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(typeof authStateListener, "function");
+  await elements.get("portal-change-password-form").listeners.submit({ preventDefault() {} });
+  return { updateAttributes, hiddenAtUpdate, signInCalls, elements };
+}
+
+test("?recovery=1 por sí solo no permite omitir la contraseña actual", async () => {
+  const result = await runPasswordChange({ search: "?recovery=1", currentPassword: "" });
+  assert.equal(result.updateAttributes, undefined);
+  assert.equal(result.elements.get("current_password_group").hidden, false);
+});
+
+test("el cambio normal exige y envía currentPassword a updateUser", async () => {
+  const result = await runPasswordChange({ search: "", currentPassword: "CurrentPass123!" });
+  assert.deepEqual(JSON.parse(JSON.stringify(result.updateAttributes)), {
+    password: "ReplacementPass123!",
+    currentPassword: "CurrentPass123!",
+  });
+  assert.equal(result.signInCalls, 0);
+});
+
+test("el evento PASSWORD_RECOVERY de Auth permite el cambio sin contraseña anterior", async () => {
+  const result = await runPasswordChange({ search: "", authEvent: "PASSWORD_RECOVERY", currentPassword: "" });
+  assert.deepEqual(JSON.parse(JSON.stringify(result.updateAttributes)), { password: "ReplacementPass123!" });
+  assert.equal(result.hiddenAtUpdate, true);
 });
 
 test("las páginas Auth cargan una versión fija de supabase-js y no piden código vendedor", () => {
