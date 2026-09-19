@@ -145,19 +145,14 @@ No se modifican webhooks ni contratos server-side con `nexar-pagos`.
 
 `vendedores/index.html` es el punto de entrada público del circuito de vendedores. Ofrece el ingreso al portal autenticado mediante `vendedores/login.html` y el formulario para enviar una solicitud de incorporación. La home conserva únicamente el acceso secundario a Vendedores.
 
-Se preservan:
+El frontend autenticado usa Supabase Auth y el contrato `auth.users → perfiles → vendedor_id → RLS`.
+El login usa email y contraseña de Auth; dashboard, perfil, licencias y comisiones se consultan con la sesión autenticada y los permisos de RLS. El perfil solo solicita los campos permitidos por M06.5 y actualiza directamente email de contacto, teléfono y alias/CBU.
 
-- login y contraseña temporal;
-- sesión y expiración;
-- recuperación;
-- cambio de contraseña;
-- perfil;
-- dashboard;
-- llamadas a Netlify Functions mediante backend absoluto centralizado;
-- llamadas Supabase protegidas;
-- mensajes de éxito y error.
+Las Functions, sesiones, RPC y columnas de contraseña del Portal Vendedor legacy siguen presentes temporalmente para sus consumidores existentes, pero el frontend nuevo ya no las consume. Su retirada queda para una fase posterior validada.
 
-Variables server-side requeridas por las Functions:
+La recuperación usa el email de acceso y `supabase.auth.resetPasswordForEmail()`. Para producción debe estar autorizada en Supabase la URL de redirección de perfil del dominio publicado, por ejemplo `https://nexarsistemas.com.ar/vendedores/perfil.html?recovery=1`; la configuración remota no se versiona aquí.
+
+Variables server-side requeridas por las Functions legacy:
 
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`

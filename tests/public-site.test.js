@@ -221,9 +221,9 @@ test("el material comercial del portal no se publica ni se indexa", () => {
   assert.match(material, /<meta name="robots" content="noindex,nofollow">/);
   assert.match(material, /data-portal-page="material"/);
   assert.doesNotMatch(material, /data-portal-page="(?:dashboard|profile)"/);
-  assert.doesNotMatch(portalScript, /page === "material"/);
+  assert.match(portalScript, /page === "material"/);
   assert.doesNotMatch(portalScript, /function initMaterialPage\(\)/);
-  assert.match(portalScript, /document\.addEventListener\("DOMContentLoaded", \(\) => \{\s*bindLogout\(\);/);
+  assert.match(portalScript, /if \(page === "material"\) bindLogout\(getClient\(\)\);/);
   assert.match(material, /id="commercial-sheet-comercio"/);
   assert.match(material, /id="commercial-sheet-finanzas"/);
   assert.match(material, /data-print-sheet="commercial-sheet-comercio"/);

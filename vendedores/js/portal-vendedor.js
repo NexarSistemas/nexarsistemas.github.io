@@ -1,822 +1,281 @@
 (function () {
-  const STORAGE_KEY = "nexar.portal.vendedor.session";
-  const DASHBOARD_RPC = "portal_dashboard_vendedor";
-
   const page = document.body ? document.body.dataset.portalPage : "";
-
-  function getFunctionEndpoint(functionName) {
-    const runtimeConfig = window.NEXAR_RUNTIME_CONFIG || {};
-    if (typeof runtimeConfig.getFunctionUrl === "function") {
-      return runtimeConfig.getFunctionUrl(functionName);
-    }
-
-    return `https://nexarsistemas.com.ar/.netlify/functions/${functionName}`;
-  }
+  const LOGIN_ROUTE = "./login.html";
+  const PROFILE_FIELDS = "id,codigo_vendedor,email,telefono,alias_cbu";
+  const LICENSE_FIELDS = "license_key,producto,usuario,plan,plan_vendido,expira,created_at";
+  const COMMISSION_FIELDS = "tipo,producto,license_key,monto,estado,created_at,paid_at";
 
   function getConfig() {
     const config = window.NEXAR_SUPABASE_CONFIG || {};
     const url = typeof config.url === "string" ? config.url.trim() : "";
     const anonKey = typeof config.anonKey === "string" ? config.anonKey.trim() : "";
-    const isPlaceholder =
-      !url ||
-      !anonKey ||
-      url.includes("TU-PROYECTO") ||
-      anonKey.includes("TU_ANON_PUBLIC_KEY");
-
-    return {
-      url,
-      anonKey,
-      ready: !isPlaceholder
-    };
+    const ready = url && anonKey && !url.includes("TU-PROYECTO") && !anonKey.includes("TU_ANON_PUBLIC_KEY");
+    return { url, anonKey, ready };
   }
 
-  function getStatusElement(statusId = "portal-status") {
-    return document.getElementById(statusId);
+  function getClient() {
+    const config = getConfig();
+    if (!config.ready || !window.supabase || typeof window.supabase.createClient !== "function") {
+      throw new Error("No pudimos preparar el acceso seguro al portal.");
+    }
+    return window.supabase.createClient(config.url, config.anonKey);
   }
 
+  function getStatusElement(statusId = "portal-status") { return document.getElementById(statusId); }
   function showStatus(message, type, statusId = "portal-status") {
     const element = getStatusElement(statusId);
-    if (!element) {
-      return;
-    }
-
+    if (!element) return;
     element.textContent = message;
     element.className = `portal-status is-visible is-${type}`;
   }
-
   function hideStatus(statusId = "portal-status") {
     const element = getStatusElement(statusId);
-    if (!element) {
-      return;
-    }
-
+    if (!element) return;
     element.textContent = "";
     element.className = "portal-status";
   }
-
-  function saveSession(payload) {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+  function escapeHtml(value) {
+    return String(value ?? "-").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
   }
-
-  function loadSession() {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(raw);
-    } catch (error) {
-      sessionStorage.removeItem(STORAGE_KEY);
-      return null;
-    }
-  }
-
-  function clearSession() {
-    sessionStorage.removeItem(STORAGE_KEY);
-  }
-
-  function requiresPasswordChange(session) {
-    return Boolean(session && session.vendedor && session.vendedor.password_change_required);
-  }
-
-  function getDefaultPortalRoute(session) {
-    return requiresPasswordChange(session) ? "./perfil.html" : "./dashboard.html";
-  }
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function parseUtcTimestamp(value) {
-    if (typeof value !== "string" || !value.trim()) {
-      return Number.NaN;
-    }
-
-    const normalized = /(?:Z|[+-]\d{2}:?\d{2})$/.test(value.trim())
-      ? value.trim()
-      : `${value.trim()}Z`;
-    return Date.parse(normalized);
-  }
-
-  function isExpired(session) {
-    if (!session || !session.expires_at) {
-      return true;
-    }
-
-    const expiresAt = parseUtcTimestamp(session.expires_at);
-    return Number.isNaN(expiresAt) || expiresAt <= Date.now();
-  }
-
-  async function callSupabaseRpc(functionName, payload) {
-    const config = getConfig();
-    if (!config.ready) {
-      throw new Error("Falta configurar assets/js/supabase-config.js.");
-    }
-
-    const response = await fetch(`${config.url}/rest/v1/rpc/${functionName}`, {
-      method: "POST",
-      headers: {
-        apikey: config.anonKey,
-        Authorization: `Bearer ${config.anonKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      let detail = "";
-      try {
-        const errorData = await response.json();
-        detail = errorData.message || errorData.error || errorData.hint || "";
-      } catch (error) {
-        detail = "";
-      }
-
-      throw new Error(detail || `Supabase respondio con estado ${response.status}.`);
-    }
-
-    return response.json();
-  }
-
   function formatCurrency(value) {
-    const amount = Number(value || 0);
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      maximumFractionDigits: 2
-    }).format(amount);
+    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 }).format(Number(value || 0));
   }
-
   function formatDate(value) {
-    if (!value) {
-      return "-";
-    }
-
+    if (!value) return "-";
     const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-      return value;
-    }
-
-    return new Intl.DateTimeFormat("es-AR", {
-      dateStyle: "short",
-      timeStyle: value.includes("T") ? "short" : undefined
-    }).format(parsed);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: value.includes("T") ? "short" : undefined }).format(parsed);
   }
-
   function createStatCard(label, value, hint) {
-    return `
-      <article class="portal-stat">
-        <span>${label}</span>
-        <strong>${value}</strong>
-        <span>${hint}</span>
-      </article>
-    `;
+    return `<article class="portal-stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><span>${escapeHtml(hint)}</span></article>`;
   }
-
-  function statePillClass(value) {
-    if (value === "pagada") {
-      return "is-paid";
-    }
-    if (value === "pendiente") {
-      return "is-pending";
-    }
-    return "is-cancelled";
-  }
-
+  function statePillClass(value) { return value === "pagada" ? "is-paid" : value === "pendiente" ? "is-pending" : "is-cancelled"; }
   function renderTable(containerId, columns, rows) {
     const container = document.getElementById(containerId);
-    if (!container) {
-      return;
-    }
-
-    if (!Array.isArray(rows) || !rows.length) {
-      container.innerHTML = '<p class="portal-empty">Todavia no hay datos para mostrar.</p>';
-      return;
-    }
-
-    const head = columns.map((column) => `<th>${column.label}</th>`).join("");
-    const body = rows.map((row) => `
-      <tr>
-        ${columns.map((column) => `<td>${column.render(row)}</td>`).join("")}
-      </tr>
-    `).join("");
-
-    container.innerHTML = `
-      <table class="portal-table">
-        <thead><tr>${head}</tr></thead>
-        <tbody>${body}</tbody>
-      </table>
-    `;
+    if (!container) return;
+    if (!rows.length) { container.innerHTML = '<p class="portal-empty">Todavía no hay datos para mostrar.</p>'; return; }
+    const head = columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("");
+    const body = rows.map((row) => `<tr>${columns.map((column) => `<td>${column.render(row)}</td>`).join("")}</tr>`).join("");
+    container.innerHTML = `<table class="portal-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   }
 
-  function bindLogout() {
-    const targets = [
-      document.getElementById("portal-logout-button"),
-      document.getElementById("portal-logout-link")
-    ].filter(Boolean);
-
-    targets.forEach((element) => {
-      if (element.dataset.logoutBound === "true") {
-        return;
-      }
-
+  async function getPortalIdentity(client) {
+    const { data: sessionData } = await client.auth.getSession();
+    const session = sessionData.session;
+    if (!session || !session.user) return null;
+    const { data: profile, error } = await client.from("perfiles")
+      .select("user_id,nombre,rol,activo,vendedor_id").eq("user_id", session.user.id).maybeSingle();
+    if (error || !profile || !profile.activo || profile.rol !== "vendedor" || !profile.vendedor_id) {
+      await client.auth.signOut();
+      return null;
+    }
+    return { session, profile };
+  }
+  async function requirePortalIdentity(client, statusId) {
+    const identity = await getPortalIdentity(client);
+    if (identity) return identity;
+    if (statusId) showStatus("Tu acceso no está habilitado para el portal.", "error", statusId);
+    window.setTimeout(() => { window.location.href = LOGIN_ROUTE; }, statusId ? 1000 : 0);
+    return null;
+  }
+  function bindLogout(client) {
+    [document.getElementById("portal-logout-button"), document.getElementById("portal-logout-link")].filter(Boolean).forEach((element) => {
+      if (element.dataset.logoutBound === "true") return;
       element.dataset.logoutBound = "true";
-      element.addEventListener("click", (event) => {
-        event.preventDefault();
-        clearSession();
-        window.location.href = "./login.html";
+      element.addEventListener("click", async (event) => {
+        event.preventDefault(); await client.auth.signOut(); window.location.href = LOGIN_ROUTE;
       });
     });
   }
 
-  async function fetchProfile(sessionToken) {
-      const response = await fetch(`${getFunctionEndpoint("portal-update-profile")}?session_token=${encodeURIComponent(sessionToken)}`, {
-      method: "GET"
-    });
-    const payload = await response.json();
-
-    if (!response.ok) {
-      throw new Error((payload && payload.error) || "No pudimos cargar el perfil.");
-    }
-
-    return payload;
-  }
-
-  function renderProfileIdentity(vendedor) {
-    const labels = {
-      profile_codigo_vendedor: vendedor.codigo_vendedor || "-",
-      profile_nombre: vendedor.nombre || "-",
-      profile_apellido: vendedor.apellido || "-",
-      profile_dni: vendedor.dni || "-"
-    };
-
-    Object.entries(labels).forEach(([id, value]) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.textContent = value;
-      }
-    });
-
-    const emailField = document.getElementById("profile_email");
-    const telefonoField = document.getElementById("profile_telefono");
-    const aliasField = document.getElementById("profile_alias_cbu");
-
-    if (emailField) {
-      emailField.value = vendedor.email || "";
-    }
-    if (telefonoField) {
-      telefonoField.value = vendedor.telefono || "";
-    }
-    if (aliasField) {
-      aliasField.value = vendedor.alias_cbu || "";
-    }
-  }
-
   async function initLoginPage() {
-    const existingSession = loadSession();
-    if (existingSession && !isExpired(existingSession)) {
-      window.location.href = getDefaultPortalRoute(existingSession);
-      return;
-    }
-
-    clearSession();
-
+    const client = getClient();
+    const { data } = await client.auth.getSession();
+    if (data.session && await getPortalIdentity(client)) { window.location.href = "./dashboard.html"; return; }
     const form = document.getElementById("portal-login-form");
     const submitButton = document.getElementById("portal-login-submit");
-    if (!form || !submitButton) {
-      return;
-    }
-
+    if (!form || !submitButton) return;
     form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      hideStatus();
-
-      const codigoField = document.getElementById("codigo_vendedor");
-      const passwordField = document.getElementById("password");
-      const codigo = codigoField ? codigoField.value.trim().toUpperCase() : "";
-      const password = passwordField ? passwordField.value : "";
-
-      if (!codigo || !password) {
-        showStatus("Completá código vendedor y contraseña para continuar.", "error");
-        return;
-      }
-
-      submitButton.disabled = true;
-      submitButton.textContent = "Ingresando...";
-      showStatus("Validando acceso...", "loading");
-
+      event.preventDefault(); hideStatus();
+      const email = document.getElementById("email")?.value.trim().toLowerCase() || "";
+      const password = document.getElementById("password")?.value || "";
+      if (!isValidEmail(email) || !password) { showStatus("Ingresá tu email de acceso y contraseña.", "error"); return; }
+      submitButton.disabled = true; submitButton.textContent = "Ingresando..."; showStatus("Validando acceso...", "loading");
       try {
-        const response = await fetch(getFunctionEndpoint("portal-login-vendedor"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            codigo_vendedor: codigo,
-            password
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error("Credenciales invalidas.");
-        }
-
-        const payload = await response.json();
-        if (!payload || !payload.session_token || !payload.vendedor) {
-          throw new Error("Respuesta incompleta.");
-        }
-
-        saveSession(payload);
-        window.location.href = getDefaultPortalRoute(payload);
+        const { error } = await client.auth.signInWithPassword({ email, password });
+        if (error || !await getPortalIdentity(client)) {
+          await client.auth.signOut(); showStatus("No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.", "error");
+        } else window.location.href = "./dashboard.html";
       } catch (error) {
-        console.error("Portal vendedor: error al iniciar sesion.", error);
-        showStatus("No pudimos iniciar sesion. Verificá tus datos e intentá nuevamente.", "error");
+        showStatus("No pudimos iniciar sesión. Intentá nuevamente.", "error");
       } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Ingresar";
+        submitButton.disabled = false; submitButton.textContent = "Ingresar";
       }
     });
   }
 
   async function initRecoveryPage() {
+    const client = getClient();
     const form = document.getElementById("portal-recovery-form");
     const submitButton = document.getElementById("portal-recovery-submit");
-    if (!form || !submitButton) {
-      return;
-    }
-
+    if (!form || !submitButton) return;
     form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      hideStatus();
-
-      const codigoField = document.getElementById("recovery_codigo_vendedor");
-      const emailField = document.getElementById("recovery_email");
-      const telefonoField = document.getElementById("recovery_telefono");
-      const mensajeField = document.getElementById("recovery_mensaje");
-
-      const codigo = codigoField ? codigoField.value.trim().toUpperCase() : "";
-      const email = emailField ? emailField.value.trim().toLowerCase() : "";
-      const telefono = telefonoField ? telefonoField.value.trim() : "";
-      const mensaje = mensajeField ? mensajeField.value.trim() : "";
-
-      if (!codigo) {
-        showStatus("Ingresá tu código vendedor para continuar.", "error");
-        return;
-      }
-
-      if (!email && !telefono) {
-        showStatus("Ingresá email o teléfono para continuar.", "error");
-        return;
-      }
-
-      if (email && !isValidEmail(email)) {
-        showStatus("Si informás email, debe tener un formato válido.", "error");
-        return;
-      }
-
-      if (mensaje.length > 500) {
-        showStatus("El mensaje es demasiado largo.", "error");
-        return;
-      }
-
-      submitButton.disabled = true;
-      submitButton.textContent = "Enviando...";
-      showStatus("Registrando solicitud...", "loading");
-
+      event.preventDefault(); hideStatus();
+      const email = document.getElementById("recovery_email")?.value.trim().toLowerCase() || "";
+      if (!isValidEmail(email)) { showStatus("Ingresá un email de acceso válido.", "error"); return; }
+      submitButton.disabled = true; submitButton.textContent = "Enviando...";
+      const redirectTo = `${window.location.origin}${window.location.pathname.replace("recuperar.html", "perfil.html")}?recovery=1`;
       try {
-        const response = await fetch(getFunctionEndpoint("portal-password-recovery"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            codigo_vendedor: codigo,
-            email,
-            telefono,
-            mensaje
-          })
-        });
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error((payload && payload.error) || "No pudimos registrar la solicitud.");
-        }
-
-        form.reset();
-        showStatus(
-          (payload && payload.message) || "Si los datos son correctos, registramos tu solicitud.",
-          "success"
-        );
+        const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+        if (error) showStatus("No pudimos solicitar el restablecimiento. Intentá nuevamente.", "error");
+        else { form.reset(); showStatus("Si el email está registrado, vas a recibir instrucciones para restablecer tu contraseña.", "success"); }
       } catch (error) {
-        console.error("Portal vendedor: error al solicitar recuperacion.", error);
-        showStatus(error.message || "No pudimos registrar la solicitud.", "error");
+        showStatus("No pudimos solicitar el restablecimiento. Intentá nuevamente.", "error");
       } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Enviar solicitud";
+        submitButton.disabled = false; submitButton.textContent = "Enviar enlace";
       }
     });
   }
 
-  function renderDashboard(payload) {
-    const vendedor = payload.vendedor || {};
-    const resumen = payload.resumen || {};
+  function renderDashboard(identity, seller, licenses, commissions) {
     const title = document.getElementById("portal-title");
     const subtitle = document.getElementById("portal-subtitle");
+    if (title) title.textContent = `Dashboard de ${identity.profile.nombre}`;
+    if (subtitle) subtitle.textContent = `Vendedor ${seller.codigo_vendedor || "-"}`;
     const summary = document.getElementById("portal-summary");
-    const adminSummary = document.getElementById("portal-admin-summary");
-
-    if (title) {
-      title.textContent = vendedor.es_admin
-        ? `Dashboard general - ${vendedor.nombre || ""} ${vendedor.apellido || ""}`.trim()
-        : `Dashboard de ${vendedor.nombre || ""} ${vendedor.apellido || ""}`.trim();
-    }
-
-    if (subtitle) {
-      const rolePill = vendedor.es_admin
-        ? '<span class="portal-pill is-admin">Vendedor admin</span>'
-        : '<span class="portal-pill is-standard">Vendedor</span>';
-      subtitle.innerHTML = `${rolePill} Codigo ${vendedor.codigo_vendedor || "-"}`;
-    }
-
     if (summary) {
+      const pending = commissions.filter((item) => item.estado === "pendiente");
+      const pendingTotal = pending.reduce((total, item) => total + Number(item.monto || 0), 0);
       summary.innerHTML = [
-        createStatCard("Licencias", String(resumen.total_licencias || 0), "Ventas/licencias visibles"),
-        createStatCard("Comisiones pendientes", String(resumen.comisiones_pendientes || 0), "Movimientos pendientes"),
-        createStatCard("Total pendiente", formatCurrency(resumen.total_pendiente || 0), "Monto a liquidar"),
-        createStatCard("Total pagado", formatCurrency(resumen.total_pagado || 0), "Historial abonado")
+        createStatCard("Licencias recientes", String(licenses.length), "Información visible para tu cuenta"),
+        createStatCard("Comisiones recientes", String(commissions.length), "Información visible para tu cuenta"),
+        createStatCard("Pendiente reciente", formatCurrency(pendingTotal), "Según los movimientos mostrados")
       ].join("");
     }
-
-    if (adminSummary) {
-      if (vendedor.es_admin) {
-        adminSummary.hidden = false;
-        adminSummary.innerHTML = `
-          <h2>Resumen general</h2>
-          <p>Vendedores totales: <strong>${resumen.total_vendedores || 0}</strong></p>
-          <p>Vendedores activos: <strong>${resumen.vendedores_activos || 0}</strong></p>
-          <p>Comisiones pagadas: <strong>${resumen.comisiones_pagadas || 0}</strong></p>
-        `;
-      } else {
-        adminSummary.hidden = true;
-        adminSummary.innerHTML = "";
-      }
-    }
-
     renderTable("portal-licenses", [
-      { label: "Fecha", render: (row) => formatDate(row.created_at) },
-      { label: "Licencia", render: (row) => row.license_key || "-" },
-      { label: "Producto", render: (row) => row.producto || "-" },
-      { label: "Cliente", render: (row) => row.usuario || "-" },
-      { label: "Plan", render: (row) => row.plan_vendido || row.plan || "-" },
-      { label: "Expira", render: (row) => formatDate(row.expira) }
-    ], payload.ultimas_licencias || []);
-
+      { label: "Fecha", render: (row) => escapeHtml(formatDate(row.created_at)) },
+      { label: "Licencia", render: (row) => escapeHtml(row.license_key) },
+      { label: "Producto", render: (row) => escapeHtml(row.producto) },
+      { label: "Cliente", render: (row) => escapeHtml(row.usuario) },
+      { label: "Plan", render: (row) => escapeHtml(row.plan_vendido || row.plan) },
+      { label: "Expira", render: (row) => escapeHtml(formatDate(row.expira)) }
+    ], licenses);
     renderTable("portal-commissions", [
-      { label: "Fecha", render: (row) => formatDate(row.created_at) },
-      { label: "Tipo", render: (row) => row.tipo || "-" },
-      { label: "Producto", render: (row) => row.producto || "-" },
-      { label: "Licencia", render: (row) => row.license_key || "-" },
-      { label: "Monto", render: (row) => formatCurrency(row.monto || 0) },
-      {
-        label: "Estado",
-        render: (row) => `<span class="portal-pill ${statePillClass(row.estado)}">${row.estado || "-"}</span>`
-      }
-    ], payload.ultimas_comisiones || []);
+      { label: "Fecha", render: (row) => escapeHtml(formatDate(row.created_at)) },
+      { label: "Tipo", render: (row) => escapeHtml(row.tipo) },
+      { label: "Producto", render: (row) => escapeHtml(row.producto) },
+      { label: "Licencia", render: (row) => escapeHtml(row.license_key) },
+      { label: "Monto", render: (row) => escapeHtml(formatCurrency(row.monto)) },
+      { label: "Estado", render: (row) => `<span class="portal-pill ${statePillClass(row.estado)}">${escapeHtml(row.estado)}</span>` }
+    ], commissions);
   }
-
   async function initDashboardPage() {
-    bindLogout();
-
-    const session = loadSession();
-    if (!session || isExpired(session) || !session.session_token) {
-      clearSession();
-      window.location.href = "./login.html";
-      return;
-    }
-
-    if (requiresPasswordChange(session)) {
-      window.location.href = "./perfil.html";
-      return;
-    }
-
+    const client = getClient(); bindLogout(client);
+    const identity = await requirePortalIdentity(client, "portal-status");
+    if (!identity) return;
     showStatus("Cargando dashboard...", "loading");
-
     try {
-      const payload = await callSupabaseRpc(DASHBOARD_RPC, {
-        p_session_token: session.session_token
-      });
-
-      saveSession({
-        ...session,
-        vendedor: {
-          ...(session.vendedor || {}),
-          ...(payload.vendedor || {})
-        }
-      });
-      renderDashboard(payload);
-      hideStatus();
+      const [sellerResult, licenseResult, commissionResult] = await Promise.all([
+        client.from("vendedores").select(PROFILE_FIELDS).eq("id", identity.profile.vendedor_id).maybeSingle(),
+        client.from("licencias").select(LICENSE_FIELDS).order("created_at", { ascending: false }).limit(25),
+        client.from("comisiones").select(COMMISSION_FIELDS).order("created_at", { ascending: false }).limit(25)
+      ]);
+      if (sellerResult.error || !sellerResult.data || licenseResult.error || commissionResult.error) {
+        showStatus("No pudimos cargar los datos autorizados para tu cuenta.", "error"); return;
+      }
+      renderDashboard(identity, sellerResult.data, licenseResult.data || [], commissionResult.data || []); hideStatus();
     } catch (error) {
-      console.error("Portal vendedor: error al cargar dashboard.", error);
-      clearSession();
-      showStatus("La sesion vencio o no pudimos cargar tus datos. Ingresá nuevamente.", "error");
-      setTimeout(() => {
-        window.location.href = "./login.html";
-      }, 1400);
+      showStatus("No pudimos cargar los datos autorizados para tu cuenta.", "error"); return;
     }
   }
 
+  function renderProfile(identity, seller) {
+    const values = { profile_codigo_vendedor: seller.codigo_vendedor || "-", profile_nombre: identity.profile.nombre || "-", profile_login_email: identity.session.user.email || "-" };
+    Object.entries(values).forEach(([id, value]) => { const element = document.getElementById(id); if (element) element.textContent = value; });
+    document.getElementById("profile_email").value = seller.email || "";
+    document.getElementById("profile_telefono").value = seller.telefono || "";
+    document.getElementById("profile_alias_cbu").value = seller.alias_cbu || "";
+  }
   async function initProfilePage() {
-    bindLogout();
-
-    const session = loadSession();
-    if (!session || isExpired(session) || !session.session_token) {
-      clearSession();
-      window.location.href = "./login.html";
-      return;
-    }
-
-    const title = document.getElementById("portal-profile-title");
-    const copy = document.getElementById("portal-profile-copy");
+    const client = getClient(); bindLogout(client);
+    const identity = await requirePortalIdentity(client, "portal-profile-status");
+    if (!identity) return;
+    const sellerResult = await client.from("vendedores").select(PROFILE_FIELDS).eq("id", identity.profile.vendedor_id).maybeSingle();
+    if (sellerResult.error || !sellerResult.data) { showStatus("No pudimos cargar tu perfil.", "error", "portal-profile-status"); return; }
+    let seller = sellerResult.data; renderProfile(identity, seller);
     const profileForm = document.getElementById("portal-update-profile-form");
-    const profileSubmitButton = document.getElementById("portal-update-profile-submit");
-    const passwordForm = document.getElementById("portal-change-password-form");
-    const passwordSubmitButton = document.getElementById("portal-change-password-submit");
-    const forcedChange = requiresPasswordChange(session);
-    let currentSession = session;
-
-    if (title) {
-      title.textContent = forcedChange ? "Completar perfil y cambiar contraseña" : "Mi perfil";
-    }
-
-    if (copy) {
-      copy.textContent = forcedChange
-        ? "Este es tu primer acceso o tenés una clave temporal. Primero revisá tus datos y definí una nueva contraseña."
-        : "Actualizá tus datos de contacto y cobro, y cambiá tu contraseña cuando lo necesites.";
-    }
-
-    try {
-      const payload = await fetchProfile(session.session_token);
-      currentSession = {
-        ...session,
-        vendedor: {
-          ...(session.vendedor || {}),
-          ...(payload.vendedor || {})
-        }
-      };
-      saveSession(currentSession);
-      renderProfileIdentity(currentSession.vendedor || {});
-    } catch (error) {
-      console.error("Portal vendedor: error al cargar perfil.", error);
-      clearSession();
-      showStatus(error.message || "No pudimos cargar tu perfil.", "error", "portal-profile-status");
-      setTimeout(() => {
-        window.location.href = "./login.html";
-      }, 1400);
-      return;
-    }
-
-    if (profileForm && profileSubmitButton) {
-      profileForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        hideStatus("portal-profile-status");
-
-        const emailField = document.getElementById("profile_email");
-        const telefonoField = document.getElementById("profile_telefono");
-        const aliasField = document.getElementById("profile_alias_cbu");
-
-        const email = emailField ? emailField.value.trim().toLowerCase() : "";
-        const telefono = telefonoField ? telefonoField.value.trim() : "";
-        const aliasCbu = aliasField ? aliasField.value.trim() : "";
-
-        if (email && !isValidEmail(email)) {
-          showStatus("Si informás email, debe tener un formato válido.", "error", "portal-profile-status");
-          return;
-        }
-
-        profileSubmitButton.disabled = true;
-        profileSubmitButton.textContent = "Guardando...";
-        showStatus("Actualizando datos de contacto...", "loading", "portal-profile-status");
-
-        try {
-          const response = await fetch(getFunctionEndpoint("portal-update-profile"), {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              session_token: currentSession.session_token,
-              email,
-              telefono,
-              alias_cbu: aliasCbu
-            })
-          });
-
-          const payload = await response.json();
-          if (!response.ok) {
-            throw new Error((payload && payload.error) || "No pudimos actualizar el perfil.");
-          }
-
-          currentSession = {
-            ...currentSession,
-            vendedor: {
-              ...(currentSession.vendedor || {}),
-              ...(payload.vendedor || {})
-            }
-          };
-          saveSession(currentSession);
-          renderProfileIdentity(currentSession.vendedor || {});
-          showStatus("Datos actualizados correctamente.", "success", "portal-profile-status");
-        } catch (error) {
-          console.error("Portal vendedor: error al actualizar perfil.", error);
-          showStatus(error.message || "No pudimos actualizar el perfil.", "error", "portal-profile-status");
-        } finally {
-          profileSubmitButton.disabled = false;
-          profileSubmitButton.textContent = "Guardar datos";
-        }
-      });
-    }
-
-    if (!passwordForm || !passwordSubmitButton) {
-      return;
-    }
-
-    passwordForm.addEventListener("submit", async (event) => {
+    const profileSubmit = document.getElementById("portal-update-profile-submit");
+    profileForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      hideStatus("portal-password-status");
-
-      const currentPasswordField = document.getElementById("current_password");
-      const newPasswordField = document.getElementById("new_password");
-      const confirmPasswordField = document.getElementById("confirm_password");
-
-      const currentPassword = currentPasswordField ? currentPasswordField.value : "";
-      const newPassword = newPasswordField ? newPasswordField.value : "";
-      const confirmPassword = confirmPasswordField ? confirmPasswordField.value : "";
-
-      if (!currentPassword || !newPassword || !confirmPassword) {
-        showStatus("Completá los tres campos para actualizar la contraseña.", "error", "portal-password-status");
-        return;
+      const email = document.getElementById("profile_email").value.trim().toLowerCase();
+      const telefono = document.getElementById("profile_telefono").value.trim();
+      const alias_cbu = document.getElementById("profile_alias_cbu").value.trim();
+      if (email && !isValidEmail(email)) { showStatus("Si informás email, debe tener un formato válido.", "error", "portal-profile-status"); return; }
+      profileSubmit.disabled = true;
+      const { data, error } = await client.from("vendedores").update({ email, telefono, alias_cbu }).eq("id", seller.id).select(PROFILE_FIELDS).maybeSingle();
+      profileSubmit.disabled = false;
+      if (error || !data) { showStatus("No pudimos actualizar tus datos de contacto.", "error", "portal-profile-status"); return; }
+      seller = data; renderProfile(identity, seller); showStatus("Datos actualizados correctamente.", "success", "portal-profile-status");
+    });
+    const passwordForm = document.getElementById("portal-change-password-form");
+    const passwordSubmit = document.getElementById("portal-change-password-submit");
+    const recoveryMode = new URLSearchParams(window.location.search).get("recovery") === "1";
+    if (recoveryMode) { document.getElementById("current_password_group").hidden = true; document.getElementById("portal-profile-copy").textContent = "Definí una nueva contraseña para recuperar tu acceso."; }
+    passwordForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const currentPassword = document.getElementById("current_password").value;
+      const newPassword = document.getElementById("new_password").value;
+      const confirmPassword = document.getElementById("confirm_password").value;
+      if (!newPassword || newPassword !== confirmPassword || (!recoveryMode && !currentPassword)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
+      passwordSubmit.disabled = true;
+      if (!recoveryMode) {
+        const verified = await client.auth.signInWithPassword({ email: identity.session.user.email, password: currentPassword });
+        if (verified.error) { passwordSubmit.disabled = false; showStatus("No pudimos verificar la contraseña actual.", "error", "portal-password-status"); return; }
       }
-
-      passwordSubmitButton.disabled = true;
-      passwordSubmitButton.textContent = "Guardando...";
-      showStatus("Actualizando contraseña...", "loading", "portal-password-status");
-
-      try {
-        const response = await fetch(getFunctionEndpoint("portal-change-password"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            session_token: currentSession.session_token,
-            current_password: currentPassword,
-            new_password: newPassword,
-            confirm_password: confirmPassword
-          })
-        });
-
-        const payload = await response.json();
-        if (!response.ok) {
-          throw new Error((payload && payload.error) || "No pudimos actualizar la contraseña.");
-        }
-
-        currentSession = {
-          ...currentSession,
-          vendedor: {
-            ...(currentSession.vendedor || {}),
-            ...(payload.vendedor || {}),
-            password_change_required: false
-          }
-        };
-        saveSession(currentSession);
-
-        passwordForm.reset();
-        showStatus("Contraseña actualizada correctamente. Ya podés continuar al dashboard.", "success", "portal-password-status");
-
-        setTimeout(() => {
-          window.location.href = "./dashboard.html";
-        }, 900);
-      } catch (error) {
-        console.error("Portal vendedor: error al cambiar contraseña.", error);
-        showStatus(error.message || "No pudimos actualizar la contraseña.", "error", "portal-password-status");
-      } finally {
-        passwordSubmitButton.disabled = false;
-        passwordSubmitButton.textContent = "Guardar nueva contraseña";
-      }
+      const { error } = await client.auth.updateUser({ password: newPassword });
+      passwordSubmit.disabled = false;
+      if (error) showStatus("No pudimos actualizar la contraseña. Intentá nuevamente.", "error", "portal-password-status");
+      else { passwordForm.reset(); showStatus("Contraseña actualizada correctamente.", "success", "portal-password-status"); history.replaceState({}, "", "./perfil.html"); }
     });
   }
 
   function bindPrintSheets() {
     let selectedSheet = null;
-
-    const clearPrintState = () => {
-      document.body.classList.remove("is-printing-sheet");
-      if (selectedSheet) {
-        selectedSheet.classList.remove("is-print-target");
-        selectedSheet = null;
-      }
-    };
-
+    const clearPrintState = () => { document.body.classList.remove("is-printing-sheet"); selectedSheet?.classList.remove("is-print-target"); selectedSheet = null; };
     window.addEventListener("afterprint", clearPrintState);
-
-    document.querySelectorAll("[data-print-sheet]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const sheetId = button.dataset.printSheet;
-        const sheet = document.getElementById(sheetId);
-        if (!sheet) {
-          return;
-        }
-
-        clearPrintState();
-        selectedSheet = sheet;
-        document.body.classList.add("is-printing-sheet");
-        selectedSheet.classList.add("is-print-target");
-        window.print();
-      });
-    });
+    document.querySelectorAll("[data-print-sheet]").forEach((button) => button.addEventListener("click", () => {
+      const sheet = document.getElementById(button.dataset.printSheet); if (!sheet) return;
+      clearPrintState(); selectedSheet = sheet; document.body.classList.add("is-printing-sheet"); selectedSheet.classList.add("is-print-target"); window.print();
+    }));
   }
-
   function copyTextFallback(text) {
     const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.select();
-
-    try {
-      return document.execCommand("copy");
-    } finally {
-      document.body.removeChild(textarea);
-    }
+    textarea.value = text; textarea.setAttribute("readonly", ""); textarea.style.position = "fixed"; textarea.style.left = "-9999px";
+    document.body.appendChild(textarea); textarea.select();
+    try { return document.execCommand("copy"); } finally { document.body.removeChild(textarea); }
   }
-
   function bindCopyTargets() {
     const status = document.getElementById("copy-status");
-
     document.querySelectorAll("[data-copy-target]").forEach((button) => {
-      let resetTimer = null;
       const defaultLabel = button.textContent;
-
       button.addEventListener("click", async () => {
-        const target = document.getElementById(button.dataset.copyTarget);
-        const text = target ? target.textContent.trim() : "";
+        const text = document.getElementById(button.dataset.copyTarget)?.textContent.trim() || "";
         let copied = false;
-
-        if (text && navigator.clipboard && navigator.clipboard.writeText) {
-          try {
-            await navigator.clipboard.writeText(text);
-            copied = true;
-          } catch (error) {
-            copied = false;
-          }
-        }
-
-        if (text && !copied) {
-          copied = copyTextFallback(text);
-        }
-
-        window.clearTimeout(resetTimer);
-        button.textContent = copied ? "Mensaje copiado" : "No se pudo copiar";
-        if (status) {
-          status.textContent = button.textContent;
-        }
-
-        resetTimer = window.setTimeout(() => {
-          button.textContent = defaultLabel;
-          if (status) {
-            status.textContent = "";
-          }
-        }, 1500);
+        try { if (text && navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); copied = true; } } catch (error) { copied = false; }
+        if (text && !copied) copied = copyTextFallback(text);
+        button.textContent = copied ? "Mensaje copiado" : "No se pudo copiar"; if (status) status.textContent = button.textContent;
+        window.setTimeout(() => { button.textContent = defaultLabel; if (status) status.textContent = ""; }, 1500);
       });
     });
   }
-
   document.addEventListener("DOMContentLoaded", () => {
-    bindLogout();
-    bindPrintSheets();
-    bindCopyTargets();
-
-    if (page === "login") {
-      initLoginPage();
-      return;
-    }
-
-    if (page === "recovery") {
-      initRecoveryPage();
-      return;
-    }
-
-    if (page === "dashboard") {
-      initDashboardPage();
-      return;
-    }
-
-    if (page === "profile") {
-      initProfilePage();
-      return;
-    }
+    bindPrintSheets(); bindCopyTargets();
+    if (page === "material") bindLogout(getClient());
+    if (page === "login") initLoginPage();
+    if (page === "recovery") initRecoveryPage();
+    if (page === "dashboard") initDashboardPage();
+    if (page === "profile") initProfilePage();
   });
 })();
