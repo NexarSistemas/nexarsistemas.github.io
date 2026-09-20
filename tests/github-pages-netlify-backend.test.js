@@ -53,16 +53,15 @@ test("runtime-config resuelve el backend según el host", () => {
   );
 });
 
-test("portal vendedor y home usan la URL centralizada del backend", () => {
+test("home usa la URL centralizada del backend y el portal usa Supabase Auth", () => {
   const homeScript = read("assets/js/home-forms.js");
   const portalScript = read("vendedores/js/portal-vendedor.js");
   const hostScript = read("vendedores/js/portal-host.js");
 
   assert.match(homeScript, /runtimeConfig\.getFunctionUrl\("home-form-submissions"\)/);
-  assert.match(portalScript, /getFunctionEndpoint\("portal-login-vendedor"\)/);
-  assert.match(portalScript, /getFunctionEndpoint\("portal-password-recovery"\)/);
-  assert.match(portalScript, /getFunctionEndpoint\("portal-update-profile"\)/);
-  assert.match(portalScript, /getFunctionEndpoint\("portal-change-password"\)/);
+  assert.match(portalScript, /signInWithPassword/);
+  assert.match(portalScript, /resetPasswordForEmail/);
+  assert.doesNotMatch(portalScript, /getFunctionEndpoint/);
   assert.doesNotMatch(homeScript, /window\.location\.replace/);
   assert.doesNotMatch(hostScript, /window\.location\.replace/);
 });

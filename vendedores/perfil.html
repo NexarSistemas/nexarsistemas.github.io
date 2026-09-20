@@ -28,8 +28,7 @@
             <div class="portal-readonly-grid">
                 <div><span class="portal-field-label">Código vendedor</span><strong id="profile_codigo_vendedor">-</strong></div>
                 <div><span class="portal-field-label">Nombre</span><strong id="profile_nombre">-</strong></div>
-                <div><span class="portal-field-label">Apellido</span><strong id="profile_apellido">-</strong></div>
-                <div><span class="portal-field-label">DNI</span><strong id="profile_dni">-</strong></div>
+                <div><span class="portal-field-label">Email de acceso</span><strong id="profile_login_email">-</strong></div>
             </div>
         </section>
 
@@ -55,8 +54,10 @@
             <div id="portal-password-status" class="portal-status" aria-live="polite"></div>
 
             <form id="portal-change-password-form" class="portal-form" novalidate>
-                <label for="current_password">Contraseña actual</label>
-                <input id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+                <div id="current_password_group">
+                    <label for="current_password">Contraseña actual</label>
+                    <input id="current_password" name="current_password" type="password" autocomplete="current-password">
+                </div>
 
                 <label for="new_password">Nueva contraseña</label>
                 <input id="new_password" name="new_password" type="password" autocomplete="new-password" required>
@@ -73,9 +74,8 @@
     </section>
 </main>
 
-<script src="../assets/js/runtime-config.js"></script>
-<script src="./js/portal-host.js"></script>
 <script src="../assets/js/supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script src="./js/portal-vendedor.js"></script>
 </body>
 </html>
