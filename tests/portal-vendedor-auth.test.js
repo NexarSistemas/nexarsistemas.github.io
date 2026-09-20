@@ -31,6 +31,8 @@ test("el frontend del portal no llama autenticación, sesión ni RPC legacy", ()
     assert.equal(script.includes(forbidden), false, forbidden);
   }
   assert.doesNotMatch(script, /getFunctionEndpoint\("portal-(update-profile|change-password|password-recovery)"\)/);
+  assert.doesNotMatch(script, /\bcurrentPassword\s*:|\bcurrent_password\s*:/);
+  assert.doesNotMatch(script, /getFunctionEndpoint\(["']portal-(?:login-vendedor|change-password)["']\)/);
 });
 
 function makeElement(id, value = "") {
@@ -49,7 +51,7 @@ function makeElement(id, value = "") {
   };
 }
 
-async function runPasswordChange({ search, authEvent, currentPassword, updateError = null }) {
+async function runPasswordChange({ search, authEvent, currentPassword, verifyError = null, updateError = null }) {
   const ids = [
     "portal-logout-button", "portal-logout-link", "portal-profile-status", "portal-password-status",
     "profile_codigo_vendedor", "profile_nombre", "profile_login_email", "profile_email", "profile_telefono",
@@ -63,7 +65,8 @@ async function runPasswordChange({ search, authEvent, currentPassword, updateErr
   elements.get("confirm_password").value = "ReplacementPass123!";
   let updateAttributes;
   let hiddenAtUpdate;
-  let signInCalls = 0;
+  const authCalls = [];
+  let signOutCalls = 0;
   const session = { user: { id: "auth-user", email: "rona@example.com" } };
   const profile = { user_id: session.user.id, nombre: "Rolando", rol: "vendedor", activo: true, vendedor_id: "seller-id" };
   const seller = { id: "seller-id", codigo_vendedor: "RONA596", email: "contact@example.com", telefono: "", alias_cbu: "" };
@@ -72,9 +75,18 @@ async function runPasswordChange({ search, authEvent, currentPassword, updateErr
     auth: {
       onAuthStateChange(listener) { authStateListener = listener; if (authEvent) listener(authEvent, session); return { data: { subscription: { unsubscribe() {} } } }; },
       async getSession() { return { data: { session } }; },
-      async signOut() { return { error: null }; },
-      async signInWithPassword() { signInCalls += 1; return { error: null }; },
-      async updateUser(attributes) { updateAttributes = attributes; hiddenAtUpdate = elements.get("current_password_group").hidden; return { error: updateError }; },
+      async signOut() { signOutCalls += 1; return { error: null }; },
+      async signInWithPassword(credentials) {
+        authCalls.push({ method: "signInWithPassword", attributes: credentials });
+        if (!verifyError) authStateListener("SIGNED_IN", session);
+        return { error: verifyError };
+      },
+      async updateUser(attributes) {
+        authCalls.push({ method: "updateUser", attributes });
+        updateAttributes = attributes;
+        hiddenAtUpdate = elements.get("current_password_group").hidden;
+        return { error: updateError };
+      },
     },
     from(table) {
       const query = {
@@ -104,32 +116,58 @@ async function runPasswordChange({ search, authEvent, currentPassword, updateErr
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(typeof authStateListener, "function");
   await elements.get("portal-change-password-form").listeners.submit({ preventDefault() {} });
-  return { updateAttributes, hiddenAtUpdate, signInCalls, elements };
+  return { updateAttributes, hiddenAtUpdate, authCalls, signOutCalls, session, elements };
 }
 
 test("?recovery=1 por sí solo no permite omitir la contraseña actual", async () => {
-  const result = await runPasswordChange({ search: "?recovery=1", currentPassword: "" });
-  assert.equal(result.updateAttributes, undefined);
+  const result = await runPasswordChange({
+    search: "?recovery=1",
+    currentPassword: "CurrentPass123!",
+    verifyError: new Error("Invalid login credentials"),
+  });
+  assert.deepEqual(result.authCalls.map(({ method }) => method), ["signInWithPassword"]);
   assert.equal(result.elements.get("current_password_group").hidden, false);
 });
 
-test("el cambio normal usa current_password y no la propiedad camelCase", async () => {
-  const result = await runPasswordChange({ search: "", currentPassword: "CurrentPass123!" });
-  assert.deepEqual(JSON.parse(JSON.stringify(result.updateAttributes)), {
-    password: "ReplacementPass123!",
-    current_password: "CurrentPass123!",
-  });
-  assert.equal(Object.hasOwn(result.updateAttributes, "currentPassword"), false);
-  assert.equal(result.signInCalls, 0);
+test("la pantalla normal sin contraseña actual no inicia un cambio", async () => {
+  const result = await runPasswordChange({ search: "", currentPassword: "" });
+  assert.deepEqual(result.authCalls, []);
+  assert.equal(result.elements.get("current_password_group").hidden, false);
 });
 
-test("una contraseña actual inválida no muestra un cambio exitoso", async () => {
+test("el cambio normal reautentica primero con el email de la sesión y luego cambia la contraseña", async () => {
+  const result = await runPasswordChange({ search: "", currentPassword: "CurrentPass123!" });
+  assert.deepEqual(JSON.parse(JSON.stringify(result.authCalls)), [
+    { method: "signInWithPassword", attributes: { email: "rona@example.com", password: "CurrentPass123!" } },
+    { method: "updateUser", attributes: { password: "ReplacementPass123!" } },
+  ]);
+  assert.equal(result.session.user.id, "auth-user");
+});
+
+test("si signInWithPassword rechaza la contraseña actual, no se llama a updateUser", async () => {
   const result = await runPasswordChange({
     search: "",
     currentPassword: "IncorrectPass123!",
-    updateError: new Error("Invalid current password"),
+    verifyError: new Error("Invalid login credentials"),
   });
-  assert.match(result.elements.get("portal-password-status").textContent, /No pudimos actualizar/);
+  assert.deepEqual(JSON.parse(JSON.stringify(result.authCalls)), [
+    { method: "signInWithPassword", attributes: { email: "rona@example.com", password: "IncorrectPass123!" } },
+  ]);
+  assert.match(result.elements.get("portal-password-status").textContent, /contraseña actual es incorrecta/);
+  assert.match(result.elements.get("portal-password-status").className, /is-error/);
+  assert.doesNotMatch(result.elements.get("portal-password-status").className, /is-success/);
+  assert.equal(result.elements.get("portal-change-password-submit").disabled, false);
+  assert.equal(result.session.user.id, "auth-user");
+  assert.equal(result.signOutCalls, 0);
+});
+
+test("un error devuelto por updateUser se presenta como error", async () => {
+  const result = await runPasswordChange({
+    search: "",
+    currentPassword: "CurrentPass123!",
+    updateError: new Error("Password update failed"),
+  });
+  assert.deepEqual(result.authCalls.map(({ method }) => method), ["signInWithPassword", "updateUser"]);
   assert.match(result.elements.get("portal-password-status").className, /is-error/);
   assert.doesNotMatch(result.elements.get("portal-password-status").className, /is-success/);
 });
@@ -137,6 +175,9 @@ test("una contraseña actual inválida no muestra un cambio exitoso", async () =
 test("el evento PASSWORD_RECOVERY de Auth permite el cambio sin contraseña anterior", async () => {
   const result = await runPasswordChange({ search: "", authEvent: "PASSWORD_RECOVERY", currentPassword: "" });
   assert.deepEqual(JSON.parse(JSON.stringify(result.updateAttributes)), { password: "ReplacementPass123!" });
+  assert.deepEqual(JSON.parse(JSON.stringify(result.authCalls)), [
+    { method: "updateUser", attributes: { password: "ReplacementPass123!" } },
+  ]);
   assert.equal(result.hiddenAtUpdate, true);
 });
 

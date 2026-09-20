@@ -244,10 +244,17 @@
       if (!newPassword || newPassword !== confirmPassword || (!recoveryAuthEventReceived && !currentPasswordValue)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
       passwordSubmit.disabled = true;
       try {
-        const attributes = recoveryAuthEventReceived
-          ? { password: newPassword }
-          : { password: newPassword, current_password: currentPasswordValue };
-        const { error } = await client.auth.updateUser(attributes);
+        if (!recoveryAuthEventReceived) {
+          const { error: verifyError } = await client.auth.signInWithPassword({
+            email: identity.session.user.email,
+            password: currentPasswordValue
+          });
+          if (verifyError) {
+            showStatus("La contraseña actual es incorrecta. Verificá los datos e intentá nuevamente.", "error", "portal-password-status");
+            return;
+          }
+        }
+        const { error } = await client.auth.updateUser({ password: newPassword });
         if (error) showStatus("No pudimos actualizar la contraseña. Verificá los datos e intentá nuevamente.", "error", "portal-password-status");
         else {
           passwordForm.reset();
