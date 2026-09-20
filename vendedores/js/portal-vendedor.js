@@ -238,15 +238,15 @@
     syncRecoveryUi();
     passwordForm?.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const currentPassword = document.getElementById("current_password").value;
+      const currentPasswordValue = document.getElementById("current_password").value;
       const newPassword = document.getElementById("new_password").value;
       const confirmPassword = document.getElementById("confirm_password").value;
-      if (!newPassword || newPassword !== confirmPassword || (!recoveryAuthEventReceived && !currentPassword)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
+      if (!newPassword || newPassword !== confirmPassword || (!recoveryAuthEventReceived && !currentPasswordValue)) { showStatus("Revisá los datos de la nueva contraseña.", "error", "portal-password-status"); return; }
       passwordSubmit.disabled = true;
       try {
         const attributes = recoveryAuthEventReceived
           ? { password: newPassword }
-          : { password: newPassword, currentPassword };
+          : { password: newPassword, current_password: currentPasswordValue };
         const { error } = await client.auth.updateUser(attributes);
         if (error) showStatus("No pudimos actualizar la contraseña. Verificá los datos e intentá nuevamente.", "error", "portal-password-status");
         else {

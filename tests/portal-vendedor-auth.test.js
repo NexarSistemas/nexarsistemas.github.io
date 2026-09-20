@@ -49,7 +49,7 @@ function makeElement(id, value = "") {
   };
 }
 
-async function runPasswordChange({ search, authEvent, currentPassword }) {
+async function runPasswordChange({ search, authEvent, currentPassword, updateError = null }) {
   const ids = [
     "portal-logout-button", "portal-logout-link", "portal-profile-status", "portal-password-status",
     "profile_codigo_vendedor", "profile_nombre", "profile_login_email", "profile_email", "profile_telefono",
@@ -74,7 +74,7 @@ async function runPasswordChange({ search, authEvent, currentPassword }) {
       async getSession() { return { data: { session } }; },
       async signOut() { return { error: null }; },
       async signInWithPassword() { signInCalls += 1; return { error: null }; },
-      async updateUser(attributes) { updateAttributes = attributes; hiddenAtUpdate = elements.get("current_password_group").hidden; return { error: null }; },
+      async updateUser(attributes) { updateAttributes = attributes; hiddenAtUpdate = elements.get("current_password_group").hidden; return { error: updateError }; },
     },
     from(table) {
       const query = {
@@ -113,13 +113,25 @@ test("?recovery=1 por sí solo no permite omitir la contraseña actual", async (
   assert.equal(result.elements.get("current_password_group").hidden, false);
 });
 
-test("el cambio normal exige y envía currentPassword a updateUser", async () => {
+test("el cambio normal usa current_password y no la propiedad camelCase", async () => {
   const result = await runPasswordChange({ search: "", currentPassword: "CurrentPass123!" });
   assert.deepEqual(JSON.parse(JSON.stringify(result.updateAttributes)), {
     password: "ReplacementPass123!",
-    currentPassword: "CurrentPass123!",
+    current_password: "CurrentPass123!",
   });
+  assert.equal(Object.hasOwn(result.updateAttributes, "currentPassword"), false);
   assert.equal(result.signInCalls, 0);
+});
+
+test("una contraseña actual inválida no muestra un cambio exitoso", async () => {
+  const result = await runPasswordChange({
+    search: "",
+    currentPassword: "IncorrectPass123!",
+    updateError: new Error("Invalid current password"),
+  });
+  assert.match(result.elements.get("portal-password-status").textContent, /No pudimos actualizar/);
+  assert.match(result.elements.get("portal-password-status").className, /is-error/);
+  assert.doesNotMatch(result.elements.get("portal-password-status").className, /is-success/);
 });
 
 test("el evento PASSWORD_RECOVERY de Auth permite el cambio sin contraseña anterior", async () => {
