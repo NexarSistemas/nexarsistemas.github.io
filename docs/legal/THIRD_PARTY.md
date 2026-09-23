@@ -2,8 +2,8 @@
 
 **Nexar Sistemas**
 
-**Version:** 1.0.0  
-**Fecha de vigencia:** 30/06/2026  
+**Version:** 1.1.0  
+**Fecha de vigencia:** 23/09/2026  
 **Estado:** Inventario inicial
 
 Este documento funciona como inventario base de dependencias, frameworks, servicios y plataformas de terceros que pueden estar presentes en productos del ecosistema Nexar.
@@ -50,12 +50,13 @@ No implica que todos los elementos listados esten presentes en todos los product
 - Uso posible: componentes visuales sobre Tailwind para interfaces administrativas o comerciales.
 - Revision pendiente por producto: version exacta, alcance real de uso y dependencia respecto del frontend final.
 
-## 9. LinkedIn
+## 9. Microsoft Clarity
 
-- Uso: insignia pública del perfil del fundador en la home de Nexar Sistemas.
-- Recurso cargado en el navegador: `https://platform.linkedin.com/badges/js/profile.js`.
-- Finalidad: renderizar el badge enlazado al perfil público de LinkedIn.
-- Dependencia externa opcional: si el recurso falla o es bloqueado, la web conserva un fallback local y funcional con enlace al perfil.
+- Proveedor: Microsoft Clarity.
+- Uso: analitica de comportamiento del sitio web publico.
+- Recurso cargado en navegador: `https://www.clarity.ms/tag/`.
+- Finalidad: metricas de navegacion, mapas de calor y grabaciones de sesion.
+- Alcance actual: paginas publicas comerciales de Nexar Sistemas.
 
 ## 10. Otros por completar
 
