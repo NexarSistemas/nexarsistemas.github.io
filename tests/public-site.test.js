@@ -805,21 +805,17 @@ test("la presentación institucional refleja la definición actual de Nexar", ()
   assert.doesNotMatch(html, /Nexar Sistemas es un proyecto independiente/);
 });
 
-test("la home incluye la insignia oficial de LinkedIn del fundador una sola vez", () => {
+test("la home conserva el enlace limpio de LinkedIn del fundador", () => {
   const html = read("index.html");
-  const thirdParty = read("docs/legal/THIRD_PARTY.md");
-  const profileUrl = "https://ar.linkedin.com/in/rolando-navarta-b033b3428?trk=profile-badge";
+  const profileUrl = "https://www.linkedin.com/in/rolando-navarta-b033b3428/";
   const badgeScript = "https://platform.linkedin.com/badges/js/profile.js";
 
-  assert.match(html, /data-vanity="rolando-navarta-b033b3428"/);
   assert.match(html, new RegExp(profileUrl.replace(/[.?]/g, "\\$&")));
-  assert.equal((html.match(new RegExp(badgeScript.replace(/[.?]/g, "\\$&"), "g")) || []).length, 1);
   assert.match(html, /class="founder-profile-fallback"/);
   assert.match(html, /Fundador y desarrollador de Nexar Sistemas/);
-  assert.match(html, /has-linkedin-badge/);
-  assert.match(thirdParty, /## 9\. LinkedIn/);
-  assert.match(thirdParty, new RegExp(badgeScript.replace(/[.?]/g, "\\$&")));
-  assert.match(thirdParty, /fallback local y funcional/);
+  assert.doesNotMatch(html, new RegExp(badgeScript.replace(/[.?]/g, "\\$&")));
+  assert.doesNotMatch(html, /ar\.linkedin\.com\/in\/rolando-navarta-b033b3428\?trk=profile-badge/);
+  assert.doesNotMatch(html, /data-vanity|data-version|LI-profile-badge/);
 });
 
 test("Nexar Play usa exclusivamente los subdominios vigentes", () => {

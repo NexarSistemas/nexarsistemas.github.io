@@ -2,8 +2,8 @@
 
 **Nexar Sistemas**
 
-**Version:** 1.0.0  
-**Fecha de vigencia:** 30/06/2026  
+**Version:** 1.1.0  
+**Fecha de vigencia:** 23/09/2026  
 **Estado:** Vigente
 
 Esta Politica de Privacidad describe de forma general como Nexar Sistemas puede recolectar, registrar, almacenar, consultar, organizar, utilizar, compartir, conservar y proteger datos vinculados al uso de productos, servicios y procesos comerciales del ecosistema Nexar.
@@ -45,9 +45,17 @@ Esta politica se aplica especialmente a datos tratados en procesos relacionados 
 - Soporte, consultas, tickets, correo, chat, asistencia remota o seguimiento tecnico.
 - Vendedores, codigos de vendedor, comisiones, upgrades y gestiones comerciales.
 
+### Analitica del sitio publico
+
+El sitio publico de Nexar Sistemas instrumentado en `NexarSistemas/nexarsistemas.github.io` utiliza Microsoft Clarity en `nexarsistemas.com.ar` y `www.nexarsistemas.com.ar`, limitado actualmente a `index.html`, `soluciones.html`, `nexar-comercio.html` y `nexar-finanzas.html`.
+
+En esas paginas, la herramienta puede tratar datos tecnicos, de navegacion o de interaccion con el sitio para analitica de uso y comportamiento, metricas de navegacion, mapas de calor y grabaciones de sesion. Esta declaracion no afirma que Nexar Sistemas reciba o almacene categorias especificas de datos personales que no hayan sido verificadas.
+
 ## 4. Servicios de terceros
 
 Para operar productos o procesos del ecosistema Nexar, pueden intervenir servicios de terceros tales como Supabase, Mercado Pago, Netlify, GitHub, proveedores de correo electronico, APIs externas, hosting, bases de datos, plataformas cloud, herramientas de soporte, servicios de mensajeria u otros proveedores presentes o futuros.
+
+En el alcance limitado del sitio publico instrumentado indicado en la seccion anterior, Microsoft Clarity interviene como proveedor de analitica de uso y comportamiento. El tratamiento realizado mediante este servicio tambien se encuentra sujeto a las condiciones y politicas de Microsoft Clarity.
 
 Nexar Sistemas puede compartir o permitir el tratamiento de datos con dichos terceros cuando ello resulte necesario para:
 
