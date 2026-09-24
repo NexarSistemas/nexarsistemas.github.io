@@ -807,13 +807,14 @@ test("la presentación institucional refleja la definición actual de Nexar", ()
 
 test("la home conserva el enlace limpio de LinkedIn del fundador", () => {
   const html = read("index.html");
-  const profileUrl = "https://www.linkedin.com/in/rolando-navarta-b033b3428/";
+  const profileUrl = "https://www.linkedin.com/in/rolojnb/";
   const badgeScript = "https://platform.linkedin.com/badges/js/profile.js";
 
   assert.match(html, new RegExp(profileUrl.replace(/[.?]/g, "\\$&")));
   assert.match(html, /class="founder-profile-fallback"/);
   assert.match(html, /Fundador y desarrollador de Nexar Sistemas/);
   assert.doesNotMatch(html, new RegExp(badgeScript.replace(/[.?]/g, "\\$&")));
+  assert.doesNotMatch(html, /https:\/\/www\.linkedin\.com\/in\/rolando-navarta-b033b3428\//);
   assert.doesNotMatch(html, /ar\.linkedin\.com\/in\/rolando-navarta-b033b3428\?trk=profile-badge/);
   assert.doesNotMatch(html, /data-vanity|data-version|LI-profile-badge/);
 });
