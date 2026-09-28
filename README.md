@@ -10,13 +10,7 @@ Sitio público estático de Nexar Sistemas, compatible con GitHub Pages y Netlif
 
 ## Sistema visual
 
-El diseño vigente reproduce el proyecto público de ChatGPT Sites `Nexar Sistemas`, versión 3, publicado originalmente en:
-
-`https://nexar-sistemas-landing.rolojnb.chatgpt.site/`
-
-La fuente oficial del proyecto se obtuvo mediante el repositorio de origen administrado por ChatGPT Sites. La implementación React/Next del sitio de referencia no se trasladó como dependencia: su composición, variables, tipografía, tarjetas, botones, fondos, responsive y jerarquía se adaptaron a la arquitectura estática existente en `css/site.css`.
-
-Esto evita depender en producción del dominio de Sites y evita incorporar un framework o build innecesario. La única limitación deliberada es el uso de la pila tipográfica local del sistema en lugar de distribuir las fuentes internas del runtime de Sites.
+El sitio público utiliza una arquitectura estática basada en HTML, CSS y JavaScript, sin framework ni proceso de build. El sistema visual vigente se centraliza en `css/site.css` y se reutiliza en las páginas públicas para mantener consistencia y reducir dependencias innecesarias.
 
 La versión anterior al rediseño está respaldada, local y remotamente, en:
 
@@ -71,12 +65,14 @@ node tests/public-site.test.js
 
 ## GitHub Pages, Netlify y dominio
 
-- El objetivo de arquitectura es servir el frontend estático desde GitHub Pages y conservar Netlify exclusivamente como backend de Functions.
+- El frontend público se sirve mediante GitHub Pages y usa `nexarsistemas.com.ar` como dominio personalizado.
+- La zona DNS continúa administrada desde Netlify.
+- `CNAME` debe conservarse en el repositorio para asociar GitHub Pages con `nexarsistemas.com.ar`.
+- Netlify se conserva exclusivamente como backend de Functions.
 - `nexarsistemas.github.io` ya puede consumir las Functions mediante una URL absoluta de backend centralizada en `assets/js/runtime-config.js`.
 - El portal de vendedores ya no redirige forzosamente desde GitHub Pages al dominio canónico.
 - Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/vendedores/` y las páginas públicas de Mercado Pago. Los accesos canónicos de Nexar Play son `https://tetris.nexarsistemas.com.ar/`, `https://sudoku.nexarsistemas.com.ar/` y `https://ruta.nexarsistemas.com.ar/`.
-- `nexarsistemas.com.ar` sigue siendo el dominio canónico vigente y `robots.txt` / `sitemap.xml` continúan usando ese host mientras el DNS no cambie.
-- El repositorio no debe incluir un archivo `CNAME` para `nexarsistemas.com.ar` hasta que GitHub Pages pase a administrar ese dominio.
+- `robots.txt` y `sitemap.xml` continúan usando `nexarsistemas.com.ar` como host canónico.
 - `_redirects` queda reservado para el host de Netlify. Nexar Play no mantiene rutas históricas de juegos en este repositorio.
 - `netlify.toml` define el directorio de Functions y evita deploys innecesarios de Netlify cuando solo cambia frontend.
 - En esta etapa no se modifican DNS, variables remotas ni configuración externa de Netlify o GitHub Pages.
