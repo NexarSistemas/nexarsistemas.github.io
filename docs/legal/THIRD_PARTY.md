@@ -2,8 +2,8 @@
 
 **Nexar Sistemas**
 
-**Version:** 1.1.1
-**Fecha de vigencia:** 24/09/2026
+**Version:** 1.1.2
+**Fecha de vigencia:** 29/09/2026
 **Estado:** Inventario inicial
 
 Este documento funciona como inventario base de dependencias, frameworks, servicios y plataformas de terceros que pueden estar presentes en productos del ecosistema Nexar.
@@ -60,7 +60,7 @@ No implica que todos los elementos listados esten presentes en todos los product
 - Consumidor verificado: sitio publico de Nexar Sistemas.
 - Repositorio consumidor: `NexarSistemas/nexarsistemas.github.io`.
 - Hosts productivos: `nexarsistemas.com.ar` y `www.nexarsistemas.com.ar`.
-- Paginas instrumentadas: `index.html`, `soluciones.html`, `nexar-comercio.html` y `nexar-finanzas.html`.
+- Paginas instrumentadas: `index.html`, `soluciones.html`, `nexar-comercio.html`, `nexar-finanzas.html` y `legal.html`.
 - Uso: analitica de comportamiento del sitio web publico.
 - Recurso cargado en navegador: `https://www.clarity.ms/tag/`.
 - Finalidad: metricas de navegacion, mapas de calor y grabaciones de sesion.
