@@ -2,8 +2,8 @@
 
 **Nexar Sistemas**
 
-**Version:** 1.1.0  
-**Fecha de vigencia:** 23/09/2026  
+**Version:** 1.2.0  
+**Fecha de vigencia:** 29/09/2026  
 **Estado:** Vigente
 
 Esta Politica de Privacidad describe de forma general como Nexar Sistemas puede recolectar, registrar, almacenar, consultar, organizar, utilizar, compartir, conservar y proteger datos vinculados al uso de productos, servicios y procesos comerciales del ecosistema Nexar.
@@ -47,9 +47,19 @@ Esta politica se aplica especialmente a datos tratados en procesos relacionados 
 
 ### Analitica del sitio publico
 
-El sitio publico de Nexar Sistemas instrumentado en `NexarSistemas/nexarsistemas.github.io` utiliza Microsoft Clarity en `nexarsistemas.com.ar` y `www.nexarsistemas.com.ar`, limitado actualmente a `index.html`, `soluciones.html`, `nexar-comercio.html` y `nexar-finanzas.html`.
+El sitio publico de Nexar Sistemas instrumentado en `NexarSistemas/nexarsistemas.github.io` utiliza Microsoft Clarity en `nexarsistemas.com.ar` y `www.nexarsistemas.com.ar`.
 
-En esas paginas, la herramienta puede tratar datos tecnicos, de navegacion o de interaccion con el sitio para analitica de uso y comportamiento, metricas de navegacion, mapas de calor y grabaciones de sesion. Esta declaracion no afirma que Nexar Sistemas reciba o almacene categorias especificas de datos personales que no hayan sido verificadas.
+En las paginas donde la herramienta se encuentra habilitada, Clarity puede tratar datos tecnicos, de navegacion o de interaccion con el sitio para analitica de uso y comportamiento, metricas de navegacion, mapas de calor y grabaciones de sesion. Esta declaracion no afirma que Nexar Sistemas reciba o almacene categorias especificas de datos personales que no hayan sido verificadas.
+
+### Cookies y consentimiento para analitica
+
+Nexar Sistemas utiliza un mecanismo propio de consentimiento para las cookies de analitica asociadas a Microsoft Clarity.
+
+Antes de que exista una aceptacion expresa, el sitio comunica a Clarity un estado de consentimiento denegado para almacenamiento de analitica y publicidad. El almacenamiento publicitario permanece deshabilitado incluso cuando el visitante acepta las cookies de analitica, ya que el sitio no utiliza Microsoft Ads para esta finalidad.
+
+Si el visitante acepta las cookies de analitica, el sitio comunica a Clarity que el almacenamiento de analitica fue autorizado. Si las rechaza, Clarity recibe una señal de consentimiento denegado y funciona en modo sin cookies para esa finalidad.
+
+La preferencia `accepted` o `rejected` se conserva localmente en el navegador mediante `localStorage`, bajo la clave `nexar_cookie_consent`, con el unico objetivo de recordar la eleccion del visitante entre navegaciones. El usuario puede modificar su decision desde la pagina publica de privacidad y terminos.
 
 ## 4. Servicios de terceros
 
