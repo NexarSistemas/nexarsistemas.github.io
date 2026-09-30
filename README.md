@@ -22,6 +22,8 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 - `soluciones.html`: soluciones digitales para empresas, comercios y profesionales
 - `nexar-comercio.html`: producto, funciones, rubros y planes confirmados
 - `nexar-finanzas.html`: producto, funciones y planes confirmados
+- `nexar-fidelizacion.html`: producto de fidelización para comercios y marcas
+- `desarrollo-web.html`: servicio de desarrollo web y procesos digitales
 - `mercadopago-exito.html`: retorno aprobado
 - `mercadopago-pendiente.html`: retorno pendiente
 - `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
