@@ -11,6 +11,8 @@ const publicPages = [
   "soluciones.html",
   "nexar-comercio.html",
   "nexar-finanzas.html",
+  "nexar-fidelizacion.html",
+  "desarrollo-web.html",
   "nexar-tienda.html",
   "nexar-almacen.html",
   "mercadopago-exito.html",
@@ -44,6 +46,8 @@ test("los enlaces internos esenciales apuntan a archivos existentes", () => {
     "soluciones.html",
     "nexar-comercio.html",
     "nexar-finanzas.html",
+    "nexar-fidelizacion.html",
+    "desarrollo-web.html",
     "nexar-tienda.html",
     "nexar-almacen.html",
     "mercadopago-exito.html",
@@ -159,6 +163,70 @@ test("las páginas comerciales comparten footer y accesos flotantes oficiales", 
   assert.doesNotMatch(read("404.html"), /class="social-actions-float"/);
   assert.doesNotMatch(read("mercadopago-exito.html"), /class="social-actions-float"/);
   assert.match(read("404.html"), /<footer class="site-footer site-footer-compact error-footer">[\s\S]*?href="\/">Inicio<\/a>/);
+});
+
+function footerCommercialModel(html) {
+  const footer = html.match(/<footer class="site-footer">([\s\S]*?)<\/footer>/)?.[1] || "";
+  const columns = [...footer.matchAll(/<div class="footer-column">([\s\S]*?)<\/div>/g)];
+
+  return columns.map((column) => ({
+    title: column[1].match(/<strong>([^<]+)<\/strong>/)?.[1] || "",
+    links: [...column[1].matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((link) => ({
+      href: link[1].startsWith("#") ? `./index.html${link[1]}` : link[1],
+      label: link[2].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+    }))
+  }));
+}
+
+test("las nuevas landings mantienen el contrato del footer comercial de la home", () => {
+  const homeFooter = footerCommercialModel(read("index.html"));
+  assert.equal(homeFooter.length, 5);
+
+  for (const page of ["nexar-fidelizacion.html", "desarrollo-web.html"]) {
+    const html = read(page);
+    assert.match(html, /<footer class="site-footer">/);
+    assert.match(html, /<div class="container footer-grid">/);
+    assert.match(html, /<img class="brand-logo" src="\.\/assets\/nexar_sistemas\.png" alt="Nexar Sistemas" width="610" height="190" loading="lazy" decoding="async">/);
+    assert.match(html, /<div class="container footer-bottom">© 2026 Nexar Sistemas\. Todos los derechos reservados\.<\/div>/);
+    assert.deepEqual(footerCommercialModel(html), homeFooter, page);
+  }
+});
+
+test("las landings de fidelización y desarrollo web exponen sus contratos públicos", () => {
+  const pages = {
+    "nexar-fidelizacion.html": {
+      title: "Nexar Fidelización | Nexar Sistemas",
+      canonical: "https://nexarsistemas.com.ar/nexar-fidelizacion.html",
+      required: ["Producto propio de Nexar Sistemas", "puntos", "beneficios", "canjes", "INÉDITA SAN JUAN", "implementación de Nexar Fidelización"]
+    },
+    "desarrollo-web.html": {
+      title: "Desarrollo web | Nexar Sistemas",
+      canonical: "https://nexarsistemas.com.ar/desarrollo-web.html",
+      required: ["profesionales", "empresas", "organizaciones", "formularios", "automatización", "TeCMA SAN JUAN"]
+    }
+  };
+
+  for (const [page, contract] of Object.entries(pages)) {
+    const html = read(page);
+    assert.match(html, new RegExp(`<title>${contract.title.replace("|", "\\|")}<\\/title>`), page);
+    assert.match(html, /<meta name="description" content="[^"]+">/, page);
+    assert.match(html, new RegExp(`<link rel="canonical" href="${contract.canonical.replace(/\./g, "\\.")}">`), page);
+    assert.match(html, /<meta property="og:title" content="[^"]+">/, page);
+    assert.match(html, /<meta property="og:url" content="https:\/\/nexarsistemas\.com\.ar\/[^"]+">/, page);
+    assert.match(html, /<meta name="twitter:title" content="[^"]+">/, page);
+    assert.equal((html.match(/<h1\b/g) || []).length, 1, page);
+    for (const text of contract.required) {
+      assert.match(html, new RegExp(text, "i"), `${page}: ${text}`);
+    }
+  }
+
+  const home = read("index.html");
+  const solutions = read("soluciones.html");
+  assert.match(home, /href="\.\/nexar-fidelizacion\.html">Consultar por Nexar Fidelización/);
+  assert.match(home, /href="\.\/desarrollo-web\.html">Conocer desarrollo web/);
+  assert.match(solutions, /href="\.\/desarrollo-web\.html">Ver desarrollo web/);
+  assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/nexar-fidelizacion\.html/);
+  assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/desarrollo-web\.html/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {

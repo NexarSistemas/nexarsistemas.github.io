@@ -21,7 +21,7 @@ Los formatos comunicados en esta primera etapa son:
 
 ## Precios y contacto
 
-La tarjeta principal de servicios web dirige a `#servicios-web`, donde se publican estos valores desde:
+La tarjeta principal de Desarrollo web dirige a la landing pública dedicada `desarrollo-web.html`. La home mantiene la sección `#servicios-web`, donde se publican estos valores desde:
 
 - Presencia Web — desde $250.000;
 - Web Profesional — desde $450.000;
@@ -41,19 +41,8 @@ Los paquetes de desarrollo web dirigen al formulario existente mediante `#contac
 - producto o servicio: `Diseño y desarrollo web`;
 - tipo de consulta: `Solicitar presupuesto web`.
 
-No se crea una página independiente en este MVP. Esta decisión evita publicar una ruta incompleta y mantiene un flujo directo hacia el contacto comercial.
+La landing `desarrollo-web.html` es la superficie pública dedicada al servicio. Amplía la información comercial y presenta el enfoque de Nexar para webs profesionales, institucionales y procesos digitales. La sección `#servicios-web` de la home conserva los paquetes, valores desde y el acceso directo al contacto comercial.
 
 ## Validación
 
-`tests/web-services.test.js` verifica:
-
-- que la tarjeta y su contenido principal estén presentes;
-- que los precios y niveles de mantenimiento publicados coincidan con la oferta actual;
-- que la tarjeta principal enlace a `#servicios-web` y los presupuestos al contacto existente;
-- que el formulario ofrezca las opciones específicas del servicio;
-- que la hoja de estilos adicional exista y esté enlazada;
-- que no se introduzca una ruta HTML inexistente para el servicio.
-
-La misma prueba también cubre Nexar Play y sus accesos a Tetris Deluxe, Sudoku Nexar y Nexar Ruta.
-
-La prueba general `tests/public-site.test.js` continúa comprobando que los enlaces internos a archivos públicos existentes no estén rotos.
+`tests/public-site.test.js` verifica que `desarrollo-web.html` exista, use el sistema visual compartido y mantenga sus contratos públicos de SEO, contenido, enlaces internos y footer comercial. También comprueba que los enlaces desde la home y la página de soluciones lleguen a la landing dedicada y que los enlaces internos a archivos públicos existentes no estén rotos.
