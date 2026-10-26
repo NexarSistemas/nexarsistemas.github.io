@@ -13,6 +13,7 @@ const publicPages = [
   "nexar-finanzas.html",
   "nexar-fidelizacion.html",
   "desarrollo-web.html",
+  "juegos/index.html",
   "nexar-tienda.html",
   "nexar-almacen.html",
   "mercadopago-exito.html",
@@ -48,6 +49,7 @@ test("los enlaces internos esenciales apuntan a archivos existentes", () => {
     "nexar-finanzas.html",
     "nexar-fidelizacion.html",
     "desarrollo-web.html",
+    "juegos/index.html",
     "nexar-tienda.html",
     "nexar-almacen.html",
     "mercadopago-exito.html",
@@ -777,6 +779,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   }
 
   assert.match(html, /<section class="section founder-section" id="fundador"/);
+  assert.match(html, /<a href="\.\/juegos\/">Nexar Play<\/a>/);
   assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
   assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
@@ -887,18 +890,32 @@ test("la home conserva el enlace limpio de LinkedIn del fundador", () => {
   assert.doesNotMatch(html, /data-vanity|data-version|LI-profile-badge/);
 });
 
-test("Nexar Play usa exclusivamente los subdominios vigentes", () => {
+test("Nexar Play centraliza los juegos publicados y el contacto de personalización", () => {
   const home = read("index.html");
+  const games = read("juegos/index.html");
   const portalIndex = read("vendedores/index.html");
+
+  assert.match(home, /href="\.\/juegos\/">Nexar Play/);
+  assert.match(games, /<link rel="canonical" href="https:\/\/nexarsistemas\.com\.ar\/juegos\/">/);
 
   for (const [name, url] of [
     ["Tetris Deluxe", "https://tetris.nexarsistemas.com.ar/"],
     ["Sudoku Nexar", "https://sudoku.nexarsistemas.com.ar/"],
-    ["Nexar Ruta", "https://ruta.nexarsistemas.com.ar/"]
+    ["Nexar Ruta", "https://ruta.nexarsistemas.com.ar/"],
+    ["Crucigrama Nexar", "https://nexarsistemas.com.ar/nexar-crucigrama/"],
+    ["Viborita Neón", "https://nexarsistemas.com.ar/viborita-neon/"],
+    ["Pulso Neón", "https://nexarsistemas.com.ar/pulso-neon/"],
+    ["Memoria Neón", "https://nexarsistemas.com.ar/memoria-neon/"],
+    ["Parejas Neón", "https://nexarsistemas.com.ar/parejas-neon/"],
+    ["Pasaporte San Juan", "https://pasaporte.nexarsistemas.com.ar/"]
   ]) {
-    assert.match(home, new RegExp(`<h3>${name}<\\/h3>[\\s\\S]*?href="${url.replace(/[./]/g, "\\$&")}" target="_blank" rel="noopener"`));
+    assert.match(games, new RegExp(`<h3>${name}<\\/h3>[\\s\\S]*?href="${url.replace(/[./]/g, "\\$&")}" target="_blank" rel="noopener noreferrer"`));
   }
-  assert.doesNotMatch(home, /Crucigrama|nexar-crucigrama|nexar-sudoku|\.\/Tetris\/|https:\/\/nexarsistemas\.github\.io\/nexar-sudoku\//);
+
+  assert.match(games, /Demo gratuita/);
+  assert.match(games, /personalización se cotiza según el alcance/);
+  assert.match(games, /href="\.\.\/index\.html#contacto">Solicitar personalización<\/a>/);
+  assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/juegos\//);
   assert.equal(fs.existsSync(path.join(root, "Tetris")), false);
   assert.equal(fs.existsSync(path.join(root, "sudoku")), false);
   assert.equal(fs.existsSync(path.join(root, "nexar-crucigrama")), false);

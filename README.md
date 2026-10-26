@@ -24,6 +24,7 @@ La versión anterior al rediseño está respaldada, local y remotamente, en:
 - `nexar-finanzas.html`: producto, funciones y planes confirmados
 - `nexar-fidelizacion.html`: producto de fidelización para comercios y marcas
 - `desarrollo-web.html`: servicio de desarrollo web y procesos digitales
+- `juegos/`: catálogo estático Nexar Play de juegos publicados
 - `mercadopago-exito.html`: retorno aprobado
 - `mercadopago-pendiente.html`: retorno pendiente
 - `mercadopago-fallo.html`: retorno rechazado, fallido, cancelado o con error
@@ -73,7 +74,7 @@ node tests/public-site.test.js
 - Netlify se conserva exclusivamente como backend de Functions.
 - `nexarsistemas.github.io` ya puede consumir las Functions mediante una URL absoluta de backend centralizada en `assets/js/runtime-config.js`.
 - El portal de vendedores ya no redirige forzosamente desde GitHub Pages al dominio canónico.
-- Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/vendedores/` y las páginas públicas de Mercado Pago. Los accesos canónicos de Nexar Play son `https://tetris.nexarsistemas.com.ar/`, `https://sudoku.nexarsistemas.com.ar/` y `https://ruta.nexarsistemas.com.ar/`.
+- Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/juegos/`, `/vendedores/` y las páginas públicas de Mercado Pago. Nexar Play enlaza solo a juegos publicados desde su catálogo.
 - `robots.txt` y `sitemap.xml` continúan usando `nexarsistemas.com.ar` como host canónico.
 - `_redirects` queda reservado para el host de Netlify. Nexar Play no mantiene rutas históricas de juegos en este repositorio.
 - `netlify.toml` define el directorio de Functions y evita deploys innecesarios de Netlify cuando solo cambia frontend.
