@@ -57,6 +57,35 @@ function hasCanonical(html, expectedUrl) {
   );
 }
 
+function attributeValue(tag, name) {
+  return tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, "i"))?.[1] || null;
+}
+
+function referencedAssets(html, pageUrl, origin) {
+  const references = [];
+
+  for (const tag of html.matchAll(/<(?:link|script)\b[^>]*>/gi)) {
+    const element = tag[0];
+    const isStylesheet = /^<link\b/i.test(element) && /\brel\s*=\s*["'][^"']*\bstylesheet\b[^"']*["']/i.test(element);
+    const isScript = /^<script\b/i.test(element);
+    if (!isStylesheet && !isScript) continue;
+
+    const reference = attributeValue(element, isStylesheet ? "href" : "src");
+    if (!reference) continue;
+
+    try {
+      const assetUrl = new URL(reference, pageUrl);
+      if (assetUrl.origin === origin.origin && /\.(?:css|m?js)$/i.test(assetUrl.pathname)) {
+        references.push(decodeURIComponent(assetUrl.pathname).replace(/^\//, ""));
+      }
+    } catch {
+      // Una referencia inválida no autoriza una URL para IndexNow.
+    }
+  }
+
+  return new Set(references);
+}
+
 function normalizedChangedFiles(changedFiles) {
   return new Set(changedFiles.map((file) => file.replaceAll("\\", "/")));
 }
@@ -88,10 +117,11 @@ function selectIndexNowUrls({ root, canonicalOrigin, changedFiles, previousSitem
 
     const html = fs.readFileSync(fullPath, "utf8");
     if (isNoindex(html) || !hasCanonical(html, url.href)) continue;
-    if (changed.has(pagePath) || !previouslyAuthorized.has(url.href)) selected.push(url.href);
+    const dependsOnChangedAsset = [...referencedAssets(html, url, origin)].some((asset) => changed.has(asset));
+    if (changed.has(pagePath) || dependsOnChangedAsset || !previouslyAuthorized.has(url.href)) selected.push(url.href);
   }
 
   return [...new Set(selected)];
 }
 
-module.exports = { blockedByRobots, robotsRules, selectIndexNowUrls, sitemapUrls };
+module.exports = { blockedByRobots, referencedAssets, robotsRules, selectIndexNowUrls, sitemapUrls };

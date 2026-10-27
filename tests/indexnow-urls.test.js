@@ -52,3 +52,28 @@ test("IndexNow incluye altas nuevas del sitemap sin reenviar las URL existentes"
     previousSitemap: `<urlset><url><loc>${origin}/</loc></url></urlset>`
   }), [`${origin}/nueva.html`]);
 });
+
+test("IndexNow selecciona solo páginas sitemap que referencian CSS o JavaScript modificados", () => {
+  const root = fixture({
+    "robots.txt": "User-agent: *\nAllow: /\n",
+    "sitemap.xml": `<urlset><url><loc>${origin}/</loc></url><url><loc>${origin}/relacionada.html</loc></url><url><loc>${origin}/ajena.html</loc></url></urlset>`,
+    "index.html": `${page(`${origin}/`)}<link rel="stylesheet" href="./css/site.css"><script src="./assets/js/home.js"></script>`,
+    "relacionada.html": `${page(`${origin}/relacionada.html`)}<link rel="stylesheet" href="./css/site.css">`,
+    "ajena.html": `${page(`${origin}/ajena.html`)}<link rel="stylesheet" href="./css/otra.css"><script src="./assets/js/otra.js"></script>`
+  });
+  const previousSitemap = `<urlset><url><loc>${origin}/</loc></url><url><loc>${origin}/relacionada.html</loc></url><url><loc>${origin}/ajena.html</loc></url></urlset>`;
+
+  assert.deepEqual(selectIndexNowUrls({
+    root,
+    canonicalOrigin: origin,
+    changedFiles: ["css/site.css"],
+    previousSitemap
+  }), [`${origin}/`, `${origin}/relacionada.html`]);
+
+  assert.deepEqual(selectIndexNowUrls({
+    root,
+    canonicalOrigin: origin,
+    changedFiles: ["assets/js/home.js"],
+    previousSitemap
+  }), [`${origin}/`]);
+});
