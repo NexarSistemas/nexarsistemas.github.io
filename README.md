@@ -76,6 +76,7 @@ node tests/public-site.test.js
 - El portal de vendedores ya no redirige forzosamente desde GitHub Pages al dominio canónico.
 - Las URLs públicas compatibles con GitHub Pages se mantienen, incluyendo `/`, `/juegos/`, `/vendedores/` y las páginas públicas de Mercado Pago. Nexar Play enlaza solo a juegos publicados desde su catálogo.
 - `robots.txt` y `sitemap.xml` continúan usando `nexarsistemas.com.ar` como host canónico.
+- `docs/indexnow.md` documenta la notificación post-despliegue de URLs canónicas modificadas a IndexNow.
 - `_redirects` queda reservado para el host de Netlify. Nexar Play no mantiene rutas históricas de juegos en este repositorio.
 - `netlify.toml` define el directorio de Functions y evita deploys innecesarios de Netlify cuando solo cambia frontend.
 - En esta etapa no se modifican DNS, variables remotas ni configuración externa de Netlify o GitHub Pages.

@@ -924,3 +924,18 @@ test("Nexar Play centraliza los juegos publicados y el contacto de personalizaci
   assert.match(portalIndex, /href="\.\/login\.html">Ingresar al portal/);
   assert.match(portalIndex, /id="sellerApplicationForm"/);
 });
+
+test("IndexNow conserva una clave pública y un workflow posterior al despliegue", () => {
+  const key = read("14b6140b-84c3-4548-9b01-4d27442e8b1d.txt").trim();
+  const workflow = read(".github/workflows/indexnow.yml");
+  const submitter = read("scripts/indexnow-submit.js");
+
+  assert.match(key, /^[A-Za-z0-9-]{8,128}$/);
+  assert.match(workflow, /deployment_status:/);
+  assert.match(workflow, /deployment_status\.state == 'success'/);
+  assert.match(workflow, /deployment\.environment == 'github-pages'/);
+  assert.match(submitter, /https:\/\/api\.indexnow\.org\/indexnow/);
+  assert.match(workflow, /curl --fail/);
+  assert.match(workflow, /scripts\/indexnow-select\.js/);
+  assert.match(workflow, /INDEXNOW_DRY_RUN/);
+});
