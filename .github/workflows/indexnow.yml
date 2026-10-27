@@ -1,0 +1,58 @@
+name: Notificar IndexNow
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      deployment_sha:
+        description: SHA completo del despliegue de GitHub Pages a comprobar
+        required: true
+        type: string
+      dry_run:
+        description: Simular el envío sin llamar a IndexNow
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  notify-indexnow:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'github-pages')
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_SHA: ${{ github.event_name == 'deployment_status' && github.event.deployment.sha || inputs.deployment_sha }}
+      INDEXNOW_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      INDEXNOW_KEY_FILE: 14b6140b-84c3-4548-9b01-4d27442e8b1d.txt
+      CANONICAL_ORIGIN: https://nexarsistemas.com.ar
+    steps:
+      - name: Validar SHA del despliegue
+        run: |
+          [[ "$DEPLOYMENT_SHA" =~ ^[0-9a-fA-F]{40}$ ]]
+
+      - name: Obtener el commit desplegado y su padre
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOYMENT_SHA }}
+          fetch-depth: 2
+
+      - name: Verificar la clave pública de IndexNow
+        run: |
+          key_url="$CANONICAL_ORIGIN/$INDEXNOW_KEY_FILE"
+          downloaded_key="$(curl --fail --location --silent --show-error --retry 3 "$key_url")"
+          expected_key="$(tr -d '\r\n' < "$INDEXNOW_KEY_FILE")"
+          test "$downloaded_key" = "$expected_key"
+          echo "IndexNow: archivo de verificación público confirmado."
+
+      - name: Seleccionar únicamente URLs canónicas modificadas
+        id: selection
+        run: |
+          parent_sha="$(git rev-parse "$DEPLOYMENT_SHA^")"
+          node scripts/indexnow-select.js --from "$parent_sha" --to "$DEPLOYMENT_SHA" > "$RUNNER_TEMP/indexnow-urls.json"
+          echo "urls_file=$RUNNER_TEMP/indexnow-urls.json" >> "$GITHUB_OUTPUT"
+
+      - name: Notificar IndexNow
+        run: node scripts/indexnow-submit.js "${{ steps.selection.outputs.urls_file }}"
