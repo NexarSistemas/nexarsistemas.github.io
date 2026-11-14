@@ -199,7 +199,7 @@ test("las landings de fidelización y desarrollo web exponen sus contratos públ
     "nexar-fidelizacion.html": {
       title: "Nexar Fidelización | Nexar Sistemas",
       canonical: "https://nexarsistemas.com.ar/nexar-fidelizacion.html",
-      required: ["Producto propio de Nexar Sistemas", "puntos", "beneficios", "canjes", "INÉDITA SAN JUAN", "implementación de Nexar Fidelización"]
+      required: ["Producto propio de Nexar Sistemas", "puntos", "beneficios", "canjes", "INÉDITA SAN JUAN", "fidelización personalizada en desarrollo"]
     },
     "desarrollo-web.html": {
       title: "Desarrollo web | Nexar Sistemas",
@@ -229,6 +229,29 @@ test("las landings de fidelización y desarrollo web exponen sus contratos públ
   assert.match(solutions, /href="\.\/desarrollo-web\.html">Ver desarrollo web/);
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/nexar-fidelizacion\.html/);
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/desarrollo-web\.html/);
+});
+
+test("fidelización distingue modalidades, flujos y contactos", () => {
+  const html = read("nexar-fidelizacion.html");
+  assert.match(html, /Nexar Fidelización — Multicomercio/);
+  assert.match(html, /Fidelización personalizada — Aplicación exclusiva/);
+  assert.match(html, /Se prevé una modalidad por suscripción, con una inversión inicial menor frente a un desarrollo a medida/);
+  assert.match(html, /class="feature-grid modalidades-grid"/);
+  const css = read("css/site.css");
+  assert.match(css, /\.modalidades-grid\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.modalidades-grid \.feature-card p \+ p\s*\{\s*margin-top: 12px/);
+  assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.modalidades-grid\s*\{\s*grid-template-columns: 1fr/);
+  assert.match(html, /Proyecto sujeto a análisis, disponibilidad y desarrollo/);
+  assert.match(html, /códigos QR para asociarse al comercio/);
+  assert.match(html, /El comercio acredita puntos/);
+  assert.match(html, /el comercio confirma el canje/);
+  assert.match(html, /puntos y recompensas permanecen separados/);
+  assert.match(html, /migración no es automática ni está incluida por defecto/);
+  assert.match(html, /ninguna función adicional está garantizada por defecto/);
+  assert.match(html, /href="#modalidades">Conocer las modalidades/);
+  assert.match(html, /href="\.\/index\.html#contacto">Solicitar información/);
+  assert.match(html, /href="https:\/\/wa\.me\/5492646616948\?text=[^"]+" target="_blank" rel="noopener">Hablar por WhatsApp/);
+  assert.doesNotMatch(html, /implementación de Nexar Fidelización/);
 });
 
 test("la navegación autenticada del portal permanece visible hasta 960 px", () => {
@@ -797,7 +820,8 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(ineditaCase, /INÉDITA SAN JUAN/);
   assert.match(ineditaCase, /En desarrollo/);
   assert.match(ineditaCase, /app de fidelización/);
-  assert.match(ineditaCase, /Nexar Sistemas está desarrollando la aplicación/);
+  assert.match(ineditaCase, /Nexar Sistemas está desarrollando una aplicación de fidelización personalizada/);
+  assert.doesNotMatch(ineditaCase, /implementación de Nexar Fidelización/);
   assert.doesNotMatch(ineditaCase, /instagram\.com\/ineditasanjuan/);
   assert.doesNotMatch(html, /Contarnos (tu|la) necesidad/);
   assert.match(html, /Contanos tu necesidad/);
