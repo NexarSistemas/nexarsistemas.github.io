@@ -235,7 +235,12 @@ test("fidelización distingue modalidades, flujos y contactos", () => {
   const html = read("nexar-fidelizacion.html");
   assert.match(html, /Nexar Fidelización — Multicomercio/);
   assert.match(html, /Fidelización personalizada — Aplicación exclusiva/);
-  assert.match(html, /Suscripción prevista y menor inversión inicial prevista/);
+  assert.match(html, /Se prevé una modalidad por suscripción, con una inversión inicial menor frente a un desarrollo a medida/);
+  assert.match(html, /class="feature-grid modalidades-grid"/);
+  const css = read("css/site.css");
+  assert.match(css, /\.modalidades-grid\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.modalidades-grid \.feature-card p \+ p\s*\{\s*margin-top: 12px/);
+  assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.modalidades-grid\s*\{\s*grid-template-columns: 1fr/);
   assert.match(html, /Proyecto sujeto a análisis, disponibilidad y desarrollo/);
   assert.match(html, /códigos QR para asociarse al comercio/);
   assert.match(html, /El comercio acredita puntos/);
