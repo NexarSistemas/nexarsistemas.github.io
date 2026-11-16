@@ -834,7 +834,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.match(html, /Contanos qué necesitás/);
 
   assert.match(html, /<section class="hero" id="inicio">[\s\S]*?<\/section>\s*<section class="section section-soft" id="soluciones">[\s\S]*?<\/section>\s*<section class="section" id="productos">/);
-  const sectionOrder = ["soluciones", "productos", "clientes", "fundador", "contacto"];
+  const sectionOrder = ["soluciones", "productos", "casos", "fundador", "contacto"];
   const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
   assert.ok(sectionOffsets.every((offset) => offset >= 0));
   assert.deepEqual([...sectionOffsets].sort((a, b) => a - b), sectionOffsets);
@@ -861,36 +861,32 @@ test("la página de soluciones presenta una propuesta orientada a problemas real
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/soluciones\.html/);
 });
 
-test("la home presenta clientes con enlaces y estados públicos correctos", () => {
+test("la home unifica los casos y conserva el ancla de clientes", () => {
   const html = read("index.html");
   const siteCss = read("css/site.css");
-  const ineditaCard = html.match(/<article class="product-card client-card" id="cliente-inedita">([\s\S]*?)<\/article>/);
-  const tecmaCard = html.match(/<article class="product-card client-card" id="cliente-tecma">([\s\S]*?)<\/article>/);
+  const section = html.match(/<section class="section section-soft" id="casos">([\s\S]*?)<\/section>/)?.[1] || "";
+  const cards = [...section.matchAll(/<article class="case-card" data-case="([^"]+)">([\s\S]*?)<\/article>/g)];
 
-  assert.match(html, /<section class="section" id="clientes">/);
-  assert.match(html, /<h2>Quiénes confían en nosotros<\/h2>/);
-  assert.match(html, /href="#casos">Casos<\/a>/);
-  assert.equal(fs.existsSync(path.join(root, "assets/clientes/inedita_san_juan.png")), true);
-  assert.equal(fs.existsSync(path.join(root, "assets/clientes/iso_corporeo_interior.png")), true);
-  assert.equal(fs.existsSync(path.join(root, "assets/clientes/tecma-logo.png")), true);
-  assert.ok(ineditaCard);
-  assert.match(ineditaCard[1], /INÉDITA SAN JUAN/);
-  const clientLinks = [
-    { card: ineditaCard, label: "Visitar INÉDITA", href: "https://www.instagram.com/ineditasanjuan/" },
-    { card: tecmaCard, label: "Visitar TeCMA", href: "https://www.tecmasanjuan.com.ar/" }
-  ];
-  assert.ok(tecmaCard);
-  assert.match(tecmaCard[1], /TeCMA SAN JUAN/);
-  for (const { card, label, href } of clientLinks) {
-    assert.ok(card);
-    const link = card[1].match(/<a class="text-link" href="([^"]+)" target="_blank" rel="noopener noreferrer">([^<]+) <span/);
-    assert.deepEqual(link && { href: link[1], label: link[2] }, { href, label });
+  assert.equal((html.match(/id="casos"/g) || []).length, 1);
+  assert.equal((html.match(/id="clientes"/g) || []).length, 1);
+  assert.match(section, /<span class="fragment-anchor" id="clientes" aria-hidden="true"><\/span>/);
+  assert.doesNotMatch(html, /<section[^>]*id="clientes"|class="product-card client-card"/);
+  assert.deepEqual(cards.map((card) => card[1]), ["tecma", "inedita"]);
+  for (const [, , card] of cards) {
+    assert.match(card, /<strong>Necesidad:<\/strong>/);
+    assert.match(card, /<strong>Trabajo de Nexar:<\/strong>/);
+    assert.match(card, /class="case-status/);
   }
-  assert.doesNotMatch(ineditaCard[1], /App de fidelización para clientes/);
-  assert.doesNotMatch(tecmaCard[1], /Sitio web institucional y presencia digital/);
+  for (const logo of ["tecma-logo.png", "inedita_san_juan.png"]) {
+    assert.equal(fs.existsSync(path.join(root, "assets/clientes", logo)), true);
+    assert.equal((section.match(new RegExp(logo.replace(".", "\\."), "g")) || []).length, 1);
+  }
+  assert.match(cards[0][2], /alt="Logo de TeCMA SAN JUAN"/);
+  assert.match(cards[1][2], /alt="Logo de INÉDITA SAN JUAN"/);
+  assert.doesNotMatch(cards[1][2], /<a\s/);
   assert.match(siteCss, /\.case-card\[data-case="inedita"\] \.case-card-logo\s*\{[\s\S]*?width: 180px/);
+  assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.case-grid\s*\{\s*grid-template-columns: 1fr;/);
   assert.doesNotMatch(html, /Proyecto confirmado|En conversación|Próximamente/);
-  assert.match(siteCss, /@media \(max-width: 960px\)[\s\S]*?\.clients-grid\s*\{\s*grid-template-columns: 1fr;/);
 });
 
 test("las páginas públicas usan el CTA argentino aprobado", () => {
