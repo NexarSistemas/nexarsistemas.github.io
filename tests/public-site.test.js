@@ -833,7 +833,8 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.doesNotMatch(html, /Contarnos (tu|la) necesidad/);
   assert.match(html, /Contanos qué necesitás/);
 
-  const sectionOrder = ["productos", "soluciones", "clientes", "fundador", "contacto"];
+  assert.match(html, /<section class="hero" id="inicio">[\s\S]*?<\/section>\s*<section class="section section-soft" id="soluciones">[\s\S]*?<\/section>\s*<section class="section" id="productos">/);
+  const sectionOrder = ["soluciones", "productos", "clientes", "fundador", "contacto"];
   const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
   assert.ok(sectionOffsets.every((offset) => offset >= 0));
   assert.deepEqual([...sectionOffsets].sort((a, b) => a - b), sectionOffsets);
