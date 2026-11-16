@@ -225,7 +225,7 @@ test("las landings de fidelización y desarrollo web exponen sus contratos públ
   const home = read("index.html");
   const solutions = read("soluciones.html");
   assert.match(home, /href="\.\/nexar-fidelizacion\.html">Consultar por Nexar Fidelización/);
-  assert.match(home, /href="\.\/desarrollo-web\.html">Conocer desarrollo web/);
+  assert.match(home, /href="\.\/desarrollo-web\.html#precios">Ver precios de desarrollo web/);
   assert.match(solutions, /href="\.\/desarrollo-web\.html">Ver desarrollo web/);
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/nexar-fidelizacion\.html/);
   assert.match(read("sitemap.xml"), /https:\/\/nexarsistemas\.com\.ar\/desarrollo-web\.html/);
