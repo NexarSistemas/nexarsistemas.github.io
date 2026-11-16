@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     form.querySelector("#cf-submit") ||
     form.querySelector('button[type="submit"]') ||
     form.querySelector('input[type="submit"]');
-  const successMessage = document.getElementById("cf-success");
   const originalButtonLabel = submitButton ? submitButton.textContent : "";
 
   const fieldSelectors = {
@@ -170,6 +169,24 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (!producto) {
+      showStatus("Selecciona un producto o servicio para continuar.", "error");
+      focusField("producto");
+      return;
+    }
+
+    if (!planInteres) {
+      showStatus("Selecciona el tipo de consulta para continuar.", "error");
+      focusField("plan_interes");
+      return;
+    }
+
+    if (!mensaje) {
+      showStatus("Ingresa tu mensaje para continuar.", "error");
+      focusField("mensaje");
+      return;
+    }
+
     const supportRequest = isSupportRequest(producto, planInteres);
     const tableName = supportRequest ? "solicitudes_soporte" : "solicitudes_demo";
     const payload = supportRequest
@@ -207,10 +224,6 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.textContent = "Enviando...";
     }
 
-    if (successMessage) {
-      successMessage.style.display = "none";
-    }
-
     showStatus("Enviando tu solicitud...", "loading");
 
     try {
@@ -240,10 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       form.reset();
       showStatus("Tu solicitud fue enviada correctamente. Te contactaremos pronto.", "success");
-
-      if (successMessage) {
-        successMessage.style.display = "block";
-      }
     } catch (error) {
       console.error("Solicitud demo: error al enviar a Supabase.", error);
       showStatus(

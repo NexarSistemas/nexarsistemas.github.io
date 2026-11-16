@@ -2,7 +2,7 @@
 
 ## Resumen
 
-La landing envia solicitudes del formulario de contacto a `public.solicitudes_demo` en Supabase usando `fetch` contra la REST API. El frontend usa solo la URL publica del proyecto y la `anon key` publica.
+La landing envia solicitudes del formulario de contacto a `public.solicitudes_demo` o `public.solicitudes_soporte` en Supabase usando `fetch` contra la REST API. El frontend usa solo la URL publica del proyecto y la `anon key` publica.
 
 La seguridad depende de:
 
@@ -66,8 +66,8 @@ Luego abre `http://localhost:8000`.
 
 ## Paso 4: probar extremo a extremo
 
-1. Abri la landing.
-2. Completa nombre y email.
+1. Abri la landing en un entorno de prueba autorizado.
+2. Completa nombre, email, producto, tipo de consulta y mensaje. Para este ejemplo, elegi `Nexar Comercio` y `Solicitar licencia`.
 3. Envia la solicitud.
 4. Verifica en Supabase que aparezca una fila en `solicitudes_demo`.
 5. Confirma que los valores por defecto sean:
@@ -79,12 +79,20 @@ Luego abre `http://localhost:8000`.
 
 - espera `DOMContentLoaded`
 - no rompe la pagina si el formulario no existe
-- valida `nombre` y `email`
+- valida `nombre`, `email`, `producto`, `plan_interes` y `mensaje` despues de quitar espacios; telefono es opcional
 - usa fallbacks por `id` o `name`
 - no envia `undefined`
 - deshabilita el boton mientras envia
 - limpia el formulario solo si el insert fue exitoso
 - muestra mensajes de estado en `#solicitud-demo-status`
+
+## Derivacion y campos enviados
+
+La comparacion de producto y tipo de consulta ignora mayusculas, acentos y espacios exteriores. Se usa `solicitudes_soporte` si el producto es `Solicitud de soporte` u `Otro / Consulta general`, o si el tipo de consulta es `Soporte técnico`, `Información general` u `Otra consulta`. Por lo tanto, las consultas generales, incluidas las de sistemas a medida, digitalizacion y automatizacion que usan `Otro / Consulta general`, llegan a soporte. Las demas combinaciones llegan a `solicitudes_demo`.
+
+- A `solicitudes_demo`: `nombre`, `email`, `telefono`, `negocio`, `producto`, `plan_interes`, `mensaje`, `estado` (`pendiente`), `origen` (`web`) y `leida` (`false`).
+- A `solicitudes_soporte`: `nombre`, `email`, `whatsapp` (telefono), `negocio`, `producto`, `motivo`, `mensaje`, `plan` (tipo de consulta), `estado` (`pendiente`) y `technical_details` con `origen` (`web`), `telefono` y `plan_interes`.
+- En soporte, `motivo` es `otro` para `Otra consulta`, `licencia` para `Solicitar licencia` y `consulta` en los demas casos. Los datos opcionales vacios se envian como `null`; la home no tiene campo de negocio.
 
 ## Integracion con Nexar Admin
 
