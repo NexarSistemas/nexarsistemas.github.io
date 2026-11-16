@@ -36,15 +36,16 @@ test("Inicio conserva el ancla histórica y enlaza directamente a precios", () =
   assert.match(web, /Todos los valores son desde\. El precio final depende del alcance, las funcionalidades, las integraciones y los servicios externos\. Los sistemas web a medida se presupuestan individualmente\./);
 });
 
-test("la home publica Nexar Play con sus accesos independientes", () => {
+test("la home conserva el acceso histórico al catálogo Nexar Play", () => {
   const html = read("index.html");
-
-  assert.match(html, /id="nexar-play"/);
-  assert.match(html, /Tetris Deluxe/);
-  assert.match(html, /href="https:\/\/tetris\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Tetris Deluxe/);
-  assert.match(html, /href="https:\/\/sudoku\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Sudoku Nexar/);
-  assert.match(html, /Nexar Ruta/);
-  assert.match(html, /href="https:\/\/ruta\.nexarsistemas\.com\.ar\/" target="_blank" rel="noopener">Jugar Nexar Ruta/);
+  const games = read("juegos/index.html");
+  assert.equal((html.match(/id="nexar-play"/g) || []).length, 1);
+  assert.match(html, /<footer[\s\S]*?href="\.\/juegos\/" id="nexar-play">Nexar Play<\/a>/);
+  assert.doesNotMatch(html, /nexar-play-card|Tetris Deluxe|Sudoku Nexar|Nexar Ruta/);
+  for (const [name, url] of [["Tetris Deluxe", "https://tetris.nexarsistemas.com.ar/"], ["Sudoku Nexar", "https://sudoku.nexarsistemas.com.ar/"], ["Nexar Ruta", "https://ruta.nexarsistemas.com.ar/"]]) {
+    assert.ok(games.includes(name));
+    assert.ok(games.includes(`href="${url}"`));
+  }
   assert.doesNotMatch(html, /Crucigrama Nexar|\.\/Tetris\/|nexar-sudoku|nexar-crucigrama|crucigrama\.nexarsistemas\.com\.ar/);
 });
 
