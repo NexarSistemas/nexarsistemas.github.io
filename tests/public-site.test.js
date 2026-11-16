@@ -764,7 +764,14 @@ test("la home separa productos propios de soluciones Nexar Sistemas", () => {
   const solutionsSection = html.match(/<section class="section section-soft" id="soluciones">([\s\S]*?)<\/section>/)?.[1] || "";
 
   assert.match(html, /<a href="\.\/soluciones\.html">Soluciones<\/a>/);
-  assert.match(html, /<a class="button" href="#soluciones">Conocer soluciones<\/a>/);
+  const hero = html.match(/<section class="hero" id="inicio">([\s\S]*?)<\/section>/)?.[1] || "";
+  assert.match(hero, /Desarrollamos soluciones digitales <em>para hacer más simple tu trabajo\.<\/em>/);
+  assert.match(hero, /Productos propios/);
+  assert.match(hero, /<a class="button" href="#contacto">Contanos qué necesitás<\/a>/);
+  assert.match(hero, /<a class="button button-outline" href="#casos">Ver nuestros trabajos<\/a>/);
+  assert.match(html, /id="soluciones"/);
+  assert.match(html, /id="contacto"/);
+  assert.match(html, /id="casos"/);
   assert.match(productsSection, /Productos propios/);
   assert.match(productsSection, /Nexar Comercio/);
   assert.match(productsSection, /Nexar Finanzas/);
@@ -824,7 +831,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   assert.doesNotMatch(ineditaCase, /implementación de Nexar Fidelización/);
   assert.doesNotMatch(ineditaCase, /instagram\.com\/ineditasanjuan/);
   assert.doesNotMatch(html, /Contarnos (tu|la) necesidad/);
-  assert.match(html, /Contanos tu necesidad/);
+  assert.match(html, /Contanos qué necesitás/);
 
   const sectionOrder = ["productos", "soluciones", "clientes", "fundador", "contacto"];
   const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
