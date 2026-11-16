@@ -810,8 +810,23 @@ test("la navegación principal prioriza el recorrido comercial", () => {
 
   assert.match(html, /<section class="section founder-section" id="fundador"/);
   assert.match(html, /<a href="\.\/juegos\/">Nexar Play<\/a>/);
-  assert.match(html, /href="\.\/nexar-comercio\.html#planes">Ver planes de Comercio/);
-  assert.match(html, /href="\.\/nexar-finanzas\.html#planes">Ver planes de Finanzas/);
+  const products = html.match(/<section class="section" id="productos">([\s\S]*?)<\/section>/)?.[1] || "";
+  assert.equal((products.match(/class="product-card(?: finance-card)?"/g) || []).length, 3);
+  for (const product of ["comercio", "finanzas", "fidelizacion"]) {
+    assert.match(products, new RegExp(`href="\\./nexar-${product}\\.html"`));
+  }
+  for (const anchor of ["comparacion", "planes"]) {
+    assert.equal((html.match(new RegExp(`id="${anchor}"`, "g")) || []).length, 1);
+    assert.match(products, new RegExp(`id="${anchor}"`));
+    assert.doesNotMatch(html, new RegExp(`<section[^>]*id="${anchor}"`));
+  }
+  assert.match(products, /multicomercio[\s\S]*desarrollo exclusivo[\s\S]*evaluación y disponibilidad/);
+  assert.match(products, /Demo gratuita durante 30 días/);
+  for (const product of ["comercio", "finanzas"]) {
+    const landing = read(`nexar-${product}.html`);
+    assert.match(landing, /id="planes"/);
+    for (const plan of ["Básica", "Pro", "Full"]) assert.ok(landing.includes(plan));
+  }
   assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
   assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
   assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
