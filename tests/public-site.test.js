@@ -159,7 +159,11 @@ test("las páginas comerciales comparten footer y accesos flotantes oficiales", 
     } else {
       assert.doesNotMatch(html, /href="\.\/"[^>]*>Vendedores<\/a>/, page);
     }
-    assert.match(html, new RegExp(`href="${rootPath}index\\.html#nexar-play"|href="#nexar-play"`), page);
+    if (page === "index.html") {
+      assert.match(html, /<footer[\s\S]*?href="\.\/juegos\/" id="nexar-play">Nexar Play<\/a>/);
+    } else {
+      assert.match(html, new RegExp(`href="${rootPath}index\\.html#nexar-play"|href="#nexar-play"`), page);
+    }
   }
 
   assert.doesNotMatch(read("404.html"), /class="social-actions-float"/);
@@ -174,7 +178,7 @@ function footerCommercialModel(html) {
   return columns.map((column) => ({
     title: column[1].match(/<strong>([^<]+)<\/strong>/)?.[1] || "",
     links: [...column[1].matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map((link) => ({
-      href: link[1].startsWith("#") ? `./index.html${link[1]}` : link[1],
+      href: link[1] === "./juegos/" ? "./index.html#nexar-play" : link[1].startsWith("#") ? `./index.html${link[1]}` : link[1],
       label: link[2].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
     }))
   }));
@@ -712,7 +716,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   const runtimeConfig = read("assets/js/runtime-config.js");
   const sql = read("docs/supabase_home_vendedores_novedades.sql");
 
-  assert.match(html, />Hablar por WhatsApp</);
+  assert.match(html, />WhatsApp: \+5492646616948<\/a>/);
   assert.match(html, /href="\.\/vendedores\/index\.html">Vendedores/);
   assert.doesNotMatch(html, /id="vendedores"|id="sellerApplicationForm"/);
   assert.match(vendorLanding, /<title>Vendedores \| Nexar Sistemas<\/title>/);
@@ -792,7 +796,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
     { label: "Productos", href: "#productos" },
     { label: "Soluciones", href: "./soluciones.html" },
     { label: "Casos", href: "#casos" },
-    { label: "Nexar", href: "#fundador" },
+    { label: "Sobre Nexar", href: "#fundador" },
     { label: "Contacto", href: "#contacto" }
   ];
 
@@ -807,6 +811,14 @@ test("la navegación principal prioriza el recorrido comercial", () => {
     assert.deepEqual(links, primaryNavigation);
     assert.doesNotMatch(nav, /href="#planes">Planes<\/a>/);
   }
+  const allLinks = (nav) => [...nav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g)]
+    .map((match) => ({ label: match[2].trim(), href: match[1] }));
+  assert.deepEqual(allLinks(desktopNav), primaryNavigation);
+  assert.deepEqual(allLinks(mobileNav), [...primaryNavigation,
+    { label: "Preguntas", href: "#preguntas" },
+    { label: "Nexar Play", href: "./juegos/" },
+    { label: "Vendedores", href: "./vendedores/index.html" }
+  ]);
 
   assert.match(html, /<section class="section founder-section" id="fundador"/);
   assert.match(html, /<a href="\.\/juegos\/">Nexar Play<\/a>/);
@@ -827,7 +839,7 @@ test("la navegación principal prioriza el recorrido comercial", () => {
     assert.match(landing, /id="planes"/);
     for (const plan of ["Básica", "Pro", "Full"]) assert.ok(landing.includes(plan));
   }
-  assert.match(html, /href="#nexar-play">Nexar Play<\/a>/);
+  assert.match(html, /href="\.\/juegos\/" id="nexar-play">Nexar Play<\/a>/);
   assert.match(html, /<a class="header-vendor-link" href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
   assert.match(html, /<nav class="mobile-nav-links"[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
   assert.match(html, /<footer class="site-footer">[\s\S]*?href="\.\/vendedores\/index\.html">Vendedores<\/a>/);
@@ -853,6 +865,24 @@ test("la navegación principal prioriza el recorrido comercial", () => {
   const sectionOffsets = sectionOrder.map((id) => html.indexOf(`id="${id}"`));
   assert.ok(sectionOffsets.every((offset) => offset >= 0));
   assert.deepEqual([...sectionOffsets].sort((a, b) => a - b), sectionOffsets);
+});
+
+test("la home conserva preguntas, consentimiento y contacto accesible", () => {
+  const html = read("index.html");
+  const faq = html.match(/<section class="section" id="preguntas">([\s\S]*?)<\/section>/)?.[1] || "";
+  assert.deepEqual([...faq.matchAll(/<summary>([^<]+)<\/summary>/g)].map((m) => m[1]), [
+    "¿Realizan webs para profesionales?", "¿Las webs tienen un precio fijo?", "¿Cómo solicito más información?"
+  ]);
+  for (const id of ["fundador", "preguntas", "contacto", "productos", "casos", "comparacion", "planes", "clientes", "servicios-web", "nexar-play"]) {
+    assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, id);
+  }
+  assert.match(html, /<form class="newsletter-form" id="newsletterForm" novalidate>[\s\S]*?id="newsletter-status" aria-live="polite"[\s\S]*?id="newsletter-email"[^>]*required[\s\S]*?id="newsletter-consent" name="consentimiento" required/);
+  assert.match(html, /href="https:\/\/wa\.me\/5492646616948"[^>]*>\s*<span[^>]*>W<\/span>WhatsApp: \+5492646616948<\/a>/);
+  assert.doesNotMatch(html, /<section class="final-cta">/);
+  const css = read("css/site.css");
+  assert.match(css, /:focus-visible/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /\.home-page :is\([^)]*#contacto[^)]*\)\s*\{\s*scroll-margin-top: 88px/);
 });
 
 test("la página de soluciones presenta una propuesta orientada a problemas reales", () => {

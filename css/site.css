@@ -81,6 +81,10 @@ a {
     margin: 0 auto;
 }
 
+.home-page :is(#productos, #soluciones, #casos, #fundador, #contacto, #preguntas, #servicios-web, #comparacion, #planes, #clientes, #nexar-play) {
+    scroll-margin-top: 88px;
+}
+
 .site-header {
     position: sticky;
     top: 0;
@@ -1133,6 +1137,8 @@ a {
 }
 
 .newsletter-section {
+    padding-top: 45px;
+    padding-bottom: 45px;
     background: var(--white);
 }
 
@@ -1210,11 +1216,11 @@ a {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
     align-items: center;
-    gap: 72px;
-    padding: 42px;
+    gap: 40px;
+    padding: 32px;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: var(--mint);
+    background: var(--white);
 }
 
 .newsletter-inner h2 {
