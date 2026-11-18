@@ -2097,6 +2097,39 @@ a {
     }
 }
 
+/* Microinteracciones exclusivas de la página principal. */
+@media (prefers-reduced-motion: no-preference) {
+    .home-page :is(.product-card, .feature-card, .case-card) {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    @media (hover: hover) {
+        .home-page :is(.product-card, .feature-card, .case-card):hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(11, 34, 57, 0.16);
+        }
+    }
+
+    .home-page a:not(.button):not(.social-action),
+    .home-page button:not(.button) {
+        transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    @media screen {
+        .home-page .section.reveal-pending {
+            opacity: 0;
+        }
+    }
+
+    .home-page .section.reveal-pending:focus-within {
+        opacity: 1;
+    }
+
+    .home-page .section.reveal-ready {
+        transition: opacity 0.45s ease;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html {
         scroll-behavior: auto;
