@@ -2115,8 +2115,10 @@ a {
         transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
 
-    .home-page .section.reveal-pending {
-        opacity: 0;
+    @media screen {
+        .home-page .section.reveal-pending {
+            opacity: 0;
+        }
     }
 
     .home-page .section.reveal-pending:focus-within {

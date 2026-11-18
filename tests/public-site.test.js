@@ -1012,3 +1012,12 @@ test("IndexNow conserva una clave pública y un workflow posterior al despliegue
   assert.match(workflow, /scripts\/indexnow-select\.js/);
   assert.match(workflow, /INDEXNOW_DRY_RUN/);
 });
+
+test("las secciones pendientes solo se ocultan en pantalla, no al imprimir", () => {
+  const css = read("css/site.css");
+  const opacityRules = [...css.matchAll(/([^{}]+)\{\s*opacity:\s*0\s*;\s*}/g)]
+    .filter((match) => match[1].includes(".section.reveal-pending"));
+
+  assert.equal(opacityRules.length, 1);
+  assert.match(css, /@media screen\s*\{\s*\.home-page \.section\.reveal-pending\s*\{\s*opacity:\s*0\s*;\s*}\s*}/);
+});
