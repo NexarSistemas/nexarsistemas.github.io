@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const runtimeConfig = window.NEXAR_RUNTIME_CONFIG || {};
-  const HOME_FORMS_ENDPOINT = typeof runtimeConfig.getFunctionUrl === "function"
-    ? runtimeConfig.getFunctionUrl("home-form-submissions")
-    : "https://nexarsistemas.com.ar/.netlify/functions/home-form-submissions";
+  const HOME_FORMS_ENDPOINT = "https://nexarsistemas.netlify.app/.netlify/functions/home-form-submissions";
 
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

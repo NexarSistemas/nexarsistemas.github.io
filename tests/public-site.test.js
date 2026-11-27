@@ -739,7 +739,7 @@ test("la home mantiene los accesos y formularios comerciales nuevos", () => {
   assert.match(html, /Podés darte de baja cuando quieras\./);
   assert.match(html, /src="\.\/assets\/js\/runtime-config\.js"/);
   assert.match(html, /src="\.\/assets\/js\/home-forms\.js"/);
-  assert.match(frontendScript, /runtimeConfig\.getFunctionUrl\("home-form-submissions"\)/);
+  assert.match(frontendScript, /https:\/\/nexarsistemas\.netlify\.app\/\.netlify\/functions\/home-form-submissions/);
   assert.doesNotMatch(frontendScript, /\/rest\/v1\//);
   assert.doesNotMatch(frontendScript, /anonKey|service_role|RESEND_API_KEY/i);
   assert.doesNotMatch(frontendScript, /result\.duplicate/);
