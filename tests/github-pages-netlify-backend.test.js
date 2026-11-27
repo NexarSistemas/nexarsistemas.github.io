@@ -53,17 +53,65 @@ test("runtime-config resuelve el backend según el host", () => {
   );
 });
 
-test("home usa la URL centralizada del backend y el portal usa Supabase Auth", () => {
+test("home usa el endpoint de contingencia y el portal usa Supabase Auth", () => {
   const homeScript = read("assets/js/home-forms.js");
   const portalScript = read("vendedores/js/portal-vendedor.js");
   const hostScript = read("vendedores/js/portal-host.js");
 
-  assert.match(homeScript, /runtimeConfig\.getFunctionUrl\("home-form-submissions"\)/);
+  assert.match(homeScript, /https:\/\/nexarsistemas\.netlify\.app\/\.netlify\/functions\/home-form-submissions/);
   assert.match(portalScript, /signInWithPassword/);
   assert.match(portalScript, /resetPasswordForEmail/);
   assert.doesNotMatch(portalScript, /getFunctionEndpoint/);
   assert.doesNotMatch(homeScript, /window\.location\.replace/);
   assert.doesNotMatch(hostScript, /window\.location\.replace/);
+});
+
+for (const [hostname, origin, endpoint] of [
+  ["nexarsistemas.com.ar", "https://nexarsistemas.com.ar", "https://nexarsistemas.netlify.app"],
+  ["localhost", "http://localhost:8000", "http://localhost:8000"],
+  ["127.0.0.1", "http://127.0.0.1:8888", "http://127.0.0.1:8888"],
+  ["[::1]", "http://[::1]:8888", "http://[::1]:8888"]
+]) test(`ambos formularios usan el backend correcto en ${hostname}`, async () => {
+  const submissions = [];
+  const forms = {};
+  function form(elements) {
+    const button = { textContent: "Enviar", disabled: false };
+    return {
+      elements,
+      querySelector: () => button,
+      addEventListener: (_event, handler) => { formHandler.set(elements, handler); },
+      reset() {}
+    };
+  }
+  const formHandler = new Map();
+  forms.sellerApplicationForm = form({
+    nombre: { value: "Ana Ejemplo" }, email: { value: "ana@example.com" },
+    whatsapp: { value: "123456" }, localidad_provincia: { value: "San Juan" },
+    mensaje: { value: "" }
+  });
+  forms.newsletterForm = form({ email: { value: "ana@example.com" }, consentimiento: { checked: true } });
+  const status = { replaceChildren() {}, append() {} };
+  const context = {
+    window: { location: { hostname, origin } },
+    document: {
+      addEventListener: (_event, callback) => callback(),
+      getElementById: (id) => forms[id] || status,
+      createElement: () => ({})
+    },
+    fetch: async (url, options) => {
+      submissions.push({ url, body: JSON.parse(options.body) });
+      return { ok: true, json: async () => ({ success: true }) };
+    },
+    console
+  };
+  vm.runInNewContext(read("assets/js/runtime-config.js"), context);
+  vm.runInNewContext(read("assets/js/home-forms.js"), context);
+  for (const item of Object.values(forms)) await formHandler.get(item.elements)({ preventDefault() {} });
+  assert.deepEqual(submissions.map(({ url, body }) => [url, body.tipo]), [
+    [`${endpoint}/.netlify/functions/home-form-submissions`, "solicitud_vendedor"],
+    [`${endpoint}/.netlify/functions/home-form-submissions`, "suscripcion_novedades"]
+  ]);
+  assert.equal(submissions[1].body.consentimiento, true);
 });
 
 test("el helper CORS permite los orígenes esperados y rechaza el resto", () => {

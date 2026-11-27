@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const runtimeConfig = window.NEXAR_RUNTIME_CONFIG || {};
-  const HOME_FORMS_ENDPOINT = typeof runtimeConfig.getFunctionUrl === "function"
-    ? runtimeConfig.getFunctionUrl("home-form-submissions")
-    : "https://nexarsistemas.com.ar/.netlify/functions/home-form-submissions";
+  const runtimeConfig = window.NEXAR_RUNTIME_CONFIG;
+  const HOME_FORMS_ENDPOINT = runtimeConfig && runtimeConfig.backendOrigin !== window.location.origin
+    ? "https://nexarsistemas.netlify.app/.netlify/functions/home-form-submissions"
+    : runtimeConfig
+      ? runtimeConfig.getFunctionUrl("home-form-submissions")
+      : `${window.location.origin}/.netlify/functions/home-form-submissions`;
 
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
