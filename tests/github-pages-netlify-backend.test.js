@@ -66,7 +66,12 @@ test("home usa el endpoint de contingencia y el portal usa Supabase Auth", () =>
   assert.doesNotMatch(hostScript, /window\.location\.replace/);
 });
 
-test("ambos formularios envían al endpoint de contingencia", async () => {
+for (const [hostname, origin, endpoint] of [
+  ["nexarsistemas.com.ar", "https://nexarsistemas.com.ar", "https://nexarsistemas.netlify.app"],
+  ["localhost", "http://localhost:8000", "http://localhost:8000"],
+  ["127.0.0.1", "http://127.0.0.1:8888", "http://127.0.0.1:8888"],
+  ["[::1]", "http://[::1]:8888", "http://[::1]:8888"]
+]) test(`ambos formularios usan el backend correcto en ${hostname}`, async () => {
   const submissions = [];
   const forms = {};
   function form(elements) {
@@ -87,6 +92,7 @@ test("ambos formularios envían al endpoint de contingencia", async () => {
   forms.newsletterForm = form({ email: { value: "ana@example.com" }, consentimiento: { checked: true } });
   const status = { replaceChildren() {}, append() {} };
   const context = {
+    window: { location: { hostname, origin } },
     document: {
       addEventListener: (_event, callback) => callback(),
       getElementById: (id) => forms[id] || status,
@@ -98,11 +104,12 @@ test("ambos formularios envían al endpoint de contingencia", async () => {
     },
     console
   };
+  vm.runInNewContext(read("assets/js/runtime-config.js"), context);
   vm.runInNewContext(read("assets/js/home-forms.js"), context);
   for (const item of Object.values(forms)) await formHandler.get(item.elements)({ preventDefault() {} });
   assert.deepEqual(submissions.map(({ url, body }) => [url, body.tipo]), [
-    ["https://nexarsistemas.netlify.app/.netlify/functions/home-form-submissions", "solicitud_vendedor"],
-    ["https://nexarsistemas.netlify.app/.netlify/functions/home-form-submissions", "suscripcion_novedades"]
+    [`${endpoint}/.netlify/functions/home-form-submissions`, "solicitud_vendedor"],
+    [`${endpoint}/.netlify/functions/home-form-submissions`, "suscripcion_novedades"]
   ]);
   assert.equal(submissions[1].body.consentimiento, true);
 });
